@@ -49,4 +49,9 @@ public class InputData {
 		}
 		return false;
 	}
+	
+	@Override
+	public String toString() {
+		return time.toString() + " " + currentFloor + " " + direction.toString() + " " + destinationFloor;
+	}
 }
