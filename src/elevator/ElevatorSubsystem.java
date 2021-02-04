@@ -1,11 +1,19 @@
 package elevator;
 
-public class ElevatorSubsystem implements Runnable {
+import java.util.ArrayList;
 
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		
+import floor.InputData;
+
+public class ElevatorSubsystem  {
+
+	private ArrayList<InputData> elevatorScheduleBuffer;
+
+	public ArrayList<InputData> getElevatorScheduleBuffer() {
+		return elevatorScheduleBuffer;
 	}
 
+	public void setElevatorScheduleBuffer(ArrayList<InputData> elevatorScheduleBuffer) {
+		this.elevatorScheduleBuffer = elevatorScheduleBuffer;
+	}
+	
 }

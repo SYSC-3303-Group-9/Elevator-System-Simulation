@@ -4,8 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.List;
 
+import elevator.Elevator;
 import elevator.ElevatorSubsystem;
 import floor.FloorSubsystem;
 import floor.InputData;
@@ -18,9 +20,11 @@ public class Main {
 		FloorSubsystem floors = new FloorSubsystem();
 		ElevatorSubsystem elevators = new ElevatorSubsystem();
 		Scheduler scheduler = new Scheduler();
+		Elevator elevator = new Elevator(0);
 		
 		Thread floorThread = new Thread(floors);
-		Thread elevatorThread = new Thread(elevators);
+		//Thread elevatorThread = new Thread(elevators);
+		Thread elevatorThread = new Thread(elevator);
 		Thread schedulerThread = new Thread(scheduler);
 		
 		floorThread.start();
@@ -43,7 +47,10 @@ public class Main {
 			List<InputData> data = InputParser.parse(s);
 			for (InputData x : data) {
 				System.out.println(x);
+				elevator.move(x);
+				System.out.println(elevator.printLocation());
 			}
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
