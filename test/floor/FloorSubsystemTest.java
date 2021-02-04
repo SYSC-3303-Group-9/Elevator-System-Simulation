@@ -14,9 +14,16 @@ public class FloorSubsystemTest {
 	@Test
 	void shouldAddDataToBuffer() {
 		// arrange
-		Buffer buffer = new Buffer<InputData>();
+		Buffer<InputData> buffer = new Buffer<InputData>();
 		FloorSubsystem obj1 = new FloorSubsystem(buffer);
-
+		Thread th = new Thread(obj1);
+		th.start();
+		try {
+			th.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
 		// act
 		InputData result1 = new InputData(LocalTime.of(14, 5, 15, 0), 2, Direction.UP, 4);
 		InputData result2 = new InputData(LocalTime.of(1, 2, 3, 4), 1, Direction.UP, 2);

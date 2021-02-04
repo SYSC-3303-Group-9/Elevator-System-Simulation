@@ -10,28 +10,27 @@ import scheduler.Buffer;
 
 public class FloorSubsystem implements Runnable {
 
-	private Buffer<InputData> floorandSchedulerBuffer;
+	private Buffer<InputData> floorSchedulerBuffer;
 
-	public FloorSubsystem(Buffer<InputData> floorandSchedulerBuffer)
-	    {
-	        this.floorandSchedulerBuffer = floorandSchedulerBuffer;
-	    }
+	public FloorSubsystem(Buffer<InputData> floorSchedulerBuffer) {
+		this.floorSchedulerBuffer = floorSchedulerBuffer;
+	}
 
 	@Override
 	public void run() {
-		//Reads input data from the provided text file and adds each line of data to the Buffer 
-		//after converting it to a InputData type
-		File inputFile = new File(getClass().getResource("/input.txt").getFile());
-		BufferedReader reader = null;
+		// Reads input data from the provided text file and adds each line of data to
+		// the Buffer after converting it to a InputData type
 		try {
-			reader = new BufferedReader(new FileReader(inputFile));
+			File inputFile = new File(FloorSubsystem.class.getResource("/input.txt").getFile());
+			 BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+			
+			 List<InputData> data = InputParser.parse(reader);
+			for (InputData x : data) {
+				floorSchedulerBuffer.put(x);
+				System.out.println(x);
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-		}
-		List<InputData> data = InputParser.parse(reader);
-		for (InputData x : data) {
-			floorandSchedulerBuffer.put(x);
-			System.out.println(x);
 		}
 
 	}
