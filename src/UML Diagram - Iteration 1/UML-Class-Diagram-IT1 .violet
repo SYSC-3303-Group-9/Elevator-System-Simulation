@@ -5,7 +5,7 @@
    <object class="com.horstmann.violet.ClassNode" id="ClassNode0">
     <void property="attributes">
      <void property="text">
-      <string>- floorAndScheduleBuffer: Buffer</string>
+      <string>- floorAndSchedulerBuffer: Buffer</string>
      </void>
     </void>
     <void property="methods">
