@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.List;
 
-import main.Main;
 import scheduler.Buffer;
 
 public class FloorSubsystem implements Runnable {
@@ -20,6 +19,8 @@ public class FloorSubsystem implements Runnable {
 
 	@Override
 	public void run() {
+		//Reads input data from the provided text file and adds each line of data to the Buffer 
+		//after converting it to a InputData type
 		File inputFile = new File(getClass().getResource("/input.txt").getFile());
 		BufferedReader reader = null;
 		try {
