@@ -29,20 +29,6 @@ public class Buffer<T> {
 		notifyAll();
 	}
 	
-	/**
-	 * Puts the bufferItem at the specified index of the bufferStore ArrayList if possible, otherwise the bufferItem is just appended
-	 * @param index where bufferItem will be placed in bufferStore
-	 * @param bufferItem the item to place in bufferStore
-	 */
-	public synchronized void put(int index, T bufferItem) {
-		// Put the bufferItem at index in bufferStore, if out of bounds, put at end of bufferStore
-		try {
-			bufferStore.add(index, bufferItem);
-		} catch(IndexOutOfBoundsException e) {
-			bufferStore.add(bufferItem);
-		}
-		notifyAll();
-	}
 	
 	/**
 	 * Gets the first bufferItem in the bufferStore ArrayList
@@ -63,28 +49,5 @@ public class Buffer<T> {
 		return bufferItem;
 	}
 	
-	/**
-	 * Gets the bufferItem at the specified index, if the index provided is out of bounds, get the first element of bufferStore
-	 * @return element at index in bufferStore
-	 */
-	public synchronized T get(int index) {
-		T bufferItem = null;
-		// Wait thread until ArrayList is no longer empty
-		while(bufferStore.isEmpty() && isDisabled) {
-			try {
-				wait();
-			} catch(InterruptedException e) {}
-		}
-		if(!bufferStore.isEmpty()) {
-			// Get element at index, if unavailable, get first element
-			try {
-				bufferItem = bufferStore.remove(index);
-			} catch(IndexOutOfBoundsException e) {
-				bufferItem = bufferStore.remove(0);
-			}
-			
-		}
-		notifyAll();
-		return bufferItem;
-	}
+	
 }
