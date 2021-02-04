@@ -5,11 +5,9 @@ import java.util.ArrayList;
 public class Buffer<T> {
 	private T type;
 	private ArrayList<T> bufferStore;
-	private boolean readable;
 	
 	public Buffer() {
 		this.bufferStore = new ArrayList<T>();
-		this.readable = false;
 	}
 	
 	/**
@@ -18,7 +16,6 @@ public class Buffer<T> {
 	 */
 	public synchronized void put(T bufferItem) {
 		bufferStore.add(bufferItem);
-		readable = true;
 		notifyAll();
 	}
 	
@@ -34,7 +31,6 @@ public class Buffer<T> {
 		} catch(IndexOutOfBoundsException e) {
 			bufferStore.add(bufferItem);
 		}
-		readable = true;
 		notifyAll();
 	}
 	
@@ -44,14 +40,13 @@ public class Buffer<T> {
 	 */
 	public synchronized T get() {
 		T bufferItem;
-		// Wait thread until ArrayList is readable
-		while(!readable) {
+		// Wait thread until ArrayList is no longer empty
+		while(bufferStore.isEmpty()) {
 			try {
 				wait();
 			} catch(InterruptedException e) {}
 		}
 		bufferItem = bufferStore.remove(0);
-		if(bufferStore.isEmpty()) readable = false;
 		notifyAll();
 		return bufferItem;
 	}
@@ -62,8 +57,8 @@ public class Buffer<T> {
 	 */
 	public synchronized T get(int index) {
 		T bufferItem;
-		// Wait thread until ArrayList is readable
-		while(!readable) {
+		// Wait thread until ArrayList is no longer empty
+		while(bufferStore.isEmpty()) {
 			try {
 				wait();
 			} catch(InterruptedException e) {}
@@ -74,7 +69,6 @@ public class Buffer<T> {
 		} catch(IndexOutOfBoundsException e) {
 			bufferItem = bufferStore.remove(0);
 		}
-		if(bufferStore.isEmpty()) readable = false;
 		notifyAll();
 		return bufferItem;
 	}
