@@ -5,7 +5,17 @@ import java.util.ArrayList;
 public class Buffer<T> {
 	private T type;
 	private ArrayList<T> bufferStore;
+	private boolean isDisabled = true;
 	
+	public boolean isDisabled() {
+		return isDisabled;
+	}
+
+	public synchronized void setIsDisabled(boolean isDisabled) {
+		this.isDisabled = isDisabled;
+		this.notifyAll();
+	}
+
 	public Buffer() {
 		this.bufferStore = new ArrayList<T>();
 	}
@@ -39,15 +49,17 @@ public class Buffer<T> {
 	 * @return the first element in bufferStore
 	 */
 	public synchronized T get() {
-		T bufferItem;
+		T bufferItem = null;
 		// Wait thread until ArrayList is no longer empty
-		while(bufferStore.isEmpty()) {
+		while(bufferStore.isEmpty() && isDisabled) {
 			try {
 				wait();
 			} catch(InterruptedException e) {}
 		}
-		bufferItem = bufferStore.remove(0);
-		notifyAll();
+		if(!bufferStore.isEmpty()) {
+			bufferItem = bufferStore.remove(0);
+			notifyAll();
+		}
 		return bufferItem;
 	}
 	
@@ -56,18 +68,21 @@ public class Buffer<T> {
 	 * @return element at index in bufferStore
 	 */
 	public synchronized T get(int index) {
-		T bufferItem;
+		T bufferItem = null;
 		// Wait thread until ArrayList is no longer empty
-		while(bufferStore.isEmpty()) {
+		while(bufferStore.isEmpty() && isDisabled) {
 			try {
 				wait();
 			} catch(InterruptedException e) {}
 		}
-		// Get element at index, if unavailable, get first element
-		try {
-			bufferItem = bufferStore.remove(index);
-		} catch(IndexOutOfBoundsException e) {
-			bufferItem = bufferStore.remove(0);
+		if(!bufferStore.isEmpty()) {
+			// Get element at index, if unavailable, get first element
+			try {
+				bufferItem = bufferStore.remove(index);
+			} catch(IndexOutOfBoundsException e) {
+				bufferItem = bufferStore.remove(0);
+			}
+			
 		}
 		notifyAll();
 		return bufferItem;

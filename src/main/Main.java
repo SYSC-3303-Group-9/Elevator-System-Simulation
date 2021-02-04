@@ -18,15 +18,30 @@ public class Main {
 
 	public static void main(String[] args) {
 		FloorSubsystem floors = new FloorSubsystem();
-		ElevatorSubsystem elevators = new ElevatorSubsystem();
-		Scheduler scheduler = new Scheduler();
 		Elevator elevator = new Elevator(0);
+		ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem(elevator);
+		Scheduler scheduler = new Scheduler();
 		
 		Thread floorThread = new Thread(floors);
-		//Thread elevatorThread = new Thread(elevators);
-		Thread elevatorThread = new Thread(elevator);
+		Thread elevatorThread = new Thread(elevatorSubsystem);
 		Thread schedulerThread = new Thread(scheduler);
 		
+		// TODO Remove this once parsing is hooked up to FloorSubsystem.
+		try {
+			File fs = new File(Main.class.getResource("/input.txt").getFile());
+			BufferedReader s = new BufferedReader(new FileReader(fs));
+			List<InputData> data = InputParser.parse(s);
+			for (InputData x : data) {
+				System.out.println(x);
+				elevatorSubsystem.getScheduleElevatorBuffer().put(x);
+			}
+			elevatorSubsystem.getScheduleElevatorBuffer().setIsDisabled(false);	//No longer disabled
+			
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+				
 		floorThread.start();
 		elevatorThread.start();
 		schedulerThread.start();
@@ -37,21 +52,6 @@ public class Main {
 			schedulerThread.join();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		// TODO Remove this once parsing is hooked up to FloorSubsystem.
-		try {
-			File fs = new File(Main.class.getResource("/input.txt").getFile());
-			BufferedReader s = new BufferedReader(new FileReader(fs));
-			List<InputData> data = InputParser.parse(s);
-			for (InputData x : data) {
-				System.out.println(x);
-				elevator.move(x);
-				System.out.println(elevator.printLocation());
-			}
-			
-		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 		
