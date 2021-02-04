@@ -6,47 +6,26 @@ import scheduler.Buffer;
 public class ElevatorSubsystem implements Runnable {
 	
 	private Elevator elevator;
-	private Buffer<InputData> scheduleElevatorBuffer;
-	private Buffer<InputData> elevatorScheduleBuffer;
+	private Buffer<InputData> scheduleToElevatorBuffer;
+	private Buffer<InputData> elevatorToScheduleBuffer;
 	
-	public Buffer<InputData> getElevatorScheduleBuffer() {
-		return elevatorScheduleBuffer;
-	}
-
-	public void setElevatorScheduleBuffer(Buffer<InputData> elevatorScheduleBuffer) {
-		this.elevatorScheduleBuffer = elevatorScheduleBuffer;
-	}
-
-	public Buffer<InputData> getScheduleElevatorBuffer() {
-		return scheduleElevatorBuffer;
-	}
-
-	public void setScheduleElevatorBuffer(Buffer<InputData> scheduleElevatorBuffer) {
-		this.scheduleElevatorBuffer = scheduleElevatorBuffer;
-	}
 	
-	public ElevatorSubsystem(Elevator elevator) {
+	public ElevatorSubsystem(Elevator elevator, Buffer<InputData> scheduleToElevatorBuffer, Buffer<InputData> elevatorToScheduleBuffer) {
 		this.elevator = elevator;
-		this.scheduleElevatorBuffer = new Buffer<InputData>();
-		this.elevatorScheduleBuffer = new Buffer<InputData>();
+		this.scheduleToElevatorBuffer = scheduleToElevatorBuffer;
+		this.elevatorToScheduleBuffer = elevatorToScheduleBuffer;
 	}
 
 	@Override
 	public void run() {
 
 		while(true) {
-			if(scheduleElevatorBuffer.isDisabled()) {
+			InputData currTask = scheduleToElevatorBuffer.get();
+			if(currTask == null) {
 				break;
 			}
-			else {
-				InputData currTask = scheduleElevatorBuffer.get();
-				if(currTask == null) {
-					break;
-				}
-				elevator.move(currTask);
-				elevatorScheduleBuffer.put(currTask);
-			}
-			
+			elevator.move(currTask);
+			elevatorToScheduleBuffer.put(currTask);
 		}
 		System.out.println("DONE MOVING ELEVATOR");
 	}

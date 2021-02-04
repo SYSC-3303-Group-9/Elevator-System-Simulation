@@ -12,6 +12,7 @@ import elevator.ElevatorSubsystem;
 import floor.FloorSubsystem;
 import floor.InputData;
 import floor.InputParser;
+import scheduler.Buffer;
 import scheduler.Scheduler;
 
 public class Main {
@@ -19,7 +20,9 @@ public class Main {
 	public static void main(String[] args) {
 		FloorSubsystem floors = new FloorSubsystem();
 		Elevator elevator = new Elevator(0);
-		ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem(elevator);
+		Buffer<InputData> scheduleToElevatorBuffer = new Buffer<InputData>();
+		Buffer<InputData> elevatorToScheduleBuffer = new Buffer<InputData>();
+		ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem(elevator, scheduleToElevatorBuffer, elevatorToScheduleBuffer);
 		Scheduler scheduler = new Scheduler();
 		
 		Thread floorThread = new Thread(floors);
@@ -28,14 +31,17 @@ public class Main {
 		
 		// TODO Remove this once parsing is hooked up to FloorSubsystem.
 		try {
+			
+			
 			File fs = new File(Main.class.getResource("/input.txt").getFile());
 			BufferedReader s = new BufferedReader(new FileReader(fs));
 			List<InputData> data = InputParser.parse(s);
 			for (InputData x : data) {
 				System.out.println(x);
-				elevatorSubsystem.getScheduleElevatorBuffer().put(x);
+				scheduleToElevatorBuffer.put(x);
+				
 			}
-			elevatorSubsystem.getScheduleElevatorBuffer().setIsDisabled(false);	//No longer disabled
+			scheduleToElevatorBuffer.setIsDisabled(true);
 			
 			
 		} catch (FileNotFoundException e) {

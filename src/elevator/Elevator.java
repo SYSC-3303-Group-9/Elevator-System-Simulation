@@ -4,8 +4,6 @@ import floor.InputData;
 
 /**
  * Moves from floor to floor based on the data it has been sent.
- * @author Chris
- *
  */
 public class Elevator  {
 
@@ -41,7 +39,7 @@ public class Elevator  {
 	
 	/**
 	 * Prints the movement of the elevator
-	 * @return The
+	 * @return The elevator's movement
 	 */
 	public String printLocation() {
 		return this + " going " + currTask.getDirection() + ". Left from floor " + currTask.getCurrentFloor() +

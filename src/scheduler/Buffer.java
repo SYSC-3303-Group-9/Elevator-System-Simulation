@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Buffer<T> {
 	private T type;
 	private ArrayList<T> bufferStore;
-	private boolean isDisabled = true;
+	private boolean isDisabled = false;
 	
 	public boolean isDisabled() {
 		return isDisabled;
@@ -51,7 +51,7 @@ public class Buffer<T> {
 	public synchronized T get() {
 		T bufferItem = null;
 		// Wait thread until ArrayList is no longer empty
-		while(bufferStore.isEmpty() && isDisabled) {
+		while(bufferStore.isEmpty() && !isDisabled) {
 			try {
 				wait();
 			} catch(InterruptedException e) {}
