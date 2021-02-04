@@ -29,6 +29,7 @@ public class FloorSubsystem implements Runnable {
 				floorSchedulerBuffer.put(x);
 				System.out.println(x);
 			}
+			floorSchedulerBuffer.setIsDisabled(true);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
