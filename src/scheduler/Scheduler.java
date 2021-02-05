@@ -25,8 +25,13 @@ public class Scheduler implements Runnable {
 		// On future deliverables, will have to have more complex scheduling
 		while(true) {
 			input = floorToSchedulerBuffer.get();
+			if (input == null) {
+				break;
+			}
 			schedulerToElevatorBuffers.get(0).put(input);
 		}
+		
+		schedulerToElevatorBuffers.get(0).setIsDisabled(true);
 	}
 
 }
