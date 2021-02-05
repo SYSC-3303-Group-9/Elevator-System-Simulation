@@ -31,28 +31,6 @@ class BufferTest {
 		assertEquals(1, buffer.get());
 	}
 
-	@Test
-	void testGetAtIndex() {
-		buffer.put(testInteger1);
-		buffer.put(testInteger2);
-		buffer.put(testInteger3);
-		assertEquals(2, buffer.get(1));
-	}
-
-	@Test
-	void testGetAtIndexOutOfBounds() {
-		buffer.put(testInteger1);
-		buffer.put(testInteger2);
-		buffer.put(testInteger3);
-		assertEquals(1, buffer.get(10));
-	}
-
-	@Test
-	void testPutAtIndexOutOfBounds() {
-		buffer.put(3, testInteger1);
-		buffer.put(testInteger2);
-		buffer.put(testInteger3);
-		assertEquals(1, buffer.get());
-	}
+	
 
 }

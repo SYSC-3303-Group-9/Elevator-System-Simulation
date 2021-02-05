@@ -1,5 +1,6 @@
 package main;
 
+import elevator.Elevator;
 import elevator.ElevatorSubsystem;
 import floor.FloorSubsystem;
 import floor.InputData;
@@ -11,7 +12,10 @@ public class Main {
 	public static void main(String[] args) {
 		Buffer<InputData> floorSchedulerBuffer = new Buffer<InputData>();
 		FloorSubsystem floors = new FloorSubsystem(floorSchedulerBuffer);
-		ElevatorSubsystem elevators = new ElevatorSubsystem();
+		Buffer<InputData> scheduleToElevatorBuffer = new Buffer<InputData>();
+		Buffer<InputData> elevatorToScheduleBuffer = new Buffer<InputData>();
+		Elevator elevator = new Elevator(0);
+		ElevatorSubsystem elevators = new ElevatorSubsystem(elevator, floorSchedulerBuffer, elevatorToScheduleBuffer);
 		Scheduler scheduler = new Scheduler();
 
 		Thread floorThread = new Thread(floors);
