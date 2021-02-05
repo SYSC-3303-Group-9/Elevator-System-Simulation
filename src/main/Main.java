@@ -17,7 +17,7 @@ public class Main {
 		FloorSubsystem floors = new FloorSubsystem(floorSchedulerBuffer);
 		Buffer<InputData> scheduleToElevatorBuffer = new Buffer<InputData>();
 		Buffer<InputData> elevatorToScheduleBuffer = new Buffer<InputData>();
-		scheduleToElevatorBuffers.add(elevatorToScheduleBuffer);
+		scheduleToElevatorBuffers.add(scheduleToElevatorBuffer);
 		Elevator elevator = new Elevator(0);
 		ElevatorSubsystem elevators = new ElevatorSubsystem(elevator, scheduleToElevatorBuffer, elevatorToScheduleBuffer);
 		Scheduler scheduler = new Scheduler(scheduleToElevatorBuffers, floorSchedulerBuffer);
