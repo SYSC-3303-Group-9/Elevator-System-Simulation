@@ -1,10 +1,29 @@
+# Contents
+- [Contents](#contents)
+- [Elevator-System-Simulation](#elevator-system-simulation)
+- [Authors](#authors)
+- [Iteration 1](#iteration-1)
+  - [Folders/Files included](#foldersfiles-included)
+  - [Set Up Instructions](#set-up-instructions)
+  - [Test Instructions](#test-instructions)
+  - [Team Responsibilities](#team-responsibilities)
+  - [Detailed Set Up](#detailed-set-up)
+
+
 # Elevator-System-Simulation
 This project is a design and implementation of an elevator control system and simulator. The system consist of an elevator controller (the Scheduler), a simulator for the elevator cars (which includes, the lights, buttons, doors and motors) and a simulator for the floors (which includes, buttons, lights and last, but not least, people who are too lazy to take the stairs). The elevator controller is multi-threaded since it will handle more than one car at a time. The simulation is configurable in terms of the number of floors, the number number of elevators, the time it takes to open and close the doors, and the time it takes to move between floors. The simulation will run on multiple computers as part of the project involves running the controller on its own machine with the simulator(s) running on a separate computer. The code is written in Java, using the Eclipse IDE.
+
+# Authors
+ - Aubin Musingya
+ - Chris Nguyen
+ - James La Novara-Gsell
+ - Liya Abebe
+ - Noah Mank
 
 
 # Iteration 1
 
-## Folders/Files included:
+## Folders/Files included
 
     * resources
         + input.txt
@@ -28,8 +47,9 @@ This project is a design and implementation of an elevator control system and si
             + UML-Sequence-Diagram-IT1 .violet
     
     * test
-        - elevator
+        - elevator 
             + ElevatorSubsystemTest.java
+            + Elevator.java
         - floor
             + FloorSubsystemTest.java
             + InputDataTest.java
@@ -38,7 +58,21 @@ This project is a design and implementation of an elevator control system and si
             + SchedulerTest.java
             + BufferTest.java
 
-## Responsibilities:
+## Set Up Instructions
+
+ 1. Download zip file and unzip
+ 2. Open unziped file through the Eclsipse file system
+ 3. Open the Main class inside the 'main' package
+ 4. Run Main.java as 1 Java application
+
+## Test Instructions
+Tests are written and run with JUnit 5. The 'test' folder contains a test package for each subsystem
+
+ 1. Upon opening the test folder (In Eclipse), select subsystem package
+ 2. Open .java file and run as 1 JUnit test
+
+
+## Team Responsibilities
 
     * Aubin
         + UML class diagram
@@ -60,6 +94,6 @@ This project is a design and implementation of an elevator control system and si
         + Implementing Scheduler class
         + Writing Scheduler test
 
-## Detailed set up:
+## Detailed Set Up
 
 The three thread classes created are FloorSubsystem, Scheduler and ElevatorSystem. A template Buffer object class was   created from which multiple buffer objects are created. The FloorSubsystem class reads input data from the provided file   (input.txt) and puts each line of data into a buffer object shared with the Scheduler class. Following that, the Scheduler    class gets the data from the shared buffer object and processes it. The Scheduler class will contain a buffer object for    each elevatorSubsystem that exists. These buffer objects are shared with the ElevatorSubsystem. Once the data is processed,   the scheduler will put elevator schedules into the corresponding buffer objects and notify the corresponding    ElevatorSubsystem. Since each elevator will have its own subsystem, they will be instructed to move by the corresponding   ElevatorSubsystem. The elevator will then be responsible for indicating which floors it leaves and which floors in arrives   on.
