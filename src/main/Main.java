@@ -19,7 +19,7 @@ public class Main {
 		Buffer<InputData> elevatorToScheduleBuffer = new Buffer<InputData>();
 		scheduleToElevatorBuffers.add(elevatorToScheduleBuffer);
 		Elevator elevator = new Elevator(0);
-		ElevatorSubsystem elevators = new ElevatorSubsystem(elevator, floorSchedulerBuffer, elevatorToScheduleBuffer);
+		ElevatorSubsystem elevators = new ElevatorSubsystem(elevator, scheduleToElevatorBuffer, elevatorToScheduleBuffer);
 		Scheduler scheduler = new Scheduler(scheduleToElevatorBuffers, floorSchedulerBuffer);
 
 		Thread floorThread = new Thread(floors);
