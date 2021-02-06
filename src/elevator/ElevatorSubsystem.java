@@ -6,27 +6,30 @@ import scheduler.Buffer;
 public class ElevatorSubsystem implements Runnable {
 	
 	private Elevator elevator;
-	private Buffer<InputData> scheduleToElevatorBuffer;
-	private Buffer<InputData> elevatorToScheduleBuffer;
+	private Buffer<InputData> schedulerToElevatorBuffer;
+	private Buffer<InputData> elevatorToSchedulerBuffer;
 	
 	
-	public ElevatorSubsystem(Elevator elevator, Buffer<InputData> scheduleToElevatorBuffer, Buffer<InputData> elevatorToScheduleBuffer) {
+	public ElevatorSubsystem(Elevator elevator, Buffer<InputData> schedulerToElevatorBuffer, Buffer<InputData> elevatorToSchedulerBuffer) {
 		this.elevator = elevator;
-		this.scheduleToElevatorBuffer = scheduleToElevatorBuffer;
-		this.elevatorToScheduleBuffer = elevatorToScheduleBuffer;
+		this.schedulerToElevatorBuffer = schedulerToElevatorBuffer;
+		this.elevatorToSchedulerBuffer = elevatorToSchedulerBuffer;
 	}
 
 	@Override
 	public void run() {
-
 		while(true) {
-			InputData currTask = scheduleToElevatorBuffer.get();
+			// Get new task from the scheduler.
+			InputData currTask = schedulerToElevatorBuffer.get();
+			
+			// If the buffer was disabled and returned null, stop execution.
 			if(currTask == null) {
 				break;
 			}
+			
+			// Move the elevator and notify the scheduler.
 			elevator.move(currTask);
-			elevatorToScheduleBuffer.put(currTask);
+			elevatorToSchedulerBuffer.put(currTask);
 		}
-		System.out.println("DONE MOVING ELEVATOR");
 	}
 }

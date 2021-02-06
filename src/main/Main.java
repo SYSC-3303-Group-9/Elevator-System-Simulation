@@ -1,29 +1,20 @@
 package main;
 
-import java.util.ArrayList;
-
-import elevator.Elevator;
 import elevator.ElevatorSubsystem;
 import floor.FloorSubsystem;
-import floor.InputData;
-import scheduler.Buffer;
 import scheduler.Scheduler;
 
 public class Main {
 
 	public static void main(String[] args) {
-		ArrayList<Buffer<InputData>> scheduleToElevatorBuffers = new ArrayList<Buffer<InputData>>();
-		Buffer<InputData> floorSchedulerBuffer = new Buffer<InputData>();
-		FloorSubsystem floors = new FloorSubsystem(floorSchedulerBuffer);
-		Buffer<InputData> scheduleToElevatorBuffer = new Buffer<InputData>();
-		Buffer<InputData> elevatorToScheduleBuffer = new Buffer<InputData>();
-		scheduleToElevatorBuffers.add(scheduleToElevatorBuffer);
-		Elevator elevator = new Elevator(0);
-		ElevatorSubsystem elevators = new ElevatorSubsystem(elevator, scheduleToElevatorBuffer, elevatorToScheduleBuffer);
-		Scheduler scheduler = new Scheduler(scheduleToElevatorBuffers, floorSchedulerBuffer);
+		SystemBuilder builder = new SystemBuilder();
+		
+		Scheduler scheduler = builder.buildScheduler();
+		FloorSubsystem floor = builder.buildFloorSubsystem();
+		ElevatorSubsystem elevator = builder.addElevator();
 
-		Thread floorThread = new Thread(floors);
-		Thread elevatorThread = new Thread(elevators);
+		Thread floorThread = new Thread(floor);
+		Thread elevatorThread = new Thread(elevator);
 		Thread schedulerThread = new Thread(scheduler);
 
 		floorThread.start();
@@ -35,7 +26,6 @@ public class Main {
 			elevatorThread.join();
 			schedulerThread.join();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
