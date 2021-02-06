@@ -85,6 +85,7 @@ Tests are written and run with JUnit 5. The 'test' folder contains a test packag
     * James
         + Implementing InputParser class
         + Writing InputParser test
+        + Integration testing
     * Liya
         + Implementing FloorSubsystem class
         + Writing FloorSubsystem Test
