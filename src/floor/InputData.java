@@ -4,14 +4,23 @@ import java.time.LocalTime;
 
 import elevator.Direction;
 
+/**
+ * Represents an elevator request.
+ */
 public class InputData {
 	private LocalTime time;
 	private int currentFloor;
 	private Direction direction;
 	private int destinationFloor;
 	
+	/**
+	 * Creates a new instance of the InputData class.
+	 * @param time The time of the event.
+	 * @param currentFloor The floor that needs servicing.
+	 * @param direction The direction the elevator must move.
+	 * @param destinationFloor The floor that the elevator must reach.
+	 */
 	public InputData(LocalTime time, int currentFloor, Direction direction, int destinationFloor) {
-		super();
 		this.time = time;
 		this.currentFloor = currentFloor;
 		this.direction = direction;

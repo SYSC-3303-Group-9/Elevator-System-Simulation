@@ -6,45 +6,34 @@ import floor.InputData;
  * Moves from floor to floor based on the data it has been sent.
  */
 public class Elevator  {
-
-	private InputData currTask;
-	private int currFloor;
-	
-	/**
-	 * Setters and Getters
-	 * @return
-	 */
-	public InputData getCurrTask() {return currTask;}
-	public void setCurrTask(InputData currTask) {this.currTask = currTask;}
-	public int getCurrFloor() {return currFloor;}
-	public void setCurrFloor(int currentFloor) {this.currFloor = currentFloor;}
+	private int id;
 
 	/**
-	 * Class constructor
-	 * @param currFloor The current floor that the elevator is at.
+	 * Creates a new instance of the Elevator class.
+	 * @param id The unique identifier of this elevator instance.
 	 */
-	public Elevator(int currFloor) {
-		this.currFloor = currFloor;
+	public Elevator(int id) {
+		this.id = id;
 	}
 	
 	/**
-	 * Moves the elevator to a specified floor and prints the floor it left and the destination floor
-	 * @param input	The input contains the destination to elevator needs to move to amongst other data
+	 * Moves the elevator to a specified floor and prints the floor it left and the destination floor.
+	 * @param input	The input contains the destination the elevator needs to move to amongst other data.
 	 */
 	public void move(InputData input) {
-		currTask = input;
-		currFloor = input.getDestinationFloor();
-		System.out.println(printLocation());
+		System.out.println(getLocation(input));
 	}
 	
 	/**
-	 * Prints the movement of the elevator
-	 * @return The elevator's movement
+	 * Gets the movement of the elevator.
+	 * @return The elevator's movement.
 	 */
-	public String printLocation() {
-		return this + " going " + currTask.getDirection() + ". Left from floor " + currTask.getCurrentFloor() +
-				" and has arrived at " + currTask.getDestinationFloor();
+	public String getLocation(InputData task) {
+		return this + " " + task.getCurrentFloor() + " " + task.getDirection() + " " + task.getDestinationFloor();
 	}
 
-		
+	@Override
+	public String toString() {
+		return "[E" + Integer.toString(id) + "]";
+	}
 }

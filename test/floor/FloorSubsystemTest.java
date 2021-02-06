@@ -12,11 +12,16 @@ import scheduler.Buffer;
 public class FloorSubsystemTest {
 
 	@Test
-	void shouldAddDataToBuffer() {
+	void run_shouldAddDataToBuffer() {
 		// arrange
-		Buffer<InputData> buffer = new Buffer<InputData>();
-		FloorSubsystem obj1 = new FloorSubsystem(buffer);
-		Thread th = new Thread(obj1);
+		Buffer<InputData> floorToSchedulerBuffer = new Buffer<InputData>();
+		Buffer<InputData> schedulerToFloorBuffer = new Buffer<InputData>();
+		schedulerToFloorBuffer.setIsDisabled(true);
+		
+		FloorSubsystem subject = new FloorSubsystem(floorToSchedulerBuffer, schedulerToFloorBuffer);
+		
+		// act
+		Thread th = new Thread(subject);
 		th.start();
 		try {
 			th.join();
@@ -24,17 +29,15 @@ public class FloorSubsystemTest {
 			e.printStackTrace();
 		}
 		
-		// act
+		// assert
 		int nanoSecondsInSecond = 1000000000;
 		int nanoSeconds = (int)(0.1 * nanoSecondsInSecond);
 		InputData result1 = new InputData(LocalTime.of(14, 5, 15, 0), 2, Direction.UP, 4);
 		InputData result2 = new InputData(LocalTime.of(1, 2, 3, (4*nanoSeconds)), 1, Direction.UP, 2);
 		InputData result3 = new InputData(LocalTime.of(2, 3, 4, (5*nanoSeconds)), 2, Direction.DOWN, 1);
-		// assert
-		assertEquals(result1, buffer.get());
-		assertEquals(result2, buffer.get());
-		assertEquals(result3, buffer.get());
-		System.out.print(true);
-
+		
+		assertEquals(result1, floorToSchedulerBuffer.get());
+		assertEquals(result2, floorToSchedulerBuffer.get());
+		assertEquals(result3, floorToSchedulerBuffer.get());
 	}
 }
