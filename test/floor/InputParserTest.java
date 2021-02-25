@@ -15,16 +15,14 @@ public class InputParserTest {
 	
 	@Test
 	void parseShouldGetMultipleInputData() {
-		// arrange
-		InputParser parser = new InputParser();
-		
+		// arrange		
 		String text = "14:05:15.0 2 Up 4\n"
 				+ "05:02:01.1 3 Down 1\n";
 		
 		BufferedReader reader = new BufferedReader(new StringReader(text));
 		
 		// act
-		List<InputData> data = parser.parse(reader);
+		List<InputData> data = InputParser.parse(reader);
 		
 		// assert
 		assertEquals(2, data.size());

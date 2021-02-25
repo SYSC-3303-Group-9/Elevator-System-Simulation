@@ -34,6 +34,6 @@ public class Elevator  {
 
 	@Override
 	public String toString() {
-		return "[E" + Integer.toString(id) + "]";
+		return "[Elevator " + Integer.toString(id) + "]";
 	}
 }
