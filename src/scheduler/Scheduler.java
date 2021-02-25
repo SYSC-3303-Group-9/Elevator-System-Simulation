@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import floor.InputData;
 
 public class Scheduler implements Runnable {
+	private SchedulerState state;
+	
 	private ArrayList<Buffer<InputData>> schedulerToElevatorBuffers; // Will contain a scheudulerToElevatorBuffer for each elevator
 	private Buffer<InputData> floorToSchedulerBuffer;
 	private Buffer<InputData> schedulerToFloorBuffer;
@@ -22,6 +24,8 @@ public class Scheduler implements Runnable {
 			ArrayList<Buffer<InputData>> elevatorToSchedulerBuffers,
 			Buffer<InputData> floorToSchedulerBuffer,
 			Buffer<InputData> schedulerToFloorBuffer) {
+		this.state = SchedulerState.INITIAL;
+		
 		this.schedulerToElevatorBuffers = schedulerToElevatorBuffers;
 		this.elevatorToSchedulerBuffers = elevatorToSchedulerBuffers;
 		this.floorToSchedulerBuffer = floorToSchedulerBuffer;
@@ -32,22 +36,39 @@ public class Scheduler implements Runnable {
 	public void run() {	
 		// For now, just passes along the item it gets from the floorToScheduler buffer to the first (and only) elevator buffer 
 		// On future deliverables, will have to have more complex scheduling.
-		while(true) {
-			InputData input = floorToSchedulerBuffer.get();
-			if (input == null) {
+		stateMachine: while(true) {
+			switch (this.state) {
+			case INITIAL:
+				// Immediately move to next state.
+				this.state = SchedulerState.WAITING_FOR_INSTRUCTION;
 				break;
+			case WAITING_FOR_INSTRUCTION:
+				// Block until the FloorSubsystem.
+				InputData input = floorToSchedulerBuffer.get();
+				
+				// If the input is null move to the Final state.
+				if (input == null) {
+					this.state = SchedulerState.FINAL;
+				}
+				// Otherwise send instructions to ElevatorSubsystem and go to WaitingForElevator.
+				else {
+					// TODO: For iteration 1 the scheduler only handles the connection of 1 elevator.
+					schedulerToElevatorBuffers.get(0).put(input);
+					this.state = SchedulerState.WAITING_FOR_ELEVATOR;
+				}
+				break;
+			case WAITING_FOR_ELEVATOR:
+				// Wait for elevator response then send it back to floor.
+				InputData response = elevatorToSchedulerBuffers.get(0).get();
+				schedulerToFloorBuffer.put(response);
+				this.state = SchedulerState.WAITING_FOR_INSTRUCTION;
+				break;
+			case FINAL:
+				// Disable the buffers to propagate the thread shutdowns.
+				schedulerToElevatorBuffers.get(0).setIsDisabled(true);
+				schedulerToFloorBuffer.setIsDisabled(true);
+				break stateMachine;
 			}
-			
-			// TODO: For iteration 1 the scheduler only handles the connection of 1 elevator.
-			schedulerToElevatorBuffers.get(0).put(input);
-			
-			// Wait for elevator response then send it back to floor.
-			InputData response = elevatorToSchedulerBuffers.get(0).get();
-			schedulerToFloorBuffer.put(response);
 		}
-		
-		schedulerToElevatorBuffers.get(0).setIsDisabled(true);
-		schedulerToFloorBuffer.setIsDisabled(true);
 	}
-
 }
