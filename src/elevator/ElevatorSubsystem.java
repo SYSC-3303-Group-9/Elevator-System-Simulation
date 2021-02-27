@@ -8,10 +8,10 @@ public class ElevatorSubsystem implements Runnable {
 	private Elevator elevator;
 	private ElevatorState state;
 	private Buffer<InputData> schedulerToElevatorBuffer;
-	private Buffer<InputData> elevatorToSchedulerBuffer;
+	private Buffer<ElevatorEvent> elevatorToSchedulerBuffer;
 	
 	public ElevatorSubsystem(Elevator elevator, Buffer<InputData> schedulerToElevatorBuffer,
-	Buffer<InputData> elevatorToSchedulerBuffer) {
+	Buffer<ElevatorEvent> elevatorToSchedulerBuffer) {
 		this.elevator = elevator;
 		this.state = ElevatorState.INITIAL;
 		this.schedulerToElevatorBuffer = schedulerToElevatorBuffer;
@@ -23,13 +23,14 @@ public class ElevatorSubsystem implements Runnable {
 		while (true) {
 
 			InputData instructions = null;
+			ElevatorEvent elevatorInfo = null;
 
 			stateMachine: switch (this.state) {
 				
 				case INITIAL:
 					// Immidiately move to the next state
 					this.state = ElevatorState.WAITING;
-					break;
+		
 				case WAITING:
 
 					// Get new instructions from the scheduler.
@@ -52,24 +53,29 @@ public class ElevatorSubsystem implements Runnable {
 				case MOVINGDOWN:
 					// Assuming at this point that the elevator has arrived.
 
-					// Move the Elevator and notify the scheduler that the elevator has moved down.
+					// Move the Elevator
 					elevator.move(instructions);
-					elevatorToSchedulerBuffer.put(instructions);
+
+					// Notify the scheduler that the elevator has moved down.
+					elevatorInfo = new ElevatorEvent(instructions.getDestinationFloor(), elevator.getId());
+					elevatorToSchedulerBuffer.put(elevatorInfo);
 
 					// Move to next state
 					this.state = ElevatorState.WAITING;
-					break;
 
 				case MOVINGUP:
 					// Assuming at this point that the elevator has arrived.
 
-					// Move the Elevator and notify the scheduler that the elevator has moved up.
+					// Move the Elevator
 					elevator.move(instructions);
-					elevatorToSchedulerBuffer.put(instructions);
+
+					// Notify the scheduler that the elevator has moved up.
+					elevatorInfo = new ElevatorEvent(instructions.getDestinationFloor(), elevator.getId());
+					elevatorToSchedulerBuffer.put(elevatorInfo);
 
 					// Move to next state
 					this.state = ElevatorState.WAITING;
-					break;
+		
 				case FINAL:
 					break stateMachine;
 				}
