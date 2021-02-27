@@ -3,6 +3,7 @@ package main;
 import java.util.ArrayList;
 
 import elevator.Elevator;
+import elevator.ElevatorEvent;
 import elevator.ElevatorSubsystem;
 import floor.FloorSubsystem;
 import floor.InputData;
@@ -13,12 +14,12 @@ import scheduler.Scheduler;
  * Helper class to manage the buffer links between subsystems.
  */
 public class SystemBuilder {
-	private Buffer<InputData> schedulerToFloorBuffer = new Buffer<InputData>();
+	private Buffer<ElevatorEvent> schedulerToFloorBuffer = new Buffer<ElevatorEvent>();
 	private ArrayList<Buffer<InputData>> schedulerToElevatorBuffers = new ArrayList<Buffer<InputData>>();
 	
 	private Buffer<InputData> floorToSchedulerBuffer = new Buffer<InputData>();
 	
-	private ArrayList<Buffer<InputData>> elevatorToSchedulerBuffers = new ArrayList<Buffer<InputData>>();
+	private ArrayList<Buffer<ElevatorEvent>> elevatorToSchedulerBuffers = new ArrayList<Buffer<ElevatorEvent>>();
 	
 	/**
 	 * Builds a scheduler instance with the corresponding buffers attached.
@@ -49,7 +50,7 @@ public class SystemBuilder {
 		Buffer<InputData> schedulerToElevatorBuffer = new Buffer<InputData>();
 		schedulerToElevatorBuffers.add(schedulerToElevatorBuffer);
 		
-		Buffer<InputData> elevatorToSchedulerBuffer = new Buffer<InputData>();
+		Buffer<ElevatorEvent> elevatorToSchedulerBuffer = new Buffer<ElevatorEvent>();
 		elevatorToSchedulerBuffers.add(elevatorToSchedulerBuffer);
 		
 		Elevator elevator = new Elevator(schedulerToElevatorBuffers.size());

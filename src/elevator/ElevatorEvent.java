@@ -11,7 +11,15 @@ public class ElevatorEvent {
 	}
 
 	public String toString() {
-		return "Elevator " + Integer.toString(elevatorId) + "arrived at floor " + Integer.toString(floor);
+		return "Elevator " + Integer.toString(elevatorId) + " arrived at floor " + Integer.toString(floor);
 
+	}
+
+	public int getFloor() {
+		return floor;
+	}
+
+	public int getElevatorId() {
+		return elevatorId;
 	}
 }

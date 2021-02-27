@@ -2,6 +2,7 @@ package scheduler;
 
 import java.util.ArrayList;
 
+import elevator.ElevatorEvent;
 import floor.InputData;
 
 public class Scheduler implements Runnable {
@@ -9,8 +10,8 @@ public class Scheduler implements Runnable {
 	
 	private ArrayList<Buffer<InputData>> schedulerToElevatorBuffers; // Will contain a scheudulerToElevatorBuffer for each elevator
 	private Buffer<InputData> floorToSchedulerBuffer;
-	private Buffer<InputData> schedulerToFloorBuffer;
-	private ArrayList<Buffer<InputData>> elevatorToSchedulerBuffers;
+	private Buffer<ElevatorEvent> schedulerToFloorBuffer;
+	private ArrayList<Buffer<ElevatorEvent>> elevatorToSchedulerBuffers;
 	
 	/**
 	 * Creates a new instance of the Scheduler class.
@@ -21,9 +22,9 @@ public class Scheduler implements Runnable {
 	 */
 	public Scheduler(
 			ArrayList<Buffer<InputData>> schedulerToElevatorBuffers,
-			ArrayList<Buffer<InputData>> elevatorToSchedulerBuffers,
+			ArrayList<Buffer<ElevatorEvent>> elevatorToSchedulerBuffers,
 			Buffer<InputData> floorToSchedulerBuffer,
-			Buffer<InputData> schedulerToFloorBuffer) {
+			Buffer<ElevatorEvent> schedulerToFloorBuffer) {
 		this.state = SchedulerState.INITIAL;
 		
 		this.schedulerToElevatorBuffers = schedulerToElevatorBuffers;
@@ -59,7 +60,7 @@ public class Scheduler implements Runnable {
 				break;
 			case WAITING_FOR_ELEVATOR:
 				// Wait for elevator response then send it back to floor.
-				InputData response = elevatorToSchedulerBuffers.get(0).get();
+				ElevatorEvent response = elevatorToSchedulerBuffers.get(0).get();
 				schedulerToFloorBuffer.put(response);
 				this.state = SchedulerState.WAITING_FOR_INSTRUCTION;
 				break;
