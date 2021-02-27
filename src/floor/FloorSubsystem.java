@@ -6,15 +6,16 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.List;
 
+import elevator.ElevatorEvent;
 import scheduler.Buffer;
 
 
 public class FloorSubsystem implements Runnable {
 
 	private Buffer<InputData> floorToSchedulerBuffer;
-	private Buffer<InputData> schedulerToFloorBuffer;
+	private Buffer<ElevatorEvent> schedulerToFloorBuffer;
 
-	public FloorSubsystem(Buffer<InputData> floorToSchedulerBuffer, Buffer<InputData> schedulerToFloorBuffer) {
+	public FloorSubsystem(Buffer<InputData> floorToSchedulerBuffer, Buffer<ElevatorEvent> schedulerToFloorBuffer) {
 		this.floorToSchedulerBuffer = floorToSchedulerBuffer;
 		this.schedulerToFloorBuffer = schedulerToFloorBuffer;
 	}
@@ -45,7 +46,7 @@ public class FloorSubsystem implements Runnable {
 		
 		// Wait for responses from scheduler.
 		while (true) {
-			InputData x = schedulerToFloorBuffer.get();
+			ElevatorEvent x = schedulerToFloorBuffer.get();
 			if (x == null) {
 				break;
 			}
