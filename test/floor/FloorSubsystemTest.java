@@ -7,6 +7,7 @@ import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
 
 import elevator.Direction;
+import elevator.ElevatorEvent;
 import scheduler.Buffer;
 
 public class FloorSubsystemTest {
@@ -15,7 +16,7 @@ public class FloorSubsystemTest {
 	void run_shouldAddDataToBuffer() {
 		// arrange
 		Buffer<InputData> floorToSchedulerBuffer = new Buffer<InputData>();
-		Buffer<InputData> schedulerToFloorBuffer = new Buffer<InputData>();
+		Buffer<ElevatorEvent> schedulerToFloorBuffer = new Buffer<ElevatorEvent>();
 		schedulerToFloorBuffer.setIsDisabled(true);
 		
 		FloorSubsystem subject = new FloorSubsystem(floorToSchedulerBuffer, schedulerToFloorBuffer);

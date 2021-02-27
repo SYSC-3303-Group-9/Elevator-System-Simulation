@@ -15,6 +15,14 @@ public class Elevator  {
 	public Elevator(int id) {
 		this.id = id;
 	}
+
+	/**
+	 * Gets the ID of the elevator
+	 * @return the elevators ID
+	 */
+	public int getId() {
+		return id;
+	}
 	
 	/**
 	 * Moves the elevator to a specified floor and prints the floor it left and the destination floor.
@@ -36,4 +44,5 @@ public class Elevator  {
 	public String toString() {
 		return "[Elevator " + Integer.toString(id) + "]";
 	}
+
 }

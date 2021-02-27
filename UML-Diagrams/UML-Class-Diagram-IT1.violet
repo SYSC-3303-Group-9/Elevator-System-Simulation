@@ -5,12 +5,13 @@
    <object class="com.horstmann.violet.ClassNode" id="ClassNode0">
     <void property="attributes">
      <void property="text">
-      <string>- floorAndSchedulerBuffer: Buffer&lt;InputData&gt;</string>
+      <string>- flooToSchedulerBuffer: Buffer&lt;InputData&gt;
+- schedulerToFloorBuffer: Buffer&lt;ElevatorEvent&gt;</string>
      </void>
     </void>
     <void property="methods">
      <void property="text">
-      <string>+ FloorSubsystem(Buffer&lt;InputData&gt;)
+      <string>+ FloorSubsystem(Buffer&lt;InputData&gt;, Buffer&lt;ElevatorEvent&gt;)
 +run():void</string>
      </void>
     </void>
@@ -25,7 +26,7 @@
      <string>x</string>
      <void method="set">
       <object idref="Point2D$Double0"/>
-      <double>370.0</double>
+      <double>270.0</double>
      </void>
     </void>
     <void class="java.awt.geom.Point2D$Double" method="getField">
@@ -36,7 +37,7 @@
      </void>
     </void>
     <void method="setLocation">
-     <double>370.0</double>
+     <double>270.0</double>
      <double>150.0</double>
     </void>
    </object>
@@ -45,14 +46,16 @@
    <object class="com.horstmann.violet.ClassNode" id="ClassNode1">
     <void property="attributes">
      <void property="text">
-      <string>- schedulerToElevatorBuffers: ArrayLisy&lt;InputData&gt;
+      <string>- state: SchedulerState
+- schedulerToElevatorBuffers: ArrayList&lt;Buffer&lt;InputData&gt;&gt;
 - floorToScheduleBuffer: Buffer &lt;InputData&gt;
-- input: InputData</string>
+- schedulerToFloorBuffer: Buffer &lt;ElevatorEvent&gt;
+- elevatorToSchedulerBuffers: ArrayList&lt;BUffer&lt;ElevatorEvent&gt;&gt;</string>
      </void>
     </void>
     <void property="methods">
      <void property="text">
-      <string>+Scheduler(ArrayList&lt;InputData&gt;, Buffer&lt;InputData&gt;)
+      <string>+Scheduler(ArrayList&lt;Buffer&lt;InputData&gt;&gt;, ArrayList&lt;Buffer&lt;ElevatorEvent&gt;&gt;, Buffer&lt;InputData&gt;, Buffer&lt;ElevatorEvent&gt;)
 +run(): void</string>
      </void>
     </void>
@@ -88,13 +91,14 @@
     <void property="attributes">
      <void property="text">
       <string>- elevator: Elevator
+- state: ElevatorState
 - scheduleToElevatorBuffer: Buffer&lt;InputData&gt;
-- elevatorToScheduleBuffer: Buffer&lt;InputData&gt;</string>
+- elevatorToScheduleBuffer: Buffer&lt;ElevatorEvent&gt;</string>
      </void>
     </void>
     <void property="methods">
      <void property="text">
-      <string>+ElevatorSubsystem(Elevator, Buffer&lt;InputData&gt;, Buffer&lt;InputData&gt;)
+      <string>+ElevatorSubsystem(Elevator, Buffer&lt;InputData&gt;, Buffer&lt;ElevatorEvent&gt;)
 +run(): void</string>
      </void>
     </void>
@@ -109,19 +113,19 @@
      <string>x</string>
      <void method="set">
       <object idref="Point2D$Double2"/>
-      <double>1320.0</double>
+      <double>2110.0</double>
      </void>
     </void>
     <void class="java.awt.geom.Point2D$Double" method="getField">
      <string>y</string>
      <void method="set">
       <object idref="Point2D$Double2"/>
-      <double>150.0</double>
+      <double>130.0</double>
      </void>
     </void>
     <void method="setLocation">
-     <double>1320.0</double>
-     <double>150.0</double>
+     <double>2110.0</double>
+     <double>130.0</double>
     </void>
    </object>
   </void>
@@ -145,7 +149,7 @@
      <string>x</string>
      <void method="set">
       <object idref="Point2D$Double3"/>
-      <double>370.0</double>
+      <double>320.0</double>
      </void>
     </void>
     <void class="java.awt.geom.Point2D$Double" method="getField">
@@ -156,7 +160,7 @@
      </void>
     </void>
     <void method="setLocation">
-     <double>370.0</double>
+     <double>320.0</double>
      <double>290.0</double>
     </void>
    </object>
@@ -193,19 +197,19 @@
      <string>x</string>
      <void method="set">
       <object idref="Point2D$Double4"/>
-      <double>370.0</double>
+      <double>320.0</double>
      </void>
     </void>
     <void class="java.awt.geom.Point2D$Double" method="getField">
      <string>y</string>
      <void method="set">
       <object idref="Point2D$Double4"/>
-      <double>420.0</double>
+      <double>410.0</double>
      </void>
     </void>
     <void method="setLocation">
-     <double>370.0</double>
-     <double>420.0</double>
+     <double>320.0</double>
+     <double>410.0</double>
     </void>
    </object>
   </void>
@@ -228,11 +232,11 @@ Runnable</string>
      <string>x</string>
      <void method="set">
       <object idref="Point2D$Double5"/>
-      <double>930.0</double>
+      <double>1150.0</double>
      </void>
     </void>
     <void method="setLocation">
-     <double>930.0</double>
+     <double>1150.0</double>
      <double>0.0</double>
     </void>
    </object>
@@ -257,19 +261,19 @@ Direction</string>
      <string>x</string>
      <void method="set">
       <object idref="Point2D$Double6"/>
-      <double>160.0</double>
+      <double>360.0</double>
      </void>
     </void>
     <void class="java.awt.geom.Point2D$Double" method="getField">
      <string>y</string>
      <void method="set">
       <object idref="Point2D$Double6"/>
-      <double>470.0</double>
+      <double>650.0</double>
      </void>
     </void>
     <void method="setLocation">
-     <double>160.0</double>
-     <double>470.0</double>
+     <double>360.0</double>
+     <double>650.0</double>
     </void>
    </object>
   </void>
@@ -303,19 +307,19 @@ Direction</string>
      <string>x</string>
      <void method="set">
       <object idref="Point2D$Double7"/>
-      <double>900.0</double>
+      <double>930.0</double>
      </void>
     </void>
     <void class="java.awt.geom.Point2D$Double" method="getField">
      <string>y</string>
      <void method="set">
       <object idref="Point2D$Double7"/>
-      <double>440.0</double>
+      <double>480.0</double>
      </void>
     </void>
     <void method="setLocation">
-     <double>900.0</double>
-     <double>440.0</double>
+     <double>930.0</double>
+     <double>480.0</double>
     </void>
    </object>
   </void>
@@ -323,19 +327,16 @@ Direction</string>
    <object class="com.horstmann.violet.ClassNode" id="ClassNode7">
     <void property="attributes">
      <void property="text">
-      <string>- currTask: InputData
-- currFloor: int</string>
+      <string>- id: int</string>
      </void>
     </void>
     <void property="methods">
      <void property="text">
       <string>+ Elevator(int)
++ getId(): int
 + move(InputData): void
-+ printLocation(): String
-+ getCurrTask(): InputData
-+ setCurrTask(InputData): void
-+ getCurrFloor(): int
-+ setCurrFloor(int): void  </string>
++ getLocation(InputData): String
++ toString(): String</string>
      </void>
     </void>
     <void property="name">
@@ -349,19 +350,19 @@ Direction</string>
      <string>x</string>
      <void method="set">
       <object idref="Point2D$Double8"/>
-      <double>1440.0</double>
+      <double>2240.0</double>
      </void>
     </void>
     <void class="java.awt.geom.Point2D$Double" method="getField">
      <string>y</string>
      <void method="set">
       <object idref="Point2D$Double8"/>
-      <double>410.0</double>
+      <double>300.0</double>
      </void>
     </void>
     <void method="setLocation">
-     <double>1440.0</double>
-     <double>410.0</double>
+     <double>2240.0</double>
+     <double>300.0</double>
     </void>
    </object>
   </void>
@@ -383,19 +384,19 @@ Direction</string>
      <string>x</string>
      <void method="set">
       <object idref="Point2D$Double9"/>
-      <double>910.0</double>
+      <double>1170.0</double>
      </void>
     </void>
     <void class="java.awt.geom.Point2D$Double" method="getField">
      <string>y</string>
      <void method="set">
       <object idref="Point2D$Double9"/>
-      <double>660.0</double>
+      <double>670.0</double>
      </void>
     </void>
     <void method="setLocation">
-     <double>910.0</double>
-     <double>660.0</double>
+     <double>1170.0</double>
+     <double>670.0</double>
     </void>
    </object>
   </void>
@@ -403,10 +404,10 @@ Direction</string>
    <object class="com.horstmann.violet.ClassNode" id="ClassNode9">
     <void property="attributes">
      <void property="text">
-      <string>- schedulerToFloorBuffer: Buffer&lt;InputData&gt;
+      <string>- schedulerToFloorBuffer: Buffer&lt;ElevatorEvent&gt;
 - schedulerToElevatorBuffers: ArrayList&lt;Buffer&lt;InputData&gt;&gt;
 - floorToSchedulerBuffer: Buffer&lt;InputData&gt;
-- elevatorToSchedulerBuffers: ArrayList&lt;Buffer&lt;InputData&gt;&gt;</string>
+- elevatorToSchedulerBuffers: ArrayList&lt;Buffer&lt;ElevatorEvent&gt;&gt;</string>
      </void>
     </void>
     <void property="methods">
@@ -427,19 +428,19 @@ Direction</string>
      <string>x</string>
      <void method="set">
       <object idref="Point2D$Double10"/>
-      <double>800.0</double>
+      <double>1060.0</double>
      </void>
     </void>
     <void class="java.awt.geom.Point2D$Double" method="getField">
      <string>y</string>
      <void method="set">
       <object idref="Point2D$Double10"/>
-      <double>770.0</double>
+      <double>780.0</double>
      </void>
     </void>
     <void method="setLocation">
-     <double>800.0</double>
-     <double>770.0</double>
+     <double>1060.0</double>
+     <double>780.0</double>
     </void>
    </object>
   </void>
@@ -447,19 +448,17 @@ Direction</string>
    <object class="com.horstmann.violet.ClassNode" id="ClassNode10">
     <void property="attributes">
      <void property="text">
-      <string>MOVINGUP
+      <string>INITIAL
+WAITING
+MOVINGUP
 MOVINGDOWN
-WAITING</string>
-     </void>
-    </void>
-    <void property="methods">
-     <void property="text">
-      <string>+nextState()</string>
+FINAL</string>
      </void>
     </void>
     <void property="name">
      <void property="text">
-      <string>ElevatorStateEnum</string>
+      <string>&lt;&lt;enumeration&gt;&gt;
+ElevatorState</string>
      </void>
     </void>
    </object>
@@ -468,19 +467,19 @@ WAITING</string>
      <string>x</string>
      <void method="set">
       <object idref="Point2D$Double11"/>
-      <double>1460.0</double>
+      <double>2260.0</double>
      </void>
     </void>
     <void class="java.awt.geom.Point2D$Double" method="getField">
      <string>y</string>
      <void method="set">
       <object idref="Point2D$Double11"/>
-      <double>640.0</double>
+      <double>490.0</double>
      </void>
     </void>
     <void method="setLocation">
-     <double>1460.0</double>
-     <double>640.0</double>
+     <double>2260.0</double>
+     <double>490.0</double>
     </void>
    </object>
   </void>
@@ -488,18 +487,16 @@ WAITING</string>
    <object class="com.horstmann.violet.ClassNode" id="ClassNode11">
     <void property="attributes">
      <void property="text">
-      <string>WAITINGFORINSTRUCTION
-WAITINGFORELEVATOR</string>
-     </void>
-    </void>
-    <void property="methods">
-     <void property="text">
-      <string>+nextState()</string>
+      <string>INITIAL
+WAITINGFORINSTRUCTION
+WAITINGFORELEVATOR
+FINAL</string>
      </void>
     </void>
     <void property="name">
      <void property="text">
-      <string>SchedulerStateEnum</string>
+      <string>&lt;&lt;enumeration&gt;&gt;
+SchedulerState</string>
      </void>
     </void>
    </object>
@@ -508,7 +505,7 @@ WAITINGFORELEVATOR</string>
      <string>x</string>
      <void method="set">
       <object idref="Point2D$Double12"/>
-      <double>1000.0</double>
+      <double>1310.0</double>
      </void>
     </void>
     <void class="java.awt.geom.Point2D$Double" method="getField">
@@ -519,7 +516,7 @@ WAITINGFORELEVATOR</string>
      </void>
     </void>
     <void method="setLocation">
-     <double>1000.0</double>
+     <double>1310.0</double>
      <double>320.0</double>
     </void>
    </object>
@@ -528,13 +525,16 @@ WAITINGFORELEVATOR</string>
    <object class="com.horstmann.violet.ClassNode" id="ClassNode12">
     <void property="attributes">
      <void property="text">
-      <string>- floor: int</string>
+      <string>- floor: int
+- elevatorId: int</string>
      </void>
     </void>
     <void property="methods">
      <void property="text">
-      <string>+ElevatorEvent(int)
-+toString(): String</string>
+      <string>+ ElevatorEvent(int)
++ getFloor(): int
++ getElevatorId(): int
++ toString(): String</string>
      </void>
     </void>
     <void property="name">
@@ -548,19 +548,19 @@ WAITINGFORELEVATOR</string>
      <string>x</string>
      <void method="set">
       <object idref="Point2D$Double13"/>
-      <double>1350.0</double>
+      <double>2610.0</double>
      </void>
     </void>
     <void class="java.awt.geom.Point2D$Double" method="getField">
      <string>y</string>
      <void method="set">
       <object idref="Point2D$Double13"/>
-      <double>290.0</double>
+      <double>130.0</double>
      </void>
     </void>
     <void method="setLocation">
-     <double>1350.0</double>
-     <double>290.0</double>
+     <double>2610.0</double>
+     <double>130.0</double>
     </void>
    </object>
   </void>
@@ -747,14 +747,14 @@ WAITINGFORELEVATOR</string>
      <string>width</string>
      <void method="set">
       <object idref="Rectangle2D$Double0"/>
-      <double>1996.8695500708104</double>
+      <double>2997.9482681718914</double>
      </void>
     </void>
     <void class="java.awt.geom.Rectangle2D$Double" method="getField">
      <string>height</string>
      <void method="set">
       <object idref="Rectangle2D$Double0"/>
-      <double>1129.956636336103</double>
+      <double>1623.455844122716</double>
      </void>
     </void>
    </object>

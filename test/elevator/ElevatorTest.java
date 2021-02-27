@@ -19,6 +19,6 @@ public class ElevatorTest {
 		String output = subject.getLocation(input);
 		
 		// assert
-		assertEquals("[E0] 1 UP 2", output);
+		assertEquals("[Elevator 0] 1 UP 2", output);
 	}
 }
