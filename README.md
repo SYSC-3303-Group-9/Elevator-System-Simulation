@@ -159,11 +159,12 @@ The three thread classes created are FloorSubsystem, Scheduler and ElevatorSyste
     Aubin
         + UML class diagram
         + UML sequence diagram
-        + converting elevator to state machine
+        + Converting elevator to state machine
     Chris
         + ElevatorState enums
     James
-        + converting scheduler to state machine
+        + Converting scheduler to state machine
+        + State diagram
     Liya
         + ElevatorEvent.java and integrating buffers to this class
         + Updating README file
