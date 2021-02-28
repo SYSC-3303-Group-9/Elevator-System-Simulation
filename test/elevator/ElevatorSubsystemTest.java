@@ -11,7 +11,7 @@ import scheduler.Buffer;
 
 public class ElevatorSubsystemTest {
 	@Test
-	public void run_shouldEchoInput() {
+	public void run_shouldSendEvents() {
 		// arrange subject
 		Buffer<InputData> schedulerToElevatorBuffer = new Buffer<InputData>();
 		Buffer<ElevatorEvent> elevatorToSchedulerBuffer = new Buffer<ElevatorEvent>();
@@ -20,14 +20,10 @@ public class ElevatorSubsystemTest {
 		
 		// arrange data
 		InputData input1 = new InputData(LocalTime.of(0, 0), 1, Direction.UP, 2);
-		ElevatorEvent event1 = new ElevatorEvent(input1.getDestinationFloor(), 0);
 		schedulerToElevatorBuffer.put(input1);
-		elevatorToSchedulerBuffer.put(event1);
 		
 		InputData input2 = new InputData(LocalTime.of(0, 1), 2, Direction.DOWN, 1);
-		ElevatorEvent event2 = new ElevatorEvent(input1.getDestinationFloor(), 0);
 		schedulerToElevatorBuffer.put(input2);
-		elevatorToSchedulerBuffer.put(event2);
 		
 		schedulerToElevatorBuffer.setIsDisabled(true);
 		
@@ -41,8 +37,9 @@ public class ElevatorSubsystemTest {
 		}
 		
 		// assert
-		assertEquals(input1, schedulerToElevatorBuffer.get());
-		assertEquals(input2, schedulerToElevatorBuffer.get());
+		ElevatorEvent event1 = new ElevatorEvent(input1.getTime(), input1.getDestinationFloor(), 0);
+		ElevatorEvent event2 = new ElevatorEvent(input2.getTime(), input2.getDestinationFloor(), 0);
+		
 		assertEquals(event1, elevatorToSchedulerBuffer.get());
 		assertEquals(event2, elevatorToSchedulerBuffer.get());
 	}

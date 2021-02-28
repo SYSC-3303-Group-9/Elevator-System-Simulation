@@ -33,9 +33,9 @@ public class FloorSubsystemTest {
 		// assert
 		int nanoSecondsInSecond = 1000000000;
 		int nanoSeconds = (int)(0.1 * nanoSecondsInSecond);
-		InputData result1 = new InputData(LocalTime.of(14, 5, 15, 0), 2, Direction.UP, 4);
-		InputData result2 = new InputData(LocalTime.of(1, 2, 3, (4*nanoSeconds)), 1, Direction.UP, 2);
-		InputData result3 = new InputData(LocalTime.of(2, 3, 4, (5*nanoSeconds)), 2, Direction.DOWN, 1);
+		InputData result1 = new InputData(LocalTime.of(1, 2, 3, (4*nanoSeconds)), 1, Direction.UP, 2);
+		InputData result2 = new InputData(LocalTime.of(2, 3, 4, (5*nanoSeconds)), 2, Direction.DOWN, 1);
+		InputData result3 = new InputData(LocalTime.of(14, 5, 15, 0), 2, Direction.UP, 4);
 		
 		assertEquals(result1, floorToSchedulerBuffer.get());
 		assertEquals(result2, floorToSchedulerBuffer.get());

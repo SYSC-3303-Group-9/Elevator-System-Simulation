@@ -29,7 +29,8 @@ public class Elevator  {
 	 * @param input	The input contains the destination the elevator needs to move to amongst other data.
 	 */
 	public void move(InputData input) {
-		System.out.println(getLocation(input));
+		System.out.println("[" + input.getTime() + "] " + this + " is moving " + input.getDirection());
+		System.out.println("[" + input.getTime() + "] " + this + " arrived at floor " + input.getDestinationFloor());
 	}
 	
 	/**
@@ -42,7 +43,7 @@ public class Elevator  {
 
 	@Override
 	public String toString() {
-		return "[Elevator " + Integer.toString(id) + "]";
+		return "Elevator " + Integer.toString(id);
 	}
 
 }

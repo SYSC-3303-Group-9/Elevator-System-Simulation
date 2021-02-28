@@ -20,17 +20,15 @@ public class ElevatorSubsystem implements Runnable {
 	
 	@Override
 	public void run() {
-		while (true) {
-
-			InputData instructions = null;
-			ElevatorEvent elevatorInfo = null;
-
-			stateMachine: switch (this.state) {
+		InputData instructions = null;
+		stateMachine: while (true) {
+			switch (this.state) {
 				
 				case INITIAL:
-					// Immidiately move to the next state
+					// Immediately move to the next state
 					this.state = ElevatorState.WAITING;
-		
+					break;
+					
 				case WAITING:
 
 					// Get new instructions from the scheduler.
@@ -40,41 +38,48 @@ public class ElevatorSubsystem implements Runnable {
 					if (instructions == null) {
 						// Move to the final state
 						this.state = ElevatorState.FINAL;
-						break;
 					}
-					
-					// Change the state of the Elevator to Moving up or Moving down
-					if(instructions.getDirection() == Direction.UP){
-						this.state = ElevatorState.MOVINGUP;
-					} else if(instructions.getDirection() == Direction.DOWN){
-						this.state = ElevatorState.MOVINGDOWN;
+					else {
+						// Change the state of the Elevator to Moving up or Moving down
+						if(instructions.getDirection() == Direction.UP){
+							this.state = ElevatorState.MOVINGUP;
+						} else if(instructions.getDirection() == Direction.DOWN){
+							this.state = ElevatorState.MOVINGDOWN;
+						}
 					}
+					break;
 				
 				case MOVINGDOWN:
+				{
 					// Assuming at this point that the elevator has arrived.
 
 					// Move the Elevator
 					elevator.move(instructions);
 
 					// Notify the scheduler that the elevator has moved down.
-					elevatorInfo = new ElevatorEvent(instructions.getDestinationFloor(), elevator.getId());
+					ElevatorEvent elevatorInfo = new ElevatorEvent(instructions.getTime(), instructions.getDestinationFloor(), elevator.getId());
 					elevatorToSchedulerBuffer.put(elevatorInfo);
 
 					// Move to next state
 					this.state = ElevatorState.WAITING;
+					break;
+				}
 
 				case MOVINGUP:
+				{
 					// Assuming at this point that the elevator has arrived.
 
 					// Move the Elevator
 					elevator.move(instructions);
 
 					// Notify the scheduler that the elevator has moved up.
-					elevatorInfo = new ElevatorEvent(instructions.getDestinationFloor(), elevator.getId());
+					ElevatorEvent elevatorInfo = new ElevatorEvent(instructions.getTime(), instructions.getDestinationFloor(), elevator.getId());
 					elevatorToSchedulerBuffer.put(elevatorInfo);
 
 					// Move to next state
 					this.state = ElevatorState.WAITING;
+					break;
+				}
 		
 				case FINAL:
 					break stateMachine;

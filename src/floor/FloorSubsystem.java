@@ -37,7 +37,7 @@ public class FloorSubsystem implements Runnable {
 		
 		// Send all the input data to the scheduler.
 		for (InputData x : data) {
-			System.out.println("Floor sending " + x);
+			System.out.println("[" + x.getTime() + "] Floor " + x.getCurrentFloor() + " requested elevator");
 			floorToSchedulerBuffer.put(x);
 		}
 		
@@ -51,7 +51,7 @@ public class FloorSubsystem implements Runnable {
 				break;
 			}
 			
-			System.out.println("Floor received " + x.toString());
+			System.out.println("[" + x.getTime() + "] Floor received elevator event");
 		}
 	}
 

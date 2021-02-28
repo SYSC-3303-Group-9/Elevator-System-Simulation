@@ -54,6 +54,9 @@ public class Scheduler implements Runnable {
 				// Otherwise send instructions to ElevatorSubsystem and go to WaitingForElevator.
 				else {
 					// TODO: For iteration 1 the scheduler only handles the connection of 1 elevator.
+					System.out.println("[" + input.getTime() + "] Scheduling elevator to pick up at floor "
+							+ input.getCurrentFloor() + " and move to floor " + input.getDestinationFloor());
+					
 					schedulerToElevatorBuffers.get(0).put(input);
 					this.state = SchedulerState.WAITING_FOR_ELEVATOR;
 				}
