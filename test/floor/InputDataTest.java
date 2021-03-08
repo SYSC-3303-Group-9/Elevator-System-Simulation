@@ -103,12 +103,9 @@ public class InputDataTest {
 		InputData toInputData1 = InputData.fromBytes(toByte1);
 		InputData toInputData2 = InputData.fromBytes(toByte2);
 		
-		boolean result1 = toInputData1.equals(obj1);
-		boolean result2 = toInputData2.equals(obj2);
-		
-		//arrange
-		assertTrue(result1);
-		assertTrue(result2);
+		//assert
+		assertEquals(toInputData1, obj1);
+		assertEquals(toInputData2, obj2);
 		
 	}
 	
