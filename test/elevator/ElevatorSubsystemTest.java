@@ -37,8 +37,8 @@ public class ElevatorSubsystemTest {
 		}
 		
 		// assert
-		ElevatorEvent event1 = new ElevatorEvent(input1.getTime(), input1.getDestinationFloor(), 0);
-		ElevatorEvent event2 = new ElevatorEvent(input2.getTime(), input2.getDestinationFloor(), 0);
+		ElevatorEvent event1 = new ElevatorEvent(input1.getDestinationFloor(), 0);
+		ElevatorEvent event2 = new ElevatorEvent(input2.getDestinationFloor(), 0);
 		
 		assertEquals(event1, elevatorToSchedulerBuffer.get());
 		assertEquals(event2, elevatorToSchedulerBuffer.get());

@@ -51,7 +51,7 @@ public class FloorSubsystem implements Runnable {
 				break;
 			}
 			
-			System.out.println("[" + x.getTime() + "] Floor received elevator event");
+			System.out.println("Floor received elevator event"); // Add time print here
 		}
 	}
 
