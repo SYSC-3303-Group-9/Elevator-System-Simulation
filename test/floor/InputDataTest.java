@@ -125,8 +125,8 @@ public class InputDataTest {
 		boolean result2 = toInputData2.equals(obj1);
 		
 		//arrange
-		assertFalse(result1);
-		assertFalse(result2);
+		assertNotEquals(result1);
+		assertNotEquals(result2);
 		
 	}
 }
