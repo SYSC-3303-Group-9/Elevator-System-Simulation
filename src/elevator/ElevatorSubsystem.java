@@ -57,7 +57,7 @@ public class ElevatorSubsystem implements Runnable {
 					elevator.move(instructions);
 
 					// Notify the scheduler that the elevator has moved down.
-					ElevatorEvent elevatorInfo = new ElevatorEvent(instructions.getTime(), instructions.getDestinationFloor(), elevator.getId());
+					ElevatorEvent elevatorInfo = new ElevatorEvent(instructions.getDestinationFloor(), elevator.getId());
 					elevatorToSchedulerBuffer.put(elevatorInfo);
 
 					// Move to next state
@@ -73,7 +73,7 @@ public class ElevatorSubsystem implements Runnable {
 					elevator.move(instructions);
 
 					// Notify the scheduler that the elevator has moved up.
-					ElevatorEvent elevatorInfo = new ElevatorEvent(instructions.getTime(), instructions.getDestinationFloor(), elevator.getId());
+					ElevatorEvent elevatorInfo = new ElevatorEvent(instructions.getDestinationFloor(), elevator.getId());
 					elevatorToSchedulerBuffer.put(elevatorInfo);
 
 					// Move to next state
