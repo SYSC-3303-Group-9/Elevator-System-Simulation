@@ -38,7 +38,7 @@ public class ElevatorCommunicator implements Runnable {
 		ElevatorCommand command = packetToElevatorSubsystem.get();
 
 		// If buffer is not empty send instruction to elevatorSubsystem
-		if (command == !null) {
+		if (command != null) {
 			sendPacket = command.toPacket();
 			try {
 				sendReceiveSocket.send(sendPacket);
