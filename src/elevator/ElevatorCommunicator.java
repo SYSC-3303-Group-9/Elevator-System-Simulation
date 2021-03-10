@@ -5,8 +5,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
-import floor.InputData;
 import scheduler.Buffer;
+import scheduler.ElevatorCommand;
 
 public class ElevatorCommunicator implements Runnable {
 
@@ -39,7 +39,8 @@ public class ElevatorCommunicator implements Runnable {
 
 		// If buffer is not empty send instruction to elevatorSubsystem
 		if (command != null) {
-			sendPacket = command.toPacket();
+			byte commandByte[]= command.toBytes();
+			 sendPacket = new DatagramPacket(commandByte, commandByte.length);
 			try {
 				sendReceiveSocket.send(sendPacket);
 			} catch (IOException e) {
@@ -62,8 +63,8 @@ public class ElevatorCommunicator implements Runnable {
 				// Get new event from the elevatorSubsystem.
 				ElevatorEvent event = ElevatorEvent.fromBytes(receivePacket.getData());
 				
-				// If buffer is not empty send event to scheduler
-				if (event == !null) {
+				// If buffer is not empty put event in the scheduler buffer
+				if (event != null) {
 					packetFromElevatorSubsystem.put(event);
 				}
 				
