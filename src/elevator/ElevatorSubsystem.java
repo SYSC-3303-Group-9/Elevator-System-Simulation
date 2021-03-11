@@ -4,29 +4,19 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-
-import floor.InputData;
-import scheduler.Buffer;
-import scheduler.ElevatorCommand;
 
 public class ElevatorSubsystem implements Runnable {
 	
 	private Elevator elevator;
 	private ElevatorState state;
-	private Buffer<InputData> schedulerToElevatorBuffer;
-	private Buffer<ElevatorEvent> elevatorToSchedulerBuffer;
 	private DatagramSocket sendReceiveSocket;
 	DatagramPacket receivePacket, sendPacket;
 	
-	public ElevatorSubsystem(Elevator elevator, Buffer<InputData> schedulerToElevatorBuffer,
-	Buffer<ElevatorEvent> elevatorToSchedulerBuffer) {
+	public ElevatorSubsystem(Elevator elevator) {
 		this.elevator = elevator;
 		this.state = ElevatorState.INITIAL;
-		this.schedulerToElevatorBuffer = schedulerToElevatorBuffer;
-		this.elevatorToSchedulerBuffer = elevatorToSchedulerBuffer;
 		try {
-			//Unique port for each elevator
+			// Unique port for each elevator.
 			this.sendReceiveSocket = new DatagramSocket(50 + elevator.getId());
 		} catch(IOException e) {
 			e.printStackTrace();
@@ -36,13 +26,13 @@ public class ElevatorSubsystem implements Runnable {
 	
 	
 	public void sendCommand(ElevatorCommand command) {
-		//Move the Elevator
+		// Move the Elevator
 		elevator.move(command.getDirection());
 		
 		// Notify the scheduler that the elevator has moved down.
 		ElevatorEvent elevatorInfo = new ElevatorEvent(elevator.getFloor(), elevator.getId());
 		
-		//Send ElevatorEvent packet to ElevatorCommand via port 50 + Elevator ID
+		// Send ElevatorEvent packet to ElevatorCommand.
 		try {
 			sendPacket = new DatagramPacket(elevatorInfo.toBytes(),elevatorInfo.toBytes().length, InetAddress.getLocalHost(), receivePacket.getPort());
 			sendReceiveSocket.send(sendPacket);
@@ -69,7 +59,7 @@ public class ElevatorSubsystem implements Runnable {
 					break;
 					
 				case WAITING:
-					// Receive new ElevatorCommand packet from ElevatorCoomunicator via port 50 + Elevator ID.
+					// Receive new ElevatorCommand packet from ElevatorComunicator via port 50 + Elevator ID.
 					byte data[] = new byte[100];
 					receivePacket = new DatagramPacket(data, data.length);
 					

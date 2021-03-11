@@ -1,9 +1,7 @@
-package scheduler;
+package elevator;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-
-import elevator.Direction;
 
 public class ElevatorCommand {
 	private int elevatorID;

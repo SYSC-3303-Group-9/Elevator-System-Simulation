@@ -1,8 +1,8 @@
-package scheduler;
+package common;
 
 import java.util.ArrayList;
 
-public class Buffer<T> {
+public class Buffer<T> implements IBufferInput<T>, IBufferOutput<T> {
 	private ArrayList<T> bufferStore;
 	private boolean isDisabled = false;
 	
@@ -25,9 +25,9 @@ public class Buffer<T> {
 	}
 	
 	/**
-	 * Puts the bufferItem at the end of the bufferStore ArrayList
-	 * @param bufferItem an item to append to bufferStore 
+	 * {@inheritDoc}
 	 */
+	@Override
 	public synchronized void put(T bufferItem) {
 		bufferStore.add(bufferItem);
 		notifyAll();
@@ -35,9 +35,9 @@ public class Buffer<T> {
 	
 	
 	/**
-	 * Gets the first bufferItem in the bufferStore ArrayList
-	 * @return the first element in bufferStore
+	 * {@inheritDoc}
 	 */
+	@Override
 	public synchronized T get() {
 		// Wait thread until ArrayList is no longer empty
 		while(bufferStore.isEmpty() && !isDisabled) {
@@ -53,6 +53,4 @@ public class Buffer<T> {
 		}
 		return bufferItem;
 	}
-	
-	
 }

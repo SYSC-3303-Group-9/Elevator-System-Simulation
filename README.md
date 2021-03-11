@@ -82,26 +82,30 @@ Tests are written and run with JUnit 5. The 'test' folder contains a test packag
 
 ## Team Responsibilities
 
-     Aubin
-        + UML class diagram
-        + UML sequence diagram
-        + Updating README file
-     Chris
-        + Implementing ElevatorSubsystem class
-        + Writing ElevatorSubsystem test
-        + Implementing Elevator class
-     James
-        + Implementing InputParser class
-        + Writing InputParser test
-        + Integration testing
-     Liya
-        + Implementing FloorSubsystem class
-        + Writing FloorSubsystem Test
-     Noah
-        + Implementing Buffer class
-        + Writing Buffer test
-        + Implementing Scheduler class
-        + Writing Scheduler test
+Aubin
++ UML class diagram
++ UML sequence diagram
++ Updating README file
+
+Chris
++ Implementing ElevatorSubsystem class
++ Writing ElevatorSubsystem test
++ Implementing Elevator class
+
+James
++ Implementing InputParser class
++ Writing InputParser test
++ Integration testing
+
+Liya
++ Implementing FloorSubsystem class
++ Writing FloorSubsystem Test
+
+Noah
++ Implementing Buffer class
++ Writing Buffer test
++ Implementing Scheduler class
++ Writing Scheduler test
 
 ## Detailed Set Up
 
@@ -156,20 +160,24 @@ The three thread classes created are FloorSubsystem, Scheduler and ElevatorSyste
 
 ## Team Responsibilities
 
-    Aubin
-        + UML class diagram
-        + UML sequence diagram
-        + Converting elevator to state machine
-    Chris
-        + ElevatorState enums
-    James
-        + Converting scheduler to state machine
-        + State diagram
-    Liya
-        + ElevatorEvent.java and integrating buffers to this class
-        + Updating README file
-    Noah
-        + SchedulerState enums
+Aubin
++ UML class diagram
++ UML sequence diagram
++ Converting elevator to state machine
+
+Chris
++ ElevatorState enums
+
+James
++ Converting scheduler to state machine
++ State diagram
+
+Liya
++ ElevatorEvent.java and integrating buffers to this class
++ Updating README file
+
+Noah
++ SchedulerState enums
 
 ## Detailed Set Up
 

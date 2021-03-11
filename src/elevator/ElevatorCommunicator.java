@@ -6,20 +6,21 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 
-import scheduler.Buffer;
-import scheduler.ElevatorCommand;
+import common.IBufferInput;
+import common.IBufferOutput;
+import scheduler.SchedulerMessage;
 
 public class ElevatorCommunicator implements Runnable {
 
-	private Buffer<ElevatorCommand> packetToElevatorSubsystem;
-	private Buffer<ElevatorEvent> packetFromElevatorSubsystem;
+	private IBufferOutput<ElevatorCommand> fromElevatorSubsystem;
+	private IBufferInput<SchedulerMessage> toElevatorSubsystem;
 	private DatagramPacket sendPacket, receivePacket;
 	private DatagramSocket sendReceiveSocket;
 
-	public ElevatorCommunicator(Buffer<ElevatorCommand> packetToElevatorSubsystem,
-			Buffer<ElevatorEvent> packetFromElevatorSubsystem) {
-		this.packetToElevatorSubsystem = packetToElevatorSubsystem;
-		this.packetFromElevatorSubsystem = packetFromElevatorSubsystem;
+	public ElevatorCommunicator(IBufferOutput<ElevatorCommand> fromElevatorSubsystem,
+			IBufferInput<SchedulerMessage> toElevatorSubsystem) {
+		this.fromElevatorSubsystem = fromElevatorSubsystem;
+		this.toElevatorSubsystem = toElevatorSubsystem;
 
 		try {
 			// Construct a Datagram socket and bind it to the specified
@@ -37,7 +38,7 @@ public class ElevatorCommunicator implements Runnable {
 		while (true) {
 
 			// Get new instructions from the scheduler.
-			ElevatorCommand command = packetToElevatorSubsystem.get();
+			ElevatorCommand command = fromElevatorSubsystem.get();
 
 			// If buffer is not empty send instruction to elevatorSubsystem
 			if (command != null) {
@@ -69,7 +70,7 @@ public class ElevatorCommunicator implements Runnable {
 
 				// If event is not null put event in the scheduler buffer
 				if (event != null) {
-					packetFromElevatorSubsystem.put(event);
+					toElevatorSubsystem.put(SchedulerMessage.fromElevatorEvent(event));
 				}
 
 			} catch (IOException e) {

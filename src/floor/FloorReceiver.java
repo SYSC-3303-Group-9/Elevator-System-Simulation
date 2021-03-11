@@ -5,15 +5,15 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 
-import scheduler.Buffer;
+import common.IBufferInput;
+import scheduler.SchedulerMessage;
 
 public class FloorReceiver implements Runnable {
 	private DatagramSocket sendReceiveSocket;
-	private Buffer<InputData> floorToScheduler;
+	private IBufferInput<SchedulerMessage> floorToScheduler;
 	
-	FloorReceiver(Buffer<InputData> floorToScheduler){
+	FloorReceiver(IBufferInput<SchedulerMessage> floorToScheduler){
 		this.floorToScheduler = floorToScheduler;
 		try {
 			sendReceiveSocket = new DatagramSocket(70);
@@ -34,7 +34,8 @@ public class FloorReceiver implements Runnable {
 		    //Receive Packet from FloorSubsystem
 			try {
 				sendReceiveSocket.receive(receivePacket);
-				floorToScheduler.put(InputData.fromBytes(receivePacket.getData()));
+				InputData inputData = InputData.fromBytes(receivePacket.getData());
+				floorToScheduler.put(SchedulerMessage.fromInputData(inputData));
 				
 			} catch(IOException e) {
 				System.out.println("FloorReceiver, receiverPacket " + e);

@@ -2,31 +2,34 @@ package main;
 
 import java.util.ArrayList;
 
+import common.Buffer;
 import elevator.Elevator;
+import elevator.ElevatorCommand;
 import elevator.ElevatorEvent;
 import elevator.ElevatorSubsystem;
 import floor.FloorSubsystem;
 import floor.InputData;
-import scheduler.Buffer;
 import scheduler.Scheduler;
+import scheduler.SchedulerMessage;
 
 /**
  * Helper class to manage the buffer links between subsystems.
  */
 public class SystemBuilder {
-	private Buffer<ElevatorEvent> schedulerToFloorBuffer = new Buffer<ElevatorEvent>();
+	//TODO: Update this whole class once packet subsystems are added.
 	private ArrayList<Buffer<InputData>> schedulerToElevatorBuffers = new ArrayList<Buffer<InputData>>();
 	
-	private Buffer<InputData> floorToSchedulerBuffer = new Buffer<InputData>();
-	
 	private ArrayList<Buffer<ElevatorEvent>> elevatorToSchedulerBuffers = new ArrayList<Buffer<ElevatorEvent>>();
+	
+	private Buffer<SchedulerMessage> schedulerMessageBuffer = new Buffer<SchedulerMessage>();
+	private Buffer<ElevatorCommand> schedulerCommandBuffer = new Buffer<ElevatorCommand>();
 	
 	/**
 	 * Builds a scheduler instance with the corresponding buffers attached.
 	 * @return A new scheduler instance.
 	 */
 	public Scheduler buildScheduler() {
-		return new Scheduler(schedulerToElevatorBuffers, elevatorToSchedulerBuffers, floorToSchedulerBuffer, schedulerToFloorBuffer);
+		return new Scheduler(0, 0, schedulerMessageBuffer, schedulerCommandBuffer);
 	}
 	
 	/**
@@ -54,6 +57,6 @@ public class SystemBuilder {
 		elevatorToSchedulerBuffers.add(elevatorToSchedulerBuffer);
 		
 		Elevator elevator = new Elevator(schedulerToElevatorBuffers.size(), 0);
-		return new ElevatorSubsystem(elevator, schedulerToElevatorBuffer, elevatorToSchedulerBuffer);
+		return new ElevatorSubsystem(elevator);
 	}
 }
