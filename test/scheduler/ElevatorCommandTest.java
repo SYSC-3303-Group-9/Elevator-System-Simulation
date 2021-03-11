@@ -12,7 +12,7 @@ class ElevatorCommandTest {
 	ElevatorCommand expected;
 	@BeforeEach
 	void setUp() throws Exception {
-		expected = new ElevatorCommand(Direction.UP);
+		expected = new ElevatorCommand(1, Direction.UP);
 	}
 
 	@AfterEach
@@ -22,13 +22,25 @@ class ElevatorCommandTest {
 
 	@Test
 	void testSameCommandsEqual() {
-		ElevatorCommand actual = new ElevatorCommand(Direction.UP);
+		ElevatorCommand actual = new ElevatorCommand(1, Direction.UP);
 		assertEquals(expected, actual);
 	}
 	
 	@Test
 	void testDifferentCommandsNotEqual() {
-		ElevatorCommand actual = new ElevatorCommand(Direction.DOWN);
+		ElevatorCommand actual = new ElevatorCommand(1, Direction.DOWN);
+		assertNotEquals(expected, actual);
+	}
+	
+	@Test
+	void SameCommandsDifferentIDNotEqual() {
+		ElevatorCommand actual = new ElevatorCommand(2, Direction.UP);
+		assertNotEquals(expected, actual);
+	}
+	
+	@Test 
+	void DifferentCommandsDifferentIDNotEqual() {
+		ElevatorCommand actual = new ElevatorCommand(2, Direction.DOWN);
 		assertNotEquals(expected, actual);
 	}
 	
@@ -36,9 +48,11 @@ class ElevatorCommandTest {
 	void testToAndFromBytes() {
 		byte[] elevatorCommandBytes = expected.toBytes();
 		ElevatorCommand actual = ElevatorCommand.fromBytes(elevatorCommandBytes);
-		ElevatorCommand badActual = new ElevatorCommand(Direction.DOWN);
+		ElevatorCommand badActual1 = new ElevatorCommand(1, Direction.DOWN);
+		ElevatorCommand badActual2 = new ElevatorCommand(2, Direction.UP);
 		assertEquals(expected, actual);
-		assertNotEquals(expected, badActual);
+		assertNotEquals(expected, badActual1);
+		assertNotEquals(expected, badActual2);
 	}
 
 }
