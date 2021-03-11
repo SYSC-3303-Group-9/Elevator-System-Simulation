@@ -1,7 +1,6 @@
 package floor;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalTime;
 
@@ -125,8 +124,8 @@ public class InputDataTest {
 		boolean result2 = toInputData2.equals(obj1);
 		
 		//arrange
-		assertNotEquals(result1);
-		assertNotEquals(result2);
+		assertFalse(result1);
+		assertFalse(result2);
 		
 	}
 }
