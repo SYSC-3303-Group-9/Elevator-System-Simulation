@@ -17,6 +17,7 @@ public class ElevatorSubsystem implements Runnable {
 	private Buffer<InputData> schedulerToElevatorBuffer;
 	private Buffer<ElevatorEvent> elevatorToSchedulerBuffer;
 	private DatagramSocket sendReceiveSocket;
+	DatagramPacket receivePacket, sendPacket;
 	
 	public ElevatorSubsystem(Elevator elevator, Buffer<InputData> schedulerToElevatorBuffer,
 	Buffer<ElevatorEvent> elevatorToSchedulerBuffer) {
@@ -54,7 +55,21 @@ public class ElevatorSubsystem implements Runnable {
 		// Notify the scheduler that the elevator has moved down.
 		ElevatorEvent elevatorInfo = new ElevatorEvent(elevator.getFloor(), elevator.getId());
 		elevatorToSchedulerBuffer.put(elevatorInfo);
-
+			
+		
+		/**
+		 * Sending Packet containing ElevatorEvent info to the ElevatorCommunicator
+		 * NOT CURRENTLY HOOKED UP, STILL USING BUFFERS
+		 *
+		try {
+			sendPacket = new DatagramPacket(elevatorInfo.toBytes(),elevatorInfo.toBytes().length, InetAddress.getLocalHost(), 50 + elevator.getId());
+			sendReceiveSocket.send(sendPacket);
+		} catch(IOException e) {
+			System.out.println("ElevatorSubsystem, sendCommand " + e);
+			System.exit(1);
+		}
+		*/
+		
 		// Move to next state
 		this.state = ElevatorState.WAITING;
 	}
@@ -76,7 +91,9 @@ public class ElevatorSubsystem implements Runnable {
 				case WAITING:
 					// Get new instructions from the scheduler.
 					instructions = schedulerToElevatorBuffer.get();
-					/**
+					
+					/** Receive Packet containing ElevatorCommand from Elevator Communicator
+					 * 	NOT CURRENTLY HOOKED UP, STILL USING BUFFERS
 					byte data[] = new byte[100];
 					DatagramPacket receivePacket = new DatagramPacket(data, data.length);
 					
