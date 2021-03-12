@@ -53,7 +53,7 @@ public class SystemBuilder {
 		Buffer<ElevatorEvent> elevatorToSchedulerBuffer = new Buffer<ElevatorEvent>();
 		elevatorToSchedulerBuffers.add(elevatorToSchedulerBuffer);
 		
-		Elevator elevator = new Elevator(schedulerToElevatorBuffers.size());
+		Elevator elevator = new Elevator(schedulerToElevatorBuffers.size(), 0);
 		return new ElevatorSubsystem(elevator, schedulerToElevatorBuffer, elevatorToSchedulerBuffer);
 	}
 }
