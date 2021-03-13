@@ -24,6 +24,7 @@ public class FloorReceiver implements Runnable {
 	
 	@Override
 	public synchronized void run() {
+		//Receive InputData packet from the FloorSubsystem via port 70
 		while(true) {
 			byte data[] = new byte[100];
 		    DatagramPacket receivePacket = new DatagramPacket(data, data.length);
