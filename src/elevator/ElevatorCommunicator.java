@@ -46,8 +46,12 @@ public class ElevatorCommunicator implements Runnable {
 				int elevatorId = command.getID();
 
 				try {
-					sendPacket = new DatagramPacket(commandByte, commandByte.length, InetAddress.getLocalHost(),
-							elevatorId + 50);
+					sendPacket = new DatagramPacket(
+							commandByte,
+							commandByte.length,
+							InetAddress.getLocalHost(),
+							ElevatorSubsystem.BASE_PORT + elevatorId);
+					
 					sendReceiveSocket.send(sendPacket);
 				} catch (IOException e) {
 					e.printStackTrace();

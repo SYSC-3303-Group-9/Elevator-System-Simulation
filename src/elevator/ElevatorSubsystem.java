@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 public class ElevatorSubsystem implements Runnable {
+	public static final int BASE_PORT = 50;
 	
 	private Elevator elevator;
 	private ElevatorState state;
@@ -17,7 +18,7 @@ public class ElevatorSubsystem implements Runnable {
 		this.state = ElevatorState.INITIAL;
 		try {
 			// Unique port for each elevator.
-			this.sendReceiveSocket = new DatagramSocket(50 + elevator.getId());
+			this.sendReceiveSocket = new DatagramSocket(BASE_PORT + elevator.getId());
 		} catch(IOException e) {
 			e.printStackTrace();
 			System.exit(1);
