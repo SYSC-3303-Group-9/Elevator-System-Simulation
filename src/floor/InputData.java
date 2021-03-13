@@ -1,9 +1,8 @@
 package floor;
 
-import java.nio.charset.StandardCharsets;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.time.LocalTime;
-import java.util.Arrays;
-
 import elevator.Direction;
 
 /**
@@ -54,10 +53,8 @@ public class InputData {
 	public byte[] toBytes() {
 
 		// Converting Integer values to byte
-		byte intValues[] = { new Integer(this.time.getHour()).byteValue(),
-				new Integer(this.time.getMinute()).byteValue(), new Integer(this.time.getSecond()).byteValue(),
-				new Integer(this.time.getNano()).byteValue(), new Integer(this.currentFloor).byteValue(),
-				new Integer(this.destinationFloor).byteValue() };
+		byte intValues[] = ByteBuffer.allocate(24).putInt(time.getHour()).putInt(time.getMinute()).putInt(time.getSecond())
+				.putInt(time.getNano()).putInt(currentFloor).putInt(destinationFloor).array();
 
 		// Converting enums to byte
 		byte toDirection[] = this.direction.name().getBytes();
@@ -66,11 +63,12 @@ public class InputData {
 
 		// Inserting byte values in one byte array
 		System.arraycopy(intValues, 0, toBytes, 0, intValues.length);
-		System.arraycopy(toDirection, 0, toBytes, 5, toDirection.length);
-
+		System.arraycopy(toDirection, 0, toBytes, intValues.length, toDirection.length);
+		
+		/*
 		// Re-enter last byte in array (Last byte maybe be removed after
 		// System.arraycopy)
-		toBytes[intValues.length + toDirection.length - 1] = new Integer(this.destinationFloor).byteValue();
+		toBytes[intValues.length + toDirection.length - 1] = new Integer(this.destinationFloor).byteValue();*/
 
 		return toBytes;
 	}
@@ -82,30 +80,23 @@ public class InputData {
 	 * @return an InputData object
 	 */
 	public static InputData fromBytes(byte[] bytes) {
-
 		// Order of the data coming from the byte array is known
-		String receivedTime = "0" + String.valueOf(bytes[0]) + ":0" + String.valueOf(bytes[1]) + ":0"
-				+ String.valueOf(bytes[2]) + ".00000000" + String.valueOf(bytes[3]);
-
-		String atFloorReceived = String.valueOf(bytes[4]);
-
-		String toDirectionReceived;
-
-		if (bytes.length == 8) {
-			byte stringByte[] = { bytes[5], bytes[6] };
-			toDirectionReceived = new String(stringByte, StandardCharsets.UTF_8);
-		} else {
-			byte stringByte[] = { bytes[5], bytes[6], bytes[7], bytes[8] };
-			toDirectionReceived = new String(stringByte, StandardCharsets.UTF_8);
+		ByteBuffer buffer = ByteBuffer.wrap(bytes);
+		LocalTime receivedTime = LocalTime.of(buffer.getInt(), buffer.getInt(), buffer.getInt(), buffer.getInt());
+		int receivedCurrentFloor = buffer.getInt();
+		int receivedDestinationFloor = buffer.getInt();
+		
+		byte[] receivedDirectionBytes = new byte[buffer.remaining()];
+		buffer.get(receivedDirectionBytes);
+		Direction receivedDirection = null;
+		String enumName = new String(receivedDirectionBytes, Charset.defaultCharset());
+		try {
+			receivedDirection = Direction.valueOf(enumName);
+		} catch(IllegalArgumentException e) {
+			System.out.println(e.getMessage());
 		}
-
-		String toFloorReceived = (bytes.length == 8) ? String.valueOf(bytes[7]) : String.valueOf(bytes[9]);
-
-		InputData toInputData = new InputData(LocalTime.parse(receivedTime), Integer.parseInt(atFloorReceived),
-				Direction.valueOf(toDirectionReceived), Integer.parseInt(toFloorReceived));
-
-		return toInputData;
-
+		if(receivedDirection == null) return null;
+		else return new InputData(receivedTime, receivedCurrentFloor, receivedDirection, receivedDestinationFloor);
 	}
 
 	@Override
