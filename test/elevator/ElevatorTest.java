@@ -12,7 +12,7 @@ public class ElevatorTest {
 	@Test
 	public void getLocation_shouldFormatData() {
 		// arrange
-		Elevator subject = new Elevator(0);
+		Elevator subject = new Elevator(0, 0);
 		InputData input = new InputData(LocalTime.of(1, 1), 1, Direction.UP, 2);
 		
 		// act
@@ -20,5 +20,23 @@ public class ElevatorTest {
 		
 		// assert
 		assertEquals("Elevator 0 1 UP 2", output);
+	}
+	
+	@Test
+	public void moveElevator() {
+		//	arrange
+		Elevator subject = new Elevator(0,0);
+		
+		//	act
+		subject.move(Direction.UP);
+		
+		//	assert
+		assertEquals(subject.getFloor(), 1);
+		
+		//	act
+		subject.move(Direction.DOWN);
+		
+		//	assert
+		assertEquals(subject.getFloor(), 0);
 	}
 }

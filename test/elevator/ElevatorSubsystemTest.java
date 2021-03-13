@@ -16,7 +16,7 @@ public class ElevatorSubsystemTest {
 		Buffer<InputData> schedulerToElevatorBuffer = new Buffer<InputData>();
 		Buffer<ElevatorEvent> elevatorToSchedulerBuffer = new Buffer<ElevatorEvent>();
 		
-		ElevatorSubsystem subject = new ElevatorSubsystem(new Elevator(0), schedulerToElevatorBuffer, elevatorToSchedulerBuffer);
+		ElevatorSubsystem subject = new ElevatorSubsystem(new Elevator(0,0), schedulerToElevatorBuffer, elevatorToSchedulerBuffer);
 		
 		// arrange data
 		InputData input1 = new InputData(LocalTime.of(0, 0), 1, Direction.UP, 2);
