@@ -64,12 +64,6 @@ public class InputData {
 		// Inserting byte values in one byte array
 		System.arraycopy(intValues, 0, toBytes, 0, intValues.length);
 		System.arraycopy(toDirection, 0, toBytes, intValues.length, toDirection.length);
-		
-		/*
-		// Re-enter last byte in array (Last byte maybe be removed after
-		// System.arraycopy)
-		toBytes[intValues.length + toDirection.length - 1] = new Integer(this.destinationFloor).byteValue();*/
-
 		return toBytes;
 	}
 
