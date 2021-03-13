@@ -54,13 +54,11 @@ public class FloorSubsystem implements Runnable {
 			
 			// Following section is if we want to send responses back from FloorReceiver
 			// expect a response from FloorReceiver acknowledging packet receipt
-			byte response[] = new byte[20];
+			byte response[] = new byte[100];
 			receivePacket = new DatagramPacket(response, response.length);
 			try {
 				// Block until packet is received back from FloorReceiver
 				sendReceiveSocket.receive(receivePacket);
-				String s = new String(response, Charset.defaultCharset());
-				System.out.println(s);
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.exit(1);
