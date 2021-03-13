@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import elevator.Direction;
+import elevator.ElevatorCommand;
 
 class ElevatorCommandTest {
 	ElevatorCommand expected;
