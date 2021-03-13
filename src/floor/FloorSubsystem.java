@@ -44,7 +44,7 @@ public class FloorSubsystem implements Runnable {
 		for (InputData x : data) {
 			System.out.println("[" + x.getTime() + "] Floor " + x.getCurrentFloor() + " requested elevator");	
 			try {
-				sendPacket = new DatagramPacket(x.toBytes(), x.toBytes().length, InetAddress.getLocalHost(), 70);
+				sendPacket = new DatagramPacket(x.toBytes(), x.toBytes().length, InetAddress.getLocalHost(), FloorReceiver.PORT);
 				sendReceiveSocket.send(sendPacket);
 			} catch(IOException e) {
 				e.printStackTrace();

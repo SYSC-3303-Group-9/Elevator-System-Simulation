@@ -32,7 +32,7 @@ public class ElevatorCommand {
 		buffer.get(directionBytes);
 		// Attempt to convert the directionBytes into a Direction enum
 		Direction direction = null;
-		String enumName = new String(directionBytes, Charset.defaultCharset());
+		String enumName = new String(directionBytes, Charset.defaultCharset()).trim();
 		try {
 			direction = Direction.valueOf(enumName);
 		} catch(IllegalArgumentException e) {

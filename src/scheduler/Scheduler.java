@@ -153,11 +153,13 @@ public class Scheduler implements Runnable {
 			for (ScheduledJob job : elevator.getAssignedJobs()) {
 				// If picking up passenger.
 				if (this.elevatorEvent.getFloor() == job.getStartFloor()) {
+					System.out.println("Elevator " + elevator.getElevatorId() + " picked up passenger on floor " + this.elevatorEvent.getFloor());
 					job.setOnElevator(true);
 					moveToDropOff(elevator, job);
 				}
 				// If dropping off passenger.
 				else if (job.getIsOnElevator() && this.elevatorEvent.getFloor() == job.getEndFloor()) {
+					System.out.println("Elevator " + elevator.getElevatorId() + " dropped off passenger on floor " + this.elevatorEvent.getFloor());
 					completedJobs.add(job);
 				}
 			}
@@ -280,6 +282,7 @@ public class Scheduler implements Runnable {
 		// If the elevator is already on the start floor.
 		if (elevator.getLastKnownFloor() == job.getStartFloor()) {
 			// Put the person on the elevator and start moving towards drop off.
+			System.out.println("Elevator " + elevator.getElevatorId() + " picked up passenger on floor " + elevator.getLastKnownFloor());
 			job.setOnElevator(true);
 			moveToDropOff(elevator, job);
 		}

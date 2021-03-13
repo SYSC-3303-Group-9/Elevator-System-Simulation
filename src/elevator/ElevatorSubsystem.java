@@ -7,8 +7,11 @@ import java.net.InetAddress;
 
 public class ElevatorSubsystem implements Runnable {
 
+	public static final int BASE_PORT = 50;
+	
 	private Elevator elevator;
 	private ElevatorState state;
+	ElevatorCommand command = null;
 	private DatagramSocket sendReceiveSocket;
 	DatagramPacket receivePacket, sendPacket;
 
@@ -17,8 +20,8 @@ public class ElevatorSubsystem implements Runnable {
 		this.state = ElevatorState.INITIAL;
 		try {
 			// Unique port for each elevator.
-			this.sendReceiveSocket = new DatagramSocket(50 + elevator.getId());
-		} catch (IOException e) {
+			this.sendReceiveSocket = new DatagramSocket(BASE_PORT + elevator.getId());
+		} catch(IOException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
@@ -66,7 +69,6 @@ public class ElevatorSubsystem implements Runnable {
 	 * @return
 	 */
 	public boolean next() {
-		ElevatorCommand command = null;
 		switch (this.state) {
 
 		case INITIAL:
