@@ -6,103 +6,129 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 public class ElevatorSubsystem implements Runnable {
-	
+
 	private Elevator elevator;
 	private ElevatorState state;
 	private DatagramSocket sendReceiveSocket;
 	DatagramPacket receivePacket, sendPacket;
-	
+
 	public ElevatorSubsystem(Elevator elevator) {
 		this.elevator = elevator;
 		this.state = ElevatorState.INITIAL;
 		try {
 			// Unique port for each elevator.
 			this.sendReceiveSocket = new DatagramSocket(50 + elevator.getId());
-		} catch(IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
 	}
-	
-	
+
+	/**
+	 * Gets the current state of the ElevatorSubsystem state machine.
+	 * 
+	 * @return The current state.
+	 */
+	public ElevatorState getState() {
+		return this.state;
+	}
+
+	/**
+	 * Notifies the Scheduler that the elevator has moved
+	 * @param command
+	 */
 	public void sendCommand(ElevatorCommand command) {
 		// Move the Elevator
 		elevator.move(command.getDirection());
-		
+
 		// Notify the scheduler that the elevator has moved down.
 		ElevatorEvent elevatorInfo = new ElevatorEvent(elevator.getFloor(), elevator.getId());
-		
+
 		// Send ElevatorEvent packet to ElevatorCommand.
 		try {
-			sendPacket = new DatagramPacket(elevatorInfo.toBytes(),elevatorInfo.toBytes().length, InetAddress.getLocalHost(), receivePacket.getPort());
+			sendPacket = new DatagramPacket(elevatorInfo.toBytes(), elevatorInfo.toBytes().length,
+					InetAddress.getLocalHost(), receivePacket.getPort());
 			sendReceiveSocket.send(sendPacket);
-		} catch(IOException e) {
+		} catch (IOException e) {
 			System.out.println("ElevatorSubsystem, sendCommand " + e);
 			System.exit(1);
 		}
-		
+
 		// Move to next state
 		this.state = ElevatorState.WAITING;
 	}
 	
 	
-	
+	/**
+	 * Servers as a controller to the Elevator state machine.
+	 * Each call "next()" enters the switch statement and transition into states accordingly.
+	 * This enables the ability to track the state after each transition
+	 * @return
+	 */
+	public boolean next() {
+		ElevatorCommand command = null;
+		switch (this.state) {
+
+		case INITIAL:
+			// Immediately move to the next state
+			this.state = ElevatorState.WAITING;
+			break;
+
+		case WAITING:
+			// Receive new ElevatorCommand packet from ElevatorComunicator via port 50 +
+			// Elevator ID.
+			byte data[] = new byte[100];
+			receivePacket = new DatagramPacket(data, data.length);
+
+			try {
+				sendReceiveSocket.receive(receivePacket);
+			} catch (IOException e) {
+				System.out.println("ElevatorSubsystem, run " + e);
+			}
+
+			command = ElevatorCommand.fromBytes(receivePacket.getData());
+
+			// If the buffer was disabled and returned null, stop execution.
+			if (command == null) {
+				// Move to the final state
+				this.state = ElevatorState.FINAL;
+			} else {
+				// Change the state of the Elevator to Moving up or Moving down
+				if (command.getDirection() == Direction.UP) {
+					this.state = ElevatorState.MOVINGUP;
+				} else if (command.getDirection() == Direction.DOWN) {
+					this.state = ElevatorState.MOVINGDOWN;
+				}
+			}
+			break;
+
+		case MOVINGDOWN: {
+			// Assuming at this point that the elevator has arrived.
+			sendCommand(command);
+			break;
+		}
+
+		case MOVINGUP: {
+			// Assuming at this point that the elevator has arrived.
+			sendCommand(command);
+			break;
+		}
+
+		case FINAL:
+			return true;
+		}
+		return false;
+	}
+
 	@Override
 	public void run() {
-		ElevatorCommand command = null;
-		stateMachine: while (true) {
-			switch (this.state) {
-				
-				case INITIAL:
-					// Immediately move to the next state
-					this.state = ElevatorState.WAITING;
-					break;
-					
-				case WAITING:
-					// Receive new ElevatorCommand packet from ElevatorComunicator via port 50 + Elevator ID.
-					byte data[] = new byte[100];
-					receivePacket = new DatagramPacket(data, data.length);
-					
-					try {
-						sendReceiveSocket.receive(receivePacket);
-					} catch(IOException e) {
-						System.out.println("ElevatorSubsystem, run " + e);
-					}
-					
-					command = ElevatorCommand.fromBytes(receivePacket.getData());
-					
-					// If the buffer was disabled and returned null, stop execution.
-					if (command == null) {
-						// Move to the final state
-						this.state = ElevatorState.FINAL;
-					}
-					else {
-						// Change the state of the Elevator to Moving up or Moving down
-						if(command.getDirection() == Direction.UP){
-							this.state = ElevatorState.MOVINGUP;
-						} else if(command.getDirection() == Direction.DOWN){
-							this.state = ElevatorState.MOVINGDOWN;
-						}
-					}
-					break;
-				
-				case MOVINGDOWN:
-				{	
-					// Assuming at this point that the elevator has arrived.
-					sendCommand(command);
-					break;
-				}
-
-				case MOVINGUP:
-				{
-					// Assuming at this point that the elevator has arrived.
-					sendCommand(command);
-					break;
-				}
-		
-				case FINAL:
-					break stateMachine;
-				}
+		while(true) {
+			// if "next()" returns true, we have reached the final state of the state machine,
+			// and therefore no longer can/need to transition
+			if(next()) {
+				break;
+			}
 		}
+		
 	}
 }
