@@ -1,13 +1,9 @@
 package floor;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 import java.time.LocalTime;
-
 import org.junit.jupiter.api.Test;
-
 import elevator.Direction;
-
 public class InputDataTest {
 
 	@Test
@@ -93,19 +89,21 @@ public class InputDataTest {
 		//arrange
 		InputData obj1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 1);
 		InputData obj2 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.DOWN, 2);
-		
+		InputData obj3 = new InputData(LocalTime.of(13, 43, 27, 5220314), 3, Direction.UP, 5);
 		
 		
 		//act
 		byte toByte1 [] = obj1.toBytes();
 		byte toByte2 [] = obj2.toBytes();
+		byte toByte3 [] = obj3.toBytes();
 		InputData toInputData1 = InputData.fromBytes(toByte1);
 		InputData toInputData2 = InputData.fromBytes(toByte2);
+		InputData toInputData3 = InputData.fromBytes(toByte3);
 		
 		//assert
 		assertEquals(toInputData1, obj1);
 		assertEquals(toInputData2, obj2);
-		
+		assertEquals(toInputData3, obj3);
 	}
 	
 	@Test
@@ -113,19 +111,22 @@ public class InputDataTest {
 		//arrange
 		InputData obj1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 1);
 		InputData obj2 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.DOWN, 2);
+		InputData obj3 = new InputData(LocalTime.of(13, 43, 27, 5220314), 3, Direction.UP, 5);
 		
 		//act
 		byte toByte1 [] = obj1.toBytes();
 		byte toByte2 [] = obj2.toBytes();
+		byte toByte3 [] = obj3.toBytes();
 		InputData toInputData1 = InputData.fromBytes(toByte1);
 		InputData toInputData2 = InputData.fromBytes(toByte2);
-		
-		boolean result1 = toInputData1.equals(obj2);
-		boolean result2 = toInputData2.equals(obj1);
+		InputData toInputData3 = InputData.fromBytes(toByte3);
 		
 		//arrange
-		assertFalse(result1);
-		assertFalse(result2);
-		
+		assertNotEquals(obj1, toInputData2);
+		assertNotEquals(obj1, toInputData3);
+		assertNotEquals(obj2, toInputData1);
+		assertNotEquals(obj2, toInputData3);
+		assertNotEquals(obj3, toInputData1);
+		assertNotEquals(obj3, toInputData2);	
 	}
 }
