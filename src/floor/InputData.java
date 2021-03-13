@@ -83,11 +83,11 @@ public class InputData {
 		byte[] receivedDirectionBytes = new byte[buffer.remaining()];
 		buffer.get(receivedDirectionBytes);
 		Direction receivedDirection = null;
-		String enumName = new String(receivedDirectionBytes, Charset.defaultCharset());
+		String enumName = new String(receivedDirectionBytes, Charset.defaultCharset()).trim();
 		try {
 			receivedDirection = Direction.valueOf(enumName);
 		} catch(IllegalArgumentException e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 		if(receivedDirection == null) return null;
 		else return new InputData(receivedTime, receivedCurrentFloor, receivedDirection, receivedDestinationFloor);

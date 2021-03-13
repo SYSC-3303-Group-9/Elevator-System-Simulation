@@ -20,8 +20,8 @@ This project is a design and implementation of an elevator control system and si
 
 1.  Download zip file and unzip
 2.  Open unzipped file through the Eclipse file system
-3.  Open the Main class inside the 'main' package
-4.  Run Main.java as 1 Java application
+3.  Locate the 3 `Main.java` files: `elevator/Main.java`, `scheduler/Main.java`, and `floor/Main.java`. Each `Main.java` represents one part of the Elevator-System, they are meant to be running simultaneously. 
+4.  Launch each `Main.java` by right-clicking -> Run as Java application. **They must be launched in the order given in step 3**.
 
 Tests are written and run with JUnit 5. The 'test' folder contains a test package for each subsystem
 
