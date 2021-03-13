@@ -19,7 +19,7 @@ public class FloorSubsystemTest {
 		Buffer<ElevatorEvent> schedulerToFloorBuffer = new Buffer<ElevatorEvent>();
 		schedulerToFloorBuffer.setIsDisabled(true);
 		
-		FloorSubsystem subject = new FloorSubsystem(floorToSchedulerBuffer, schedulerToFloorBuffer);
+		FloorSubsystem subject = new FloorSubsystem();
 		
 		// act
 		Thread th = new Thread(subject);

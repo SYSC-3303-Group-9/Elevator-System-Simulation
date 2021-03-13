@@ -34,7 +34,7 @@ public class SystemBuilder {
 	 * @return A new floor subsystem instance.
 	 */
 	public FloorSubsystem buildFloorSubsystem() {
-		return new FloorSubsystem(floorToSchedulerBuffer, schedulerToFloorBuffer);
+		return new FloorSubsystem();
 	}
 	
 	/**
