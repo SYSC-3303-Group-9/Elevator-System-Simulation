@@ -44,7 +44,7 @@ public class ElevatorSubsystem implements Runnable {
 		
 		//Send ElevatorEvent packet to ElevatorCommand via port 50 + Elevator ID
 		try {
-			sendPacket = new DatagramPacket(elevatorInfo.toBytes(),elevatorInfo.toBytes().length, InetAddress.getLocalHost(), 50 + elevator.getId());
+			sendPacket = new DatagramPacket(elevatorInfo.toBytes(),elevatorInfo.toBytes().length, InetAddress.getLocalHost(), receivePacket.getPort());
 			sendReceiveSocket.send(sendPacket);
 		} catch(IOException e) {
 			System.out.println("ElevatorSubsystem, sendCommand " + e);
@@ -71,7 +71,7 @@ public class ElevatorSubsystem implements Runnable {
 				case WAITING:
 					// Receive new ElevatorCommand packet from ElevatorCoomunicator via port 50 + Elevator ID.
 					byte data[] = new byte[100];
-					DatagramPacket receivePacket = new DatagramPacket(data, data.length);
+					receivePacket = new DatagramPacket(data, data.length);
 					
 					try {
 						sendReceiveSocket.receive(receivePacket);
