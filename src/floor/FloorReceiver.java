@@ -10,13 +10,15 @@ import common.IBufferInput;
 import scheduler.SchedulerMessage;
 
 public class FloorReceiver implements Runnable {
+	public static final int PORT = 70;
+	
 	private DatagramSocket sendReceiveSocket;
 	private IBufferInput<SchedulerMessage> floorToScheduler;
 	
-	FloorReceiver(IBufferInput<SchedulerMessage> floorToScheduler){
+	public FloorReceiver(IBufferInput<SchedulerMessage> floorToScheduler){
 		this.floorToScheduler = floorToScheduler;
 		try {
-			sendReceiveSocket = new DatagramSocket(70);
+			sendReceiveSocket = new DatagramSocket(PORT);
 		} catch (SocketException e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -35,6 +37,7 @@ public class FloorReceiver implements Runnable {
 			try {
 				sendReceiveSocket.receive(receivePacket);
 				InputData inputData = InputData.fromBytes(receivePacket.getData());
+				System.out.println("Scheduler received " + inputData);
 				floorToScheduler.put(SchedulerMessage.fromInputData(inputData));
 				
 			} catch(IOException e) {
