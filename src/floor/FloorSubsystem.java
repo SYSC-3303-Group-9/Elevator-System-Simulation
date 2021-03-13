@@ -54,7 +54,7 @@ public class FloorSubsystem implements Runnable {
 			
 			// Following section is if we want to send responses back from FloorReceiver
 			// expect a response from FloorReceiver acknowledging packet receipt
-			byte response[] = new byte[100];
+			byte response[] = new byte[0];
 			receivePacket = new DatagramPacket(response, response.length);
 			try {
 				// Block until packet is received back from FloorReceiver
