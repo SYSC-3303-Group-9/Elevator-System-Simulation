@@ -28,17 +28,12 @@ public class ElevatorSubsystemTest {
 	int upperBound = 25;
 
 	@BeforeEach
-	void setup() {
+	void setup() throws IOException {
 		elevator = new Elevator(ran.nextInt(upperBound), 1);
 
-		try {
-			// Construct a datagram socket and bind it to any available
-			// port on the local host machine.
-			sendReceiveSocket = new DatagramSocket();
-		} catch (SocketException se) { // Can't create the socket.
-			se.printStackTrace();
-			System.exit(1);
-		}
+		// Construct a datagram socket and bind it to any available
+		// port on the local host machine.
+		sendReceiveSocket = new DatagramSocket();
 	}
 
 	@AfterEach
@@ -58,7 +53,7 @@ public class ElevatorSubsystemTest {
 	}
 
 	@Test
-	void movedElevatorUp() {
+	void movedElevatorUp() throws IOException {
 		elevator = new Elevator(ran.nextInt(upperBound), 1);
 		system = new ElevatorSubsystem(elevator);
 
@@ -70,21 +65,11 @@ public class ElevatorSubsystemTest {
 		InputData request = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2);
 
 		// Construct a datagram packet that is to be sent
-		try {
-			sendPacket = new DatagramPacket(request.toBytes(), request.toBytes().length, InetAddress.getLocalHost(),
-					50 + elevator.getId());
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+		sendPacket = new DatagramPacket(request.toBytes(), request.toBytes().length, InetAddress.getLocalHost(),
+				ElevatorSubsystem.BASE_PORT + elevator.getId());
 
 		// Send the datagram packet to the server via the send/receive socket.
-		try {
-			sendReceiveSocket.send(sendPacket);
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+		sendReceiveSocket.send(sendPacket);
 
 		// Transition to MOVINGUP state
 		system.next();
@@ -92,18 +77,13 @@ public class ElevatorSubsystemTest {
 		system.next();
 
 		// Construct a DatagramPacket for receiving packets up
-		// to 100 bytes
+		// to 8 bytes
 		byte data[] = new byte[8];
 		receivePacket = new DatagramPacket(data, data.length);
 
 		// Receiving Elevator command
-		try {
-			// Block until a datagram is received via sendReceiveSocket.
-			sendReceiveSocket.receive(receivePacket);
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+		// Block until a datagram is received via sendReceiveSocket.
+		sendReceiveSocket.receive(receivePacket);
 
 		// Close the socket.
 		sendReceiveSocket.close();
@@ -115,7 +95,7 @@ public class ElevatorSubsystemTest {
 	}
 
 	@Test
-	void movedElevatorDown() {
+	void movedElevatorDown() throws IOException {
 		elevator = new Elevator(ran.nextInt(upperBound), 3);
 		system = new ElevatorSubsystem(elevator);
 
@@ -127,21 +107,11 @@ public class ElevatorSubsystemTest {
 		InputData request = new InputData(LocalTime.of(1, 1, 1, 1), 3, Direction.DOWN, 2);
 
 		// Construct a datagram packet that is to be sent
-		try {
-			sendPacket = new DatagramPacket(request.toBytes(), request.toBytes().length, InetAddress.getLocalHost(),
-					50 + elevator.getId());
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+		sendPacket = new DatagramPacket(request.toBytes(), request.toBytes().length, InetAddress.getLocalHost(),
+				ElevatorSubsystem.BASE_PORT + elevator.getId());
 
 		// Send the datagram packet to the server via the send/receive socket.
-		try {
-			sendReceiveSocket.send(sendPacket);
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+		sendReceiveSocket.send(sendPacket);
 
 		// Transition to MOVINGUP state
 		system.next();
@@ -149,18 +119,13 @@ public class ElevatorSubsystemTest {
 		system.next();
 
 		// Construct a DatagramPacket for receiving packets up
-		// to 100 bytes
+		// to 8 bytes
 		byte data[] = new byte[8];
 		receivePacket = new DatagramPacket(data, data.length);
 
 		// Receiving Elevator command
-		try {
-			// Block until a datagram is received via sendReceiveSocket.
-			sendReceiveSocket.receive(receivePacket);
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+		// Block until a datagram is received via sendReceiveSocket.
+		sendReceiveSocket.receive(receivePacket);
 
 		// Close the socket.
 		sendReceiveSocket.close();

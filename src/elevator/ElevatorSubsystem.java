@@ -47,7 +47,7 @@ public class ElevatorSubsystem implements Runnable {
 		// Notify the scheduler that the elevator has moved down.
 		ElevatorEvent elevatorInfo = new ElevatorEvent(elevator.getFloor(), elevator.getId());
 
-		// Send ElevatorEvent packet to ElevatorCommand.
+		// Send ElevatorEvent packet to ElevatorCommunicator.
 		try {
 			sendPacket = new DatagramPacket(elevatorInfo.toBytes(), elevatorInfo.toBytes().length,
 					InetAddress.getLocalHost(), receivePacket.getPort());
