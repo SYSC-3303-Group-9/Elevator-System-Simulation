@@ -20,7 +20,7 @@ This project is a design and implementation of an elevator control system and si
 
 1.  Download zip file and unzip
 2.  Open unzipped file through the Eclipse file system
-3.  Locate the 3 `Main.java` files: `elevator/Main.java`, `scheduler/Main.java`, and `floor/Main.java`. Each `Main.java` represents one part of the Elevator-System, they are meant to be running simultaneously. 
+3.  Locate the 3 `Main.java` files: `elevator/Main.java`, `scheduler/Main.java`, and `floor/Main.java`. Each `Main.java` represents one part of the Elevator-System, they are meant to be running simultaneously.
 4.  Launch each `Main.java` by right-clicking -> Run as Java application. **They must be launched in the order given in step 3**.
 
 Tests are written and run with JUnit 5. The 'test' folder contains a test package for each subsystem
@@ -83,29 +83,34 @@ Tests are written and run with JUnit 5. The 'test' folder contains a test packag
 ## Team Responsibilities
 
 Aubin
-+ UML class diagram
-+ UML sequence diagram
-+ Updating README file
+
+- UML class diagram
+- UML sequence diagram
+- Updating README file
 
 Chris
-+ Implementing ElevatorSubsystem class
-+ Writing ElevatorSubsystem test
-+ Implementing Elevator class
+
+- Implementing ElevatorSubsystem class
+- Writing ElevatorSubsystem test
+- Implementing Elevator class
 
 James
-+ Implementing InputParser class
-+ Writing InputParser test
-+ Integration testing
+
+- Implementing InputParser class
+- Writing InputParser test
+- Integration testing
 
 Liya
-+ Implementing FloorSubsystem class
-+ Writing FloorSubsystem Test
+
+- Implementing FloorSubsystem class
+- Writing FloorSubsystem Test
 
 Noah
-+ Implementing Buffer class
-+ Writing Buffer test
-+ Implementing Scheduler class
-+ Writing Scheduler test
+
+- Implementing Buffer class
+- Writing Buffer test
+- Implementing Scheduler class
+- Writing Scheduler test
 
 ## Detailed Set Up
 
@@ -161,26 +166,129 @@ The three thread classes created are FloorSubsystem, Scheduler and ElevatorSyste
 ## Team Responsibilities
 
 Aubin
-+ UML class diagram
-+ UML sequence diagram
-+ Converting elevator to state machine
+
+- UML class diagram
+- UML sequence diagram
+- Converting elevator to state machine
 
 Chris
-+ ElevatorState enums
+
+- ElevatorState enums
 
 James
-+ Converting scheduler to state machine
-+ State diagram
+
+- Converting scheduler to state machine
+- State diagram
 
 Liya
-+ ElevatorEvent.java and integrating buffers to this class
-+ Updating README file
+
+- ElevatorEvent.java and integrating buffers to this class
+- Updating README file
 
 Noah
-+ SchedulerState enums
+
+- SchedulerState enums
 
 ## Detailed Set Up
 
 In this iteration, state machines for the scheduler and elevator subsystems were added assuming that there is only one elevator. A state enum class was created for both Elevator and Scheduler classes. An Elevator Event class was also created which is passes from the elevators to the elevatorSubsystems when an elevator arrives at a floor. This object is then passed from the elevatorSubsystems to the scheduler then to the floorSubsystem where it is printed out.
+
+</details>
+
+<details><summary>Iteration 3</summary>
+
+# Iteration 3
+
+## Folders/Files included
+
+    * resources
+        + input.txt
+
+    * src
+        - common
+            + Buffer.java
+            + Constants.java
+            + IBufferInput.java
+            + IBufferOutput.java
+        - elevator
+            + Direction.java
+            + Elevator.java
+            + ElevatorCommand.java
+            + ElevatorCommunicator.java
+            + ElevatorEvent.java
+            + ElevatorState.java
+            + ElevatorSubsystem.java
+            + Main.java
+        - floor
+            + FloorReceiver.java
+            + FloorSubsystem.java
+            + InputData.java
+            + InputParser.java
+            + Main.java
+        - main
+            + Main.java
+            + SystemBuilder
+        - scheduler
+            + Main.java
+            + ScheduledJob.java
+            + Scheduler.java
+            + SchedulerElevator.java
+            + SchedulerMessage.java
+            + SchedulerState.java
+
+    * UML Diagrams
+            + StateDiagram.mdj
+            + StateDiagram.png
+            + UML-Class-Diagram-IT1 .png
+            + UML-Class-Diagram-IT1 .violet
+            + UML-Class-Diagram-IT3 .png
+            + UML-Class-Diagram-IT3 .violet
+            + UML-Sequence-Diagram-IT1 .png
+            + UML-Sequence-Diagram-IT1 .violet
+
+    * test
+        - elevator
+            + ElevatorSubsystemTest.java
+            + Elevator.java
+        - floor
+            + FloorSubsystemTest.java
+            + InputDataTest.java
+            + InputParserTest.java
+        - scheduler
+            + SchedulerTest.java
+            + BufferTest.java
+
+## Team Responsibilities
+
+Aubin
+
+- Updating InputData
+- UML sequence diagram
+- Writing ElevatorSubsystemTest
+
+Chris
+
+- Updating ElevatorSubsystem
+- Implementing FloorReceiver
+- Writing FloorReceiver test
+
+James
+
+- Updating Scheduler
+- Writing statemachine tests for Scheduler
+- Updating Statemachine diagram
+
+Liya
+
+- Implementing ElevatorCommunicator
+- Updating README and UML diagram
+
+Noah
+
+- Implementing ElevatorCommand
+- Implementing ElevatorEvent
+- Updating FloorSubsystem
+
+## Detailed Set Up
 
 </details>
