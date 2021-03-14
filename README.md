@@ -291,4 +291,10 @@ Noah
 
 ## Detailed Set Up
 
+The floor, scheduler and elevator subsystems now communicate using UDP. The `floorSubsystem.java` class reads requests from the input.txt file and sends the requests (in the form of InputData bytes) to `FloorReceiver.java` which is at port 70. Then FloorReceiver changes the InputData into SchedulerMessage and puts it in an IBufferInput which can be accessed by the `Scheduler.java` class.
+
+`Scheduler.java` schedules the request and puts an ElevatorCommand into a IBufferInput which can be accessed by `ElevatorCommunicator.java` class. This class then sends the ElevatorCommand it received to the respective `ElevatorSubsystem.java` class which is at (port 50 + elevatorId received in the command).
+
+The ElevatorSubsystem moves its elevator according to the `ElevatorCommand` it received then sends an `ElevatorEvent` to the ElevatorCommunicator. The scheduler is notified that that the elevator has moved when the ElevatorCommunicator puts this ElevatorEvent in an IBufferOutput connected to the scheduler.
+
 </details>
