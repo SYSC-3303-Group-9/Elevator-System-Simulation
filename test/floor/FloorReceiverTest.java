@@ -17,7 +17,7 @@ import scheduler.SchedulerMessage;
 class FloorReceiverTest {
 
 	@Test
-	void run_shouldAddSchedulerMessageToBuffer() {
+	void run_shouldAddSchedulerMessageToBuffer() throws IOException {
 		//arrange
 		Buffer<SchedulerMessage> buffer = new Buffer<>();
 		Thread thFloorReceiver = new Thread(new FloorReceiver(buffer));
@@ -25,14 +25,10 @@ class FloorReceiverTest {
 		
 		//act
 		thFloorReceiver.start();
-		try {
-			DatagramSocket sendSocket = new DatagramSocket();
-			DatagramPacket sendPacket = new DatagramPacket(input.toBytes(), input.toBytes().length, InetAddress.getLocalHost(), 70);
-			sendSocket.send(sendPacket);
-			sendSocket.close();
-		} catch (IOException e) {
-			System.out.println("FlooReceiverTest, run_shouldAddSchedulerMessageToBuffer " + e);
-		}
+		DatagramSocket sendSocket = new DatagramSocket();
+		DatagramPacket sendPacket = new DatagramPacket(input.toBytes(), input.toBytes().length, InetAddress.getLocalHost(), FloorReceiver.PORT);
+		sendSocket.send(sendPacket);
+		sendSocket.close();
 		
 		//arrange
 		assertTrue(input.equals(buffer.get().getInputData()));
