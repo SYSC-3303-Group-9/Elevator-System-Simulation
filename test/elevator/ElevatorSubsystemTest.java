@@ -25,7 +25,7 @@ public class ElevatorSubsystemTest {
 	Elevator elevator;
 	ElevatorSubsystem system;
 	Random ran = new Random();
-	int upperBound = 25;
+	int upperBound = 100;
 
 	@BeforeEach
 	void setup() throws IOException {
