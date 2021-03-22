@@ -23,6 +23,11 @@ public class InputData {
 	 * @param destinationFloor The floor that the elevator must reach.
 	 */
 	public InputData(LocalTime time, int currentFloor, Direction direction, int destinationFloor) {
+		if ((direction == Direction.UP && currentFloor >= destinationFloor)
+				|| (direction == Direction.DOWN && currentFloor <= destinationFloor)) {
+			throw new UnsupportedOperationException("Elevator cannot move " + direction + " from " + currentFloor + " to " + destinationFloor);
+		}
+		
 		this.time = time;
 		this.currentFloor = currentFloor;
 		this.direction = direction;

@@ -11,6 +11,7 @@ import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
 
 import common.Buffer;
+import common.Constants;
 import elevator.Direction;
 import scheduler.SchedulerMessage;
 
@@ -26,7 +27,7 @@ class FloorReceiverTest {
 		//act
 		thFloorReceiver.start();
 		DatagramSocket sendSocket = new DatagramSocket();
-		DatagramPacket sendPacket = new DatagramPacket(input.toBytes(), input.toBytes().length, InetAddress.getLocalHost(), FloorReceiver.PORT);
+		DatagramPacket sendPacket = new DatagramPacket(input.toBytes(), input.toBytes().length, InetAddress.getLocalHost(), Constants.FLOOR_RECEIVER_PORT);
 		sendSocket.send(sendPacket);
 		sendSocket.close();
 		

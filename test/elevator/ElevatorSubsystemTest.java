@@ -2,14 +2,14 @@ package elevator;
 
 import org.junit.jupiter.api.Test;
 
+import common.Constants;
+
 import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.time.LocalTime;
 import java.util.Random;
 
@@ -25,7 +25,7 @@ public class ElevatorSubsystemTest {
 	Elevator elevator;
 	ElevatorSubsystem system;
 	Random ran = new Random();
-	int upperBound = 25;
+	int upperBound = 100;
 
 	@BeforeEach
 	void setup() throws IOException {
@@ -66,7 +66,7 @@ public class ElevatorSubsystemTest {
 
 		// Construct a datagram packet that is to be sent
 		sendPacket = new DatagramPacket(request.toBytes(), request.toBytes().length, InetAddress.getLocalHost(),
-				ElevatorSubsystem.BASE_PORT + elevator.getId());
+				Constants.ELEVATOR_BASE_PORT + elevator.getId());
 
 		// Send the datagram packet to the server via the send/receive socket.
 		sendReceiveSocket.send(sendPacket);
@@ -108,7 +108,7 @@ public class ElevatorSubsystemTest {
 
 		// Construct a datagram packet that is to be sent
 		sendPacket = new DatagramPacket(request.toBytes(), request.toBytes().length, InetAddress.getLocalHost(),
-				ElevatorSubsystem.BASE_PORT + elevator.getId());
+				Constants.ELEVATOR_BASE_PORT + elevator.getId());
 
 		// Send the datagram packet to the server via the send/receive socket.
 		sendReceiveSocket.send(sendPacket);
