@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 
+import common.Constants;
 import common.IBufferInput;
 import common.IBufferOutput;
 import scheduler.SchedulerMessage;
@@ -50,7 +51,7 @@ public class ElevatorCommunicator implements Runnable {
 							commandByte,
 							commandByte.length,
 							InetAddress.getLocalHost(),
-							ElevatorSubsystem.BASE_PORT + elevatorId);
+							Constants.ELEVATOR_BASE_PORT + elevatorId);
 					
 					sendReceiveSocket.send(sendPacket);
 				} catch (IOException e) {

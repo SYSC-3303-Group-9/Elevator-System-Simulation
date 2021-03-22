@@ -28,6 +28,11 @@ Tests are written and run with JUnit 5. The 'test' folder contains a test packag
 1.  Upon opening the test folder (In Eclipse), select subsystem package
 2.  Open .java file and run as 1 JUnit test
 
+# Configuration
+
+Configurable parameters are located in `src/common/Constants.java`. 
+This includes configuring the number of floors and elevators, the various ports, the input file path and the elevator movement durations.
+
 # Authors
 
 - Aubin Musingya
