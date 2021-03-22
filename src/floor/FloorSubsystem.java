@@ -11,6 +11,8 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.List;
 
+import common.Constants;
+
 public class FloorSubsystem implements Runnable {
 	private DatagramPacket sendPacket, receivePacket;
 	private DatagramSocket sendReceiveSocket;
@@ -31,7 +33,7 @@ public class FloorSubsystem implements Runnable {
 		// Reads input data from the provided text file and adds each line of data to
 		// the Buffer after converting it to a InputData type.
 		try {
-			File inputFile = new File(FloorSubsystem.class.getResource("/input.txt").getFile());
+			File inputFile = new File(Constants.INPUT_FILE);
 			BufferedReader reader = new BufferedReader(new FileReader(inputFile));
 			data = InputParser.parse(reader);
 		} catch (FileNotFoundException e) {
@@ -40,11 +42,11 @@ public class FloorSubsystem implements Runnable {
 			return;
 		}
 		
-		// Send all the input data to the FloorReceiver (Port 70).
+		// Send all the input data to the FloorReceiver.
 		for (InputData x : data) {
 			System.out.println("[" + x.getTime() + "] Floor " + x.getCurrentFloor() + " requested elevator");	
 			try {
-				sendPacket = new DatagramPacket(x.toBytes(), x.toBytes().length, InetAddress.getLocalHost(), FloorReceiver.PORT);
+				sendPacket = new DatagramPacket(x.toBytes(), x.toBytes().length, InetAddress.getLocalHost(), Constants.FLOOR_RECEIVER_PORT);
 				sendReceiveSocket.send(sendPacket);
 			} catch(IOException e) {
 				e.printStackTrace();

@@ -9,8 +9,8 @@ public class InputDataTest {
 	@Test
 	void equalsShouldBeTrue() {
 		// arrange
-		InputData obj1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 1);
-		InputData obj2 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 1);
+		InputData obj1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2);
+		InputData obj2 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2);
 		
 		// act
 		boolean result = obj1.equals(obj2);
@@ -22,7 +22,7 @@ public class InputDataTest {
 	@Test
 	void equalsShouldBeFalseForNull() {
 		// arrange
-		InputData obj1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 1);
+		InputData obj1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2);
 		InputData obj2 = null;
 		
 		// act
@@ -35,8 +35,8 @@ public class InputDataTest {
 	@Test
 	void equalsShouldBeFalseForDifferentTime() {
 		// arrange
-		InputData obj1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 1);
-		InputData obj2 = new InputData(LocalTime.of(1, 1, 1, 2), 1, Direction.UP, 1);
+		InputData obj1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2);
+		InputData obj2 = new InputData(LocalTime.of(1, 1, 1, 2), 1, Direction.UP, 2);
 		
 		// act
 		boolean result = obj1.equals(obj2);
@@ -48,8 +48,8 @@ public class InputDataTest {
 	@Test
 	void equalsShouldBeFalseForDifferentCurrentFloor() {
 		// arrange
-		InputData obj1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 1);
-		InputData obj2 = new InputData(LocalTime.of(1, 1, 1, 1), 2, Direction.UP, 1);
+		InputData obj1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2);
+		InputData obj2 = new InputData(LocalTime.of(1, 1, 1, 1), 2, Direction.UP, 3);
 		
 		// act
 		boolean result = obj1.equals(obj2);
@@ -61,8 +61,8 @@ public class InputDataTest {
 	@Test
 	void equalsShouldBeFalseForDifferentDirection() {
 		// arrange
-		InputData obj1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 1);
-		InputData obj2 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.DOWN, 1);
+		InputData obj1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2);
+		InputData obj2 = new InputData(LocalTime.of(1, 1, 1, 1), 2, Direction.DOWN, 1);
 		
 		// act
 		boolean result = obj1.equals(obj2);
@@ -74,8 +74,8 @@ public class InputDataTest {
 	@Test
 	void equalsShouldBeFalseForDifferentDestinationFloor() {
 		// arrange
-		InputData obj1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 1);
-		InputData obj2 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2);
+		InputData obj1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2);
+		InputData obj2 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 3);
 		
 		// act
 		boolean result = obj1.equals(obj2);
@@ -87,8 +87,8 @@ public class InputDataTest {
 	@Test
 	void toAndFromBytes() {
 		//arrange
-		InputData obj1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 1);
-		InputData obj2 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.DOWN, 2);
+		InputData obj1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2);
+		InputData obj2 = new InputData(LocalTime.of(1, 1, 1, 1), 2, Direction.DOWN, 1);
 		InputData obj3 = new InputData(LocalTime.of(13, 43, 27, 5220314), 3, Direction.UP, 5);
 		
 		
@@ -109,8 +109,8 @@ public class InputDataTest {
 	@Test
 	void differentToAndFromBytes() {
 		//arrange
-		InputData obj1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 1);
-		InputData obj2 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.DOWN, 2);
+		InputData obj1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2);
+		InputData obj2 = new InputData(LocalTime.of(1, 1, 1, 1), 2, Direction.DOWN, 1);
 		InputData obj3 = new InputData(LocalTime.of(13, 43, 27, 5220314), 3, Direction.UP, 5);
 		
 		//act
