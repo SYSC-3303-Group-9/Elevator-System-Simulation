@@ -9,7 +9,7 @@ public class ElevatorEvent {
 
 	private int floor;
 	private int elevatorId;
-	private int outOfService;
+	private boolean outOfService;
 	
 	/**
 	* Creates an instance of the ElevatorEvent class
@@ -17,7 +17,7 @@ public class ElevatorEvent {
 	* @param elevatorId The elevator ID that distinguishes elevators
 	* @param outOfService The service state of the elevator (0 = false, 1 = true)
 	*/
-	public ElevatorEvent(int floor, int elevatorId, int outOfService) {
+	public ElevatorEvent(int floor, int elevatorId, boolean outOfService) {
 		this.floor = floor;
 		this.elevatorId = elevatorId;
 		this.outOfService = outOfService;
@@ -43,7 +43,7 @@ public class ElevatorEvent {
 	 * Gets the service state of the elevator
 	 * @return true(1) or false(0)
 	 */
-	public int getOutOfService() {
+	public boolean getOutOfService() {
 		return this.outOfService;
 	}
 	
@@ -53,7 +53,8 @@ public class ElevatorEvent {
 	 * @return ElevatorEvent byte array
 	 */
 	public byte[] toBytes() {
-		byte[] eventArray = ByteBuffer.allocate(12).putInt(floor).putInt(elevatorId).putInt(outOfService).array();
+		int inService = this.getOutOfService()? 1 : 0;
+		byte[] eventArray = ByteBuffer.allocate(12).putInt(floor).putInt(elevatorId).putInt(inService).array();
 		return eventArray;
 	}
 	
@@ -65,13 +66,16 @@ public class ElevatorEvent {
 		if(bytes.length != 12) return null;
 		else {
 			ByteBuffer buffer = ByteBuffer.wrap(bytes);
-			return new ElevatorEvent(buffer.getInt(), buffer.getInt(), buffer.getInt());
+			int floor = buffer.getInt();
+			int id = buffer.getInt();
+			boolean inService = buffer.getInt() == 1 ? true : false;
+			return new ElevatorEvent(floor, id, inService);
 		}
 	}
 	
 	@Override
 	public String toString() {
-		String inService = (this.getOutOfService() == 0) ? "in servcie." : "out of service.";
+		String inService = (this.getOutOfService()) ? "in service." : "out of service.";
 		return "Elevator " + Integer.toString(elevatorId) + " arrived at floor " + Integer.toString(floor) + " and is " + inService;
 		
 	}
