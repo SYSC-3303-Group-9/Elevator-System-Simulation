@@ -29,8 +29,6 @@ public class ElevatorSubsystemTest {
 
 	@BeforeEach
 	void setup() throws IOException {
-		elevator = new Elevator(ran.nextInt(upperBound), 1);
-
 		// Construct a datagram socket and bind it to any available
 		// port on the local host machine.
 		sendReceiveSocket = new DatagramSocket();

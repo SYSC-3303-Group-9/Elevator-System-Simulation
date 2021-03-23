@@ -56,7 +56,7 @@ public class SchedulerTest {
 	}
 	
 	private void mimicElevatorEvent(int floor, int elevatorId, Buffer<SchedulerMessage> messageBuffer) {
-		ElevatorEvent event = new ElevatorEvent(floor, elevatorId);
+		ElevatorEvent event = new ElevatorEvent(floor, elevatorId); //To-Do: assign elevator service state
 		messageBuffer.put(SchedulerMessage.fromElevatorEvent(event));
 	}
 	

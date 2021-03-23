@@ -9,15 +9,18 @@ public class ElevatorEvent {
 
 	private int floor;
 	private int elevatorId;
+	private int outOfService;
 	
 	/**
 	* Creates an instance of the ElevatorEvent class
 	* @param floor The floor on which the elevator has arrived
 	* @param elevatorId The elevator ID that distinguishes elevators
+	* @param outOfService The service state of the elevator (0 = false, 1 = true)
 	*/
-	public ElevatorEvent(int floor, int elevatorId) {
+	public ElevatorEvent(int floor, int elevatorId, int outOfService) {
 		this.floor = floor;
 		this.elevatorId = elevatorId;
+		this.outOfService = outOfService;
 	}
 	
 	/**
@@ -37,12 +40,20 @@ public class ElevatorEvent {
 	}
 	
 	/**
+	 * Gets the service state of the elevator
+	 * @return true(1) or false(0)
+	 */
+	public int getOutOfService() {
+		return this.outOfService;
+	}
+	
+	/**
 	 * Creates a byte array representing the information stored in ElevatorEvent object. Uses narrowing primitive conversion so assumes
-	 * that floor and elevatorId will always be smaller than 255
+	 * that floor, elevatorId and outOfService will always be smaller than 255
 	 * @return ElevatorEvent byte array
 	 */
 	public byte[] toBytes() {
-		byte[] eventArray = ByteBuffer.allocate(8).putInt(floor).putInt(elevatorId).array();
+		byte[] eventArray = ByteBuffer.allocate(12).putInt(floor).putInt(elevatorId).putInt(outOfService).array();
 		return eventArray;
 	}
 	
@@ -51,16 +62,17 @@ public class ElevatorEvent {
 	 * @return
 	 */
 	public static ElevatorEvent fromBytes(byte[] bytes) {
-		if(bytes.length != 8) return null;
+		if(bytes.length != 12) return null;
 		else {
 			ByteBuffer buffer = ByteBuffer.wrap(bytes);
-			return new ElevatorEvent(buffer.getInt(), buffer.getInt());
+			return new ElevatorEvent(buffer.getInt(), buffer.getInt(), buffer.getInt());
 		}
 	}
 	
 	@Override
 	public String toString() {
-		return "Elevator " + Integer.toString(elevatorId) + " arrived at floor " + Integer.toString(floor);
+		String inService = (this.getOutOfService() == 0) ? "in servcie." : "out of service.";
+		return "Elevator " + Integer.toString(elevatorId) + " arrived at floor " + Integer.toString(floor) + " and is " + inService;
 		
 	}
 	
@@ -73,7 +85,8 @@ public class ElevatorEvent {
 		if (o instanceof ElevatorEvent) {
 			ElevatorEvent other = (ElevatorEvent)o;
 			return getElevatorId() == other.getElevatorId()
-					&& getFloor() == other.getFloor();
+					&& getFloor() == other.getFloor()
+					&& getOutOfService() == other.getOutOfService();
 		}
 		return false;
 	}
