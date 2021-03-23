@@ -53,8 +53,8 @@ public class ElevatorEvent {
 	 * @return ElevatorEvent byte array
 	 */
 	public byte[] toBytes() {
-		int inService = this.getOutOfService()? 1 : 0;
-		byte[] eventArray = ByteBuffer.allocate(12).putInt(floor).putInt(elevatorId).putInt(inService).array();
+		int outOfService = this.getOutOfService()? 1 : 0;
+		byte[] eventArray = ByteBuffer.allocate(12).putInt(floor).putInt(elevatorId).putInt(outOfService).array();
 		return eventArray;
 	}
 	
@@ -68,15 +68,15 @@ public class ElevatorEvent {
 			ByteBuffer buffer = ByteBuffer.wrap(bytes);
 			int floor = buffer.getInt();
 			int id = buffer.getInt();
-			boolean inService = buffer.getInt() == 1 ? true : false;
-			return new ElevatorEvent(floor, id, inService);
+			boolean outOfService = buffer.getInt() == 1 ? true : false;
+			return new ElevatorEvent(floor, id, outOfService);
 		}
 	}
 	
 	@Override
 	public String toString() {
-		String inService = (this.getOutOfService()) ? "in service." : "out of service.";
-		return "Elevator " + Integer.toString(elevatorId) + " arrived at floor " + Integer.toString(floor) + " and is " + inService;
+		String outOfService = (this.getOutOfService()) ? "out of service." : " in service.";
+		return "Elevator " + Integer.toString(elevatorId) + " arrived at floor " + Integer.toString(floor) + " and is " + outOfService;
 		
 	}
 	
