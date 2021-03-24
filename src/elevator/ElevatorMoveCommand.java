@@ -3,11 +3,11 @@ package elevator;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
-public class ElevatorCommand {
+public class ElevatorMoveCommand {
 	private int elevatorID;
 	private Direction moveDirection;
 	
-	public ElevatorCommand(int elevatorID, Direction direction) {
+	public ElevatorMoveCommand(int elevatorID, Direction direction) {
 		this.moveDirection = direction;
 		this.elevatorID = elevatorID;
 	}
@@ -21,7 +21,7 @@ public class ElevatorCommand {
 		return eventArray;
 	}
 	
-	public static ElevatorCommand fromBytes(byte[] bytes) {
+	public static ElevatorMoveCommand fromBytes(byte[] bytes) {
 		// Create a ByteBuffer for bytes
 		ByteBuffer buffer = ByteBuffer.wrap(bytes);
 		// Save elevatorID value from ByteBuffer
@@ -39,7 +39,7 @@ public class ElevatorCommand {
 			System.out.println(e.getMessage());
 		}
 		if(direction == null) return null;
-		else return new ElevatorCommand(id, direction);
+		else return new ElevatorMoveCommand(id, direction);
 	}
 	
 	public Direction getDirection() {
@@ -53,8 +53,8 @@ public class ElevatorCommand {
 	@Override
 	public boolean equals(Object o) {
 		if(o == this) return true;
-		if(!(o instanceof ElevatorCommand)) return false;
-		ElevatorCommand c = (ElevatorCommand) o;
+		if(!(o instanceof ElevatorMoveCommand)) return false;
+		ElevatorMoveCommand c = (ElevatorMoveCommand) o;
 		return this.moveDirection.equals(c.getDirection()) && (this.elevatorID == c.getID());
 	}
 }

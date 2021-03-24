@@ -7,13 +7,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import elevator.Direction;
-import elevator.ElevatorCommand;
+import elevator.ElevatorMoveCommand;
 
 class ElevatorCommandTest {
-	ElevatorCommand expected;
+	ElevatorMoveCommand expected;
 	@BeforeEach
 	void setUp() throws Exception {
-		expected = new ElevatorCommand(1, Direction.UP);
+		expected = new ElevatorMoveCommand(1, Direction.UP);
 	}
 
 	@AfterEach
@@ -23,34 +23,34 @@ class ElevatorCommandTest {
 
 	@Test
 	void testSameCommandsEqual() {
-		ElevatorCommand actual = new ElevatorCommand(1, Direction.UP);
+		ElevatorMoveCommand actual = new ElevatorMoveCommand(1, Direction.UP);
 		assertEquals(expected, actual);
 	}
 	
 	@Test
 	void testDifferentCommandsNotEqual() {
-		ElevatorCommand actual = new ElevatorCommand(1, Direction.DOWN);
+		ElevatorMoveCommand actual = new ElevatorMoveCommand(1, Direction.DOWN);
 		assertNotEquals(expected, actual);
 	}
 	
 	@Test
 	void SameCommandsDifferentIDNotEqual() {
-		ElevatorCommand actual = new ElevatorCommand(2, Direction.UP);
+		ElevatorMoveCommand actual = new ElevatorMoveCommand(2, Direction.UP);
 		assertNotEquals(expected, actual);
 	}
 	
 	@Test 
 	void DifferentCommandsDifferentIDNotEqual() {
-		ElevatorCommand actual = new ElevatorCommand(2, Direction.DOWN);
+		ElevatorMoveCommand actual = new ElevatorMoveCommand(2, Direction.DOWN);
 		assertNotEquals(expected, actual);
 	}
 	
 	@Test
 	void testToAndFromBytes() {
 		byte[] elevatorCommandBytes = expected.toBytes();
-		ElevatorCommand actual = ElevatorCommand.fromBytes(elevatorCommandBytes);
-		ElevatorCommand badActual1 = new ElevatorCommand(1, Direction.DOWN);
-		ElevatorCommand badActual2 = new ElevatorCommand(2, Direction.UP);
+		ElevatorMoveCommand actual = ElevatorMoveCommand.fromBytes(elevatorCommandBytes);
+		ElevatorMoveCommand badActual1 = new ElevatorMoveCommand(1, Direction.DOWN);
+		ElevatorMoveCommand badActual2 = new ElevatorMoveCommand(2, Direction.UP);
 		assertEquals(expected, actual);
 		assertNotEquals(expected, badActual1);
 		assertNotEquals(expected, badActual2);
