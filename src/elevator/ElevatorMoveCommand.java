@@ -7,11 +7,20 @@ public class ElevatorMoveCommand {
 	private int elevatorID;
 	private Direction moveDirection;
 	
+	/**
+	 * Used to construct an ElevatorMoveCommand to be sent to the ElevatorMotor by the Scheduler
+	 * @param elevatorID an int indicating the ID of the elevator to be moved
+	 * @param direction the direction in which the elevator should be moved
+	 */
 	public ElevatorMoveCommand(int elevatorID, Direction direction) {
 		this.moveDirection = direction;
 		this.elevatorID = elevatorID;
 	}
 	
+	/**
+	 * Converts an ElevatorMoveCommand object into an array of bytes to be sent with packets
+	 * @return byte array representing an ElevatorMoveCommand object
+	 */
 	public byte[] toBytes() {
 		byte[] elevatorIDArray = ByteBuffer.allocate(4).putInt(elevatorID).array();
 		byte[] moveDirectionArray = moveDirection.name().getBytes();
@@ -21,6 +30,11 @@ public class ElevatorMoveCommand {
 		return eventArray;
 	}
 	
+	/**
+	 * Constructs an ElevatorMoveCommand object from a passed array of bytes
+	 * @param bytes an array of bytes created from calling toBytes() on an ElevatorMoveCommand object
+	 * @return the ElevatorMoveCommand object represented by the data stored in the byte array
+	 */
 	public static ElevatorMoveCommand fromBytes(byte[] bytes) {
 		// Create a ByteBuffer for bytes
 		ByteBuffer buffer = ByteBuffer.wrap(bytes);
