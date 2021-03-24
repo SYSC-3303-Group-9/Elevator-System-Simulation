@@ -1,4 +1,4 @@
-package scheduler;
+package elevator;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import elevator.Direction;
 import elevator.ElevatorMoveCommand;
 
-class ElevatorCommandTest {
+class ElevatorMoveCommandTest {
 	ElevatorMoveCommand expected;
 	@BeforeEach
 	void setUp() throws Exception {
@@ -34,13 +34,13 @@ class ElevatorCommandTest {
 	}
 	
 	@Test
-	void SameCommandsDifferentIDNotEqual() {
+	void testSameCommandsDifferentIDNotEqual() {
 		ElevatorMoveCommand actual = new ElevatorMoveCommand(2, Direction.UP);
 		assertNotEquals(expected, actual);
 	}
 	
 	@Test 
-	void DifferentCommandsDifferentIDNotEqual() {
+	void testDifferentCommandsDifferentIDNotEqual() {
 		ElevatorMoveCommand actual = new ElevatorMoveCommand(2, Direction.DOWN);
 		assertNotEquals(expected, actual);
 	}
