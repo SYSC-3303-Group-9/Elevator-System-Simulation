@@ -3,8 +3,7 @@ package elevator;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
-public class ElevatorMoveCommand {
-	private int elevatorID;
+public class ElevatorMoveCommand extends ElevatorCommand {
 	private Direction moveDirection;
 	
 	/**
@@ -12,22 +11,23 @@ public class ElevatorMoveCommand {
 	 * @param elevatorID an int indicating the ID of the elevator to be moved
 	 * @param direction the direction in which the elevator should be moved
 	 */
-	public ElevatorMoveCommand(int elevatorID, Direction direction) {
+	public ElevatorMoveCommand(int elevatorID, int fault, Direction direction) {
+		super(elevatorID, fault);
 		this.moveDirection = direction;
-		this.elevatorID = elevatorID;
 	}
 	
 	/**
 	 * Converts an ElevatorMoveCommand object into an array of bytes to be sent with packets
 	 * @return byte array representing an ElevatorMoveCommand object
 	 */
+	@Override
 	public byte[] toBytes() {
-		byte[] elevatorIDArray = ByteBuffer.allocate(4).putInt(elevatorID).array();
-		byte[] moveDirectionArray = moveDirection.name().getBytes();
-		byte[] eventArray = new byte[elevatorIDArray.length + moveDirectionArray.length];
-		System.arraycopy(elevatorIDArray, 0, eventArray, 0, elevatorIDArray.length);
-		System.arraycopy(moveDirectionArray, 0, eventArray, elevatorIDArray.length, moveDirectionArray.length);
-		return eventArray;
+		byte[] elevatorCommandBytes = super.toBytes();
+		byte[] moveDirectionBytes = moveDirection.name().getBytes();
+		byte[] elevatorMoveCommandBytes = new byte[elevatorCommandBytes.length + moveDirectionBytes.length];
+		System.arraycopy(elevatorCommandBytes, 0, elevatorMoveCommandBytes, 0, elevatorCommandBytes.length);
+		System.arraycopy(moveDirectionBytes, 0, elevatorMoveCommandBytes, elevatorCommandBytes.length, moveDirectionBytes.length);
+		return elevatorMoveCommandBytes;
 	}
 	
 	/**
@@ -38,8 +38,10 @@ public class ElevatorMoveCommand {
 	public static ElevatorMoveCommand fromBytes(byte[] bytes) {
 		// Create a ByteBuffer for bytes
 		ByteBuffer buffer = ByteBuffer.wrap(bytes);
-		// Save elevatorID value from ByteBuffer
-		int id = buffer.getInt();
+		// Use static constructor method from ElevatorCommand
+		byte elevatorCommandBytes[] = new byte[8]; 
+		buffer.get(elevatorCommandBytes, 0, 8);
+		ElevatorCommand tempCommand = ElevatorCommand.fromBytes(elevatorCommandBytes);
 		// Create byte[] with the same size as the remaining bytes in the buffer (Direction string bytes)
 		byte[] directionBytes = new byte[buffer.remaining()];
 		// Copy remaining ByteBuffer bytes over to directionBytes
@@ -53,15 +55,11 @@ public class ElevatorMoveCommand {
 			System.out.println(e.getMessage());
 		}
 		if(direction == null) return null;
-		else return new ElevatorMoveCommand(id, direction);
+		else return new ElevatorMoveCommand(tempCommand.getID(), tempCommand.getFault(), direction);
 	}
 	
 	public Direction getDirection() {
 		return this.moveDirection;
-	}
-	
-	public int getID() {
-		return this.elevatorID;
 	}
 	
 	@Override
@@ -69,6 +67,6 @@ public class ElevatorMoveCommand {
 		if(o == this) return true;
 		if(!(o instanceof ElevatorMoveCommand)) return false;
 		ElevatorMoveCommand c = (ElevatorMoveCommand) o;
-		return this.moveDirection.equals(c.getDirection()) && (this.elevatorID == c.getID());
+		return super.equals(c) && moveDirection.equals(c.getDirection());
 	}
 }

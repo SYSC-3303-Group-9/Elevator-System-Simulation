@@ -13,7 +13,7 @@ class ElevatorMoveCommandTest {
 	ElevatorMoveCommand expected;
 	@BeforeEach
 	void setUp() throws Exception {
-		expected = new ElevatorMoveCommand(1, Direction.UP);
+		expected = new ElevatorMoveCommand(1, 1, Direction.UP);
 	}
 
 	@AfterEach
@@ -23,34 +23,34 @@ class ElevatorMoveCommandTest {
 
 	@Test
 	void testSameCommandsEqual() {
-		ElevatorMoveCommand actual = new ElevatorMoveCommand(1, Direction.UP);
+		ElevatorMoveCommand actual = new ElevatorMoveCommand(1, 1, Direction.UP);
 		assertEquals(expected, actual);
 	}
 	
 	@Test
 	void testDifferentCommandsNotEqual() {
-		ElevatorMoveCommand actual = new ElevatorMoveCommand(1, Direction.DOWN);
+		ElevatorMoveCommand actual = new ElevatorMoveCommand(1, 1, Direction.DOWN);
 		assertNotEquals(expected, actual);
 	}
 	
 	@Test
 	void testSameCommandsDifferentIDNotEqual() {
-		ElevatorMoveCommand actual = new ElevatorMoveCommand(2, Direction.UP);
+		ElevatorMoveCommand actual = new ElevatorMoveCommand(2, 1, Direction.UP);
 		assertNotEquals(expected, actual);
 	}
 	
 	@Test 
 	void testDifferentCommandsDifferentIDNotEqual() {
-		ElevatorMoveCommand actual = new ElevatorMoveCommand(2, Direction.DOWN);
+		ElevatorMoveCommand actual = new ElevatorMoveCommand(2, 1, Direction.DOWN);
 		assertNotEquals(expected, actual);
 	}
 	
 	@Test
 	void testToAndFromBytes() {
-		byte[] elevatorCommandBytes = expected.toBytes();
-		ElevatorMoveCommand actual = ElevatorMoveCommand.fromBytes(elevatorCommandBytes);
-		ElevatorMoveCommand badActual1 = new ElevatorMoveCommand(1, Direction.DOWN);
-		ElevatorMoveCommand badActual2 = new ElevatorMoveCommand(2, Direction.UP);
+		byte[] elevatorMoveCommandBytes = expected.toBytes();
+		ElevatorMoveCommand actual = ElevatorMoveCommand.fromBytes(elevatorMoveCommandBytes);
+		ElevatorMoveCommand badActual1 = new ElevatorMoveCommand(1, 1, Direction.DOWN);
+		ElevatorMoveCommand badActual2 = new ElevatorMoveCommand(2, 1, Direction.UP);
 		assertEquals(expected, actual);
 		assertNotEquals(expected, badActual1);
 		assertNotEquals(expected, badActual2);
