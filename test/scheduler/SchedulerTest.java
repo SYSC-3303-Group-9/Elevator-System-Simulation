@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import common.Buffer;
 import elevator.Direction;
-import elevator.ElevatorCommand;
+import elevator.ElevatorMoveCommand;
 import elevator.ElevatorEvent;
 import floor.InputData;
 
@@ -56,7 +56,7 @@ public class SchedulerTest {
 	}
 	
 	private void mimicElevatorEvent(int floor, int elevatorId, Buffer<SchedulerMessage> messageBuffer) {
-		ElevatorEvent event = new ElevatorEvent(floor, elevatorId);
+		ElevatorEvent event = new ElevatorEvent(floor, elevatorId); //To-Do: assign elevator service state
 		messageBuffer.put(SchedulerMessage.fromElevatorEvent(event));
 	}
 	
@@ -64,7 +64,7 @@ public class SchedulerTest {
 	public void tick_shouldScheduleGoingUp() {
 		// arrange subject
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
-		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
+		Buffer<ElevatorMoveCommand> commandBuffer = new Buffer<ElevatorMoveCommand>();
 		Scheduler subject = new Scheduler(1, 3, messageBuffer, commandBuffer);
 		
 		// act 0: move out of initial state
@@ -95,7 +95,7 @@ public class SchedulerTest {
 	public void tick_shouldScheduleGoingUpExtended() {
 		// arrange subject
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
-		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
+		Buffer<ElevatorMoveCommand> commandBuffer = new Buffer<ElevatorMoveCommand>();
 		Scheduler subject = new Scheduler(1, 5, messageBuffer, commandBuffer);
 		
 		// act 0: move out of initial state
@@ -136,7 +136,7 @@ public class SchedulerTest {
 	public void tick_shouldScheduleGoingDown() {
 		// arrange subject
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
-		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
+		Buffer<ElevatorMoveCommand> commandBuffer = new Buffer<ElevatorMoveCommand>();
 		Scheduler subject = new Scheduler(1, 5, messageBuffer, commandBuffer);
 		
 		// act 0: move out of initial state
@@ -192,7 +192,7 @@ public class SchedulerTest {
 	public void tick_shouldScheduleClosestElevator() {
 		// arrange subject
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
-		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
+		Buffer<ElevatorMoveCommand> commandBuffer = new Buffer<ElevatorMoveCommand>();
 		Scheduler subject = new Scheduler(2 /* 2 elevators */, 5, messageBuffer, commandBuffer);
 		
 		// act 0: move out of initial state
@@ -205,7 +205,7 @@ public class SchedulerTest {
 		
 		// assert 1: elevator was moved up to floor 2
 		processNewJob(subject, true);
-		ElevatorCommand command1 = commandBuffer.get();
+		ElevatorMoveCommand command1 = commandBuffer.get();
 		assertEquals(Direction.UP, command1.getDirection());
 		mimicElevatorEvent(2, command1.getID(), messageBuffer);
 		
@@ -216,7 +216,7 @@ public class SchedulerTest {
 		
 		// assert 2: *different* elevator was moved up to floor 2
 		processNewJob(subject, true);
-		ElevatorCommand command2 = commandBuffer.get();
+		ElevatorMoveCommand command2 = commandBuffer.get();
 		assertEquals(Direction.UP, command1.getDirection());
 		assertNotEquals(command1.getID(), command2.getID());
 		mimicElevatorEvent(2, command2.getID(), messageBuffer);
@@ -231,7 +231,7 @@ public class SchedulerTest {
 	public void tick_shouldScheduleElevatorMovingInSameDirection() {
 		// arrange subject
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
-		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
+		Buffer<ElevatorMoveCommand> commandBuffer = new Buffer<ElevatorMoveCommand>();
 		Scheduler subject = new Scheduler(1, 5, messageBuffer, commandBuffer);
 		
 		// act 0: move out of initial state
@@ -273,7 +273,7 @@ public class SchedulerTest {
 	public void tick_shouldQueueBlockedJobsUntilReady_ChangeDirectionToStart() {
 		// arrange subject
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
-		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
+		Buffer<ElevatorMoveCommand> commandBuffer = new Buffer<ElevatorMoveCommand>();
 		Scheduler subject = new Scheduler(1, 5, messageBuffer, commandBuffer);
 		
 		// act 0: move out of initial state
@@ -318,7 +318,7 @@ public class SchedulerTest {
 	public void tick_shouldQueueBlockedJobsUntilReady_ContinueDirectionToStart() {
 		// arrange subject
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
-		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
+		Buffer<ElevatorMoveCommand> commandBuffer = new Buffer<ElevatorMoveCommand>();
 		Scheduler subject = new Scheduler(1, 5, messageBuffer, commandBuffer);
 		
 		// act 0: move out of initial state
@@ -363,7 +363,7 @@ public class SchedulerTest {
 	public void tick_shouldQueueBlockedJobsUntilReady_MovingSameDirectionButPastPickupAlready() {
 		// arrange subject
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
-		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
+		Buffer<ElevatorMoveCommand> commandBuffer = new Buffer<ElevatorMoveCommand>();
 		Scheduler subject = new Scheduler(1, 5, messageBuffer, commandBuffer);
 		
 		// act 0: move out of initial state
@@ -415,7 +415,7 @@ public class SchedulerTest {
 	public void tick_shouldScheduleJobForEachElevator_DifferentDirections() {
 		// arrange subject
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
-		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
+		Buffer<ElevatorMoveCommand> commandBuffer = new Buffer<ElevatorMoveCommand>();
 		Scheduler subject = new Scheduler(2 /* 2 elevators */, 5, messageBuffer, commandBuffer);
 		
 		// act 0: move out of initial state
@@ -449,8 +449,8 @@ public class SchedulerTest {
 		//			 Other elevator still moving up to dropoff floor 4
 		processElevatorEvent(subject, true);
 		processElevatorEvent(subject, true);
-		ElevatorCommand command1 = commandBuffer.get();
-		ElevatorCommand command2 = commandBuffer.get();
+		ElevatorMoveCommand command1 = commandBuffer.get();
+		ElevatorMoveCommand command2 = commandBuffer.get();
 		
 		assertNotEquals(command1.getDirection(), command2.getDirection());
 		int pickupFloor2Id = -1;

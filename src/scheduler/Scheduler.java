@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import common.IBufferInput;
 import common.IBufferOutput;
 import elevator.Direction;
-import elevator.ElevatorCommand;
+import elevator.ElevatorMoveCommand;
 import elevator.ElevatorEvent;
 import floor.InputData;
 
@@ -22,7 +22,7 @@ public class Scheduler implements Runnable {
 
 	private int numFloors;
 	private IBufferOutput<SchedulerMessage> outputBuffer;
-	private IBufferInput<ElevatorCommand> inputBuffer;
+	private IBufferInput<ElevatorMoveCommand> inputBuffer;
 	
 	/**
 	 * Creates a new instance of the Scheduler class.
@@ -34,7 +34,7 @@ public class Scheduler implements Runnable {
 			int numElevators,
 			int numFloors,
 			IBufferOutput<SchedulerMessage> outputBuffer,
-			IBufferInput<ElevatorCommand> inputBuffer) {
+			IBufferInput<ElevatorMoveCommand> inputBuffer) {
 		this.state = SchedulerState.INITIAL;
 		
 		this.numFloors = numFloors;
@@ -208,7 +208,7 @@ public class Scheduler implements Runnable {
 			this.elevatorToCommand.updateLastKnownFloor();
 			
 			// Add the elevator command to the buffer and move to waiting for message.
-			this.inputBuffer.put(new ElevatorCommand(this.elevatorToCommand.getElevatorId(), this.elevatorToCommand.getDirection()));
+			this.inputBuffer.put(new ElevatorMoveCommand(this.elevatorToCommand.getElevatorId(), this.elevatorToCommand.getDirection()));
 			this.state = SchedulerState.WAITING_FOR_MESSAGE;
 			break;
 		}

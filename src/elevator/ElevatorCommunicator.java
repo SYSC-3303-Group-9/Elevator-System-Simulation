@@ -13,12 +13,12 @@ import scheduler.SchedulerMessage;
 
 public class ElevatorCommunicator implements Runnable {
 
-	private IBufferOutput<ElevatorCommand> fromElevatorSubsystem;
+	private IBufferOutput<ElevatorMoveCommand> fromElevatorSubsystem;
 	private IBufferInput<SchedulerMessage> toElevatorSubsystem;
 	private DatagramPacket sendPacket, receivePacket;
 	private DatagramSocket sendReceiveSocket;
 
-	public ElevatorCommunicator(IBufferOutput<ElevatorCommand> fromElevatorSubsystem,
+	public ElevatorCommunicator(IBufferOutput<ElevatorMoveCommand> fromElevatorSubsystem,
 			IBufferInput<SchedulerMessage> toElevatorSubsystem) {
 		this.fromElevatorSubsystem = fromElevatorSubsystem;
 		this.toElevatorSubsystem = toElevatorSubsystem;
@@ -39,7 +39,7 @@ public class ElevatorCommunicator implements Runnable {
 		while (true) {
 
 			// Get new instructions from the scheduler.
-			ElevatorCommand command = fromElevatorSubsystem.get();
+			ElevatorMoveCommand command = fromElevatorSubsystem.get();
 
 			// If buffer is not empty send instruction to elevatorSubsystem
 			if (command != null) {

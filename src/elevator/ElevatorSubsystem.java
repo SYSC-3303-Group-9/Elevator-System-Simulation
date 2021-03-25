@@ -14,7 +14,7 @@ public class ElevatorSubsystem implements Runnable {
 	private int id;
 	private int floor;
 	private ElevatorState state;
-	ElevatorCommand command = null;
+	ElevatorMoveCommand command = null;
 	private DatagramSocket sendReceiveSocket;
 	DatagramPacket receivePacket, sendPacket;
 
@@ -65,12 +65,12 @@ public class ElevatorSubsystem implements Runnable {
 	 * 
 	 * @param command
 	 */
-	public void sendCommand(ElevatorCommand command) {
+	public void sendCommand(ElevatorMoveCommand command) {
 		// Move the Elevator
 		this.move(command.getDirection());
 
 		// Notify the scheduler that the elevator has moved down.
-		ElevatorEvent elevatorInfo = new ElevatorEvent(this.floor, this.id);
+		ElevatorEvent elevatorInfo = new ElevatorEvent(elevator.getFloor(), elevator.getId());// TO-DO: assign the service state of the elevator
 
 		// Send ElevatorEvent packet to ElevatorCommunicator.
 		try {
@@ -166,7 +166,7 @@ public class ElevatorSubsystem implements Runnable {
 				System.out.println("ElevatorSubsystem, run " + e);
 			}
 
-			command = ElevatorCommand.fromBytes(receivePacket.getData());
+			command = ElevatorMoveCommand.fromBytes(receivePacket.getData());
 
 			// If the buffer was disabled and returned null, stop execution.
 			if (command == null) {
