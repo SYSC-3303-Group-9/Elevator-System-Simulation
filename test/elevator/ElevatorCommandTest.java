@@ -7,65 +7,66 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class ElevatorCommandTest {
-	ElevatorCommand expected1;
-	ElevatorCommand expected2;
+	ElevatorDoorCommand doorCommand;
+	ElevatorMoveCommand moveCommand;
 	
 	@BeforeEach
 	void setUp() throws Exception {
-		expected1 = new ElevatorCommand(0, 0);
-		expected2 = new ElevatorCommand(1, 1);
+		doorCommand = new ElevatorDoorCommand(1, Fault.TRANSIENT, DoorState.OPEN);
+		moveCommand = new ElevatorMoveCommand(1, Fault.TRANSIENT, Direction.UP);
 	}
 
 	@AfterEach
 	void tearDown() throws Exception {
-		expected1 = null;
-		expected2 = null;
-	}
-
-	@Test
-	void testSameIDSameFaultEqual() {
-		ElevatorCommand actual1 = new ElevatorCommand(0, 0);
-		ElevatorCommand actual2 = new ElevatorCommand(1, 1);
-		assertEquals(expected1, actual1);
-		assertEquals(expected2, actual2);
+		doorCommand = null;
+		moveCommand = null;
 	}
 	
 	@Test
-	void testDifferentIDDiffereentFaultNotEquals() {
-		ElevatorCommand actual1 = new ElevatorCommand(0, 0);
-		ElevatorCommand actual2 = new ElevatorCommand(1, 1);
-		assertNotEquals(expected1, actual2);
-		assertNotEquals(expected2, actual1);
-	}
-	
-	@Test
-	void testDifferentIDSameFaultNotEquals() {
-		ElevatorCommand actual1 = new ElevatorCommand(1, 0);
-		ElevatorCommand actual2 = new ElevatorCommand(0, 1);
-		assertNotEquals(expected1, actual1);
-		assertNotEquals(expected1, actual2);
-	}
-	
-	@Test
-	void testSameIDDifferentFaultNotEquals() {
-		ElevatorCommand actual1 = new ElevatorCommand(0, 1);
-		ElevatorCommand actual2 = new ElevatorCommand(1, 0);
-		assertNotEquals(expected1, actual1);
-		assertNotEquals(expected2, actual2);
-	}
-	
-	@Test
-	void testToAndFromBytes() {
-		byte[] actualBytes1 = expected1.toBytes();
-		byte[] actualBytes2 = expected2.toBytes();
+	void testDifferentCommandDifferentBytes() {
+		byte[] actualBytes1 = doorCommand.toBytes();
+		byte[] actualBytes2 = moveCommand.toBytes();
 		assertNotEquals(actualBytes1, actualBytes2);
+	}
+	
+	@Test
+	void testIllegalCommandIdentifierThrowsException() {
+		// Create illegal byte array using illegal command identifier
+		byte[] wrongBytes1 = doorCommand.toBytes();
+		wrongBytes1[0] = (byte) 0x03;
+		assertThrows(IllegalArgumentException.class, () -> {ElevatorCommand.fromBytes(wrongBytes1);});
+	}
+	
+	@Test
+	void testCorruptedMoveDirectionThrowsException() {
+		// Create illegal byte array using 'corrupted' move direction
+		byte[] wrongBytes1 = moveCommand.toBytes();
+		wrongBytes1[11] = (byte) 0x69;
+		assertThrows(IllegalArgumentException.class, () -> {ElevatorCommand.fromBytes(wrongBytes1);});
+	}
+	
+	@Test
+	void testCorruptedDoorStateThrowsException() {
+		// Create illegal byte array using 'corrupted' move direction
+		byte[] wrongBytes1 = doorCommand.toBytes();
+		wrongBytes1[11] = (byte) 0x69;
+		assertThrows(IllegalArgumentException.class, () -> {ElevatorCommand.fromBytes(wrongBytes1);});
+	}
+	
+	@Test
+	void testFromBytesReturnsProperObjects() {
+		byte[] actualBytes1 = doorCommand.toBytes();
+		byte[] actualBytes2 = moveCommand.toBytes();
 		ElevatorCommand actual1 = ElevatorCommand.fromBytes(actualBytes1);
 		ElevatorCommand actual2 = ElevatorCommand.fromBytes(actualBytes2);
-		assertNotEquals(actual1, actual2);
-		assertEquals(expected1, actual1);
-		assertEquals(expected2, actual2);
-		assertNotEquals(expected1, actual2);
-		assertNotEquals(expected2, actual1);
+		assertTrue(actual1 instanceof ElevatorDoorCommand);
+		assertTrue(actual2 instanceof ElevatorMoveCommand);
+		ElevatorDoorCommand actualDoorCommand = (ElevatorDoorCommand) actual1;
+		ElevatorMoveCommand actualMoveCommand = (ElevatorMoveCommand) actual2;
+		assertEquals(doorCommand, actualDoorCommand);
+		assertEquals(moveCommand, actualMoveCommand);
+		assertNotEquals(doorCommand, actualMoveCommand);
+		assertNotEquals(moveCommand, actualDoorCommand);
 	}
 
 }

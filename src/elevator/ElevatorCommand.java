@@ -2,11 +2,11 @@ package elevator;
 
 import java.nio.ByteBuffer;
 
-public class ElevatorCommand {
+public abstract class ElevatorCommand {
 	private int elevatorID;
-	private int fault;
+	private Fault fault;
 	
-	public ElevatorCommand(int elevatorID, int fault) {
+	public ElevatorCommand(int elevatorID, Fault fault) {
 		this.elevatorID = elevatorID;
 		this.fault = fault;
 	}
@@ -15,17 +15,35 @@ public class ElevatorCommand {
 		return this.elevatorID;
 	}
 	
-	public int getFault() {
+	public Fault getFault() {
 		return this.fault;
 	}
 	
 	public byte[] toBytes() {
-		return ByteBuffer.allocate(8).putInt(elevatorID).putInt(fault).array();
+		byte[] idBytes = ByteBuffer.allocate(4).putInt(elevatorID).array();
+		byte[] faultBytes = fault.toBytes();
+		byte[] commandBytes = new byte[faultBytes.length + idBytes.length];
+		System.arraycopy(idBytes, 0, commandBytes, 0, idBytes.length);
+		System.arraycopy(faultBytes, 0, commandBytes, idBytes.length, faultBytes.length);
+		return commandBytes;
 	}
 	
-	public static ElevatorCommand fromBytes(byte[] bytes) {
-		ByteBuffer buffer = ByteBuffer.wrap(bytes);
-		return new ElevatorCommand(buffer.getInt(), buffer.getInt());
+	public static ElevatorCommand fromBytes(byte[] bytes) throws IllegalArgumentException {
+		// Returns either an ElevatorDoorCommand or an ElevatorMoveCommand
+		ElevatorCommand command;
+		switch(bytes[0]) {
+			case ElevatorDoorCommand.COMMAND_IDENTIFIER: 
+				command = ElevatorDoorCommand.fromBytes(bytes);
+				break;
+			case ElevatorMoveCommand.COMMAND_IDENTIFIER:
+				command = ElevatorMoveCommand.fromBytes(bytes);
+				break;
+			default:
+				command = null;
+				break;
+		}
+		if(command == null) throw new IllegalArgumentException("Byte array passed to fromBytes() does not represent an ElevatorCommand object");
+		else return command;
 	}
 	
 	@Override

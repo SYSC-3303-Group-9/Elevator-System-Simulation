@@ -11,7 +11,7 @@ class ElevatorDoorCommandTest {
 	
 	@BeforeEach
 	void setUp() throws Exception {
-		expected = new ElevatorDoorCommand(1, 1, DoorState.OPEN);
+		expected = new ElevatorDoorCommand(1, Fault.TRANSIENT, DoorState.OPEN);
 	}
 
 	@AfterEach
@@ -21,13 +21,13 @@ class ElevatorDoorCommandTest {
 
 	@Test
 	void testSameCommandsEqual() {
-		ElevatorDoorCommand actual = new ElevatorDoorCommand(1, 1, DoorState.OPEN);
+		ElevatorDoorCommand actual = new ElevatorDoorCommand(1, Fault.TRANSIENT, DoorState.OPEN);
 		assertEquals(expected, actual);
 	}
 	
 	@Test
 	void testDifferentCommandsNotEqual() {
-		ElevatorDoorCommand actual = new ElevatorDoorCommand(1, 1, DoorState.CLOSED);
+		ElevatorDoorCommand actual = new ElevatorDoorCommand(1, Fault.TRANSIENT, DoorState.CLOSED);
 		assertNotEquals(expected, actual);
 	}
 	
@@ -35,8 +35,8 @@ class ElevatorDoorCommandTest {
 	void testToAndFromBytes() {
 		byte[] elevatorDoorCommandBytes = expected.toBytes();
 		ElevatorDoorCommand actual = ElevatorDoorCommand.fromBytes(elevatorDoorCommandBytes);
-		ElevatorDoorCommand badActual1 = new ElevatorDoorCommand(1, 1, DoorState.CLOSED);
-		ElevatorDoorCommand badActual2 = new ElevatorDoorCommand(3, 0, DoorState.STUCK);
+		ElevatorDoorCommand badActual1 = new ElevatorDoorCommand(1, Fault.TRANSIENT, DoorState.CLOSED);
+		ElevatorDoorCommand badActual2 = new ElevatorDoorCommand(3, Fault.NONE, DoorState.STUCK);
 		assertEquals(expected, actual);
 		assertNotEquals(expected, badActual1);
 		assertNotEquals(expected, badActual2);

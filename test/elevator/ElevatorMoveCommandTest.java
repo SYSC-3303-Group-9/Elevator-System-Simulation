@@ -13,7 +13,7 @@ class ElevatorMoveCommandTest {
 	ElevatorMoveCommand expected;
 	@BeforeEach
 	void setUp() throws Exception {
-		expected = new ElevatorMoveCommand(1, 1, Direction.UP);
+		expected = new ElevatorMoveCommand(1, Fault.TRANSIENT, Direction.UP);
 	}
 
 	@AfterEach
@@ -23,25 +23,25 @@ class ElevatorMoveCommandTest {
 
 	@Test
 	void testSameCommandsEqual() {
-		ElevatorMoveCommand actual = new ElevatorMoveCommand(1, 1, Direction.UP);
+		ElevatorMoveCommand actual = new ElevatorMoveCommand(1, Fault.TRANSIENT, Direction.UP);
 		assertEquals(expected, actual);
 	}
 	
 	@Test
 	void testDifferentCommandsNotEqual() {
-		ElevatorMoveCommand actual = new ElevatorMoveCommand(1, 1, Direction.DOWN);
+		ElevatorMoveCommand actual = new ElevatorMoveCommand(1, Fault.TRANSIENT, Direction.DOWN);
 		assertNotEquals(expected, actual);
 	}
 	
 	@Test
 	void testSameCommandsDifferentIDNotEqual() {
-		ElevatorMoveCommand actual = new ElevatorMoveCommand(2, 1, Direction.UP);
+		ElevatorMoveCommand actual = new ElevatorMoveCommand(2, Fault.TRANSIENT, Direction.UP);
 		assertNotEquals(expected, actual);
 	}
 	
 	@Test 
 	void testDifferentCommandsDifferentIDNotEqual() {
-		ElevatorMoveCommand actual = new ElevatorMoveCommand(2, 1, Direction.DOWN);
+		ElevatorMoveCommand actual = new ElevatorMoveCommand(2, Fault.TRANSIENT, Direction.DOWN);
 		assertNotEquals(expected, actual);
 	}
 	
@@ -49,8 +49,8 @@ class ElevatorMoveCommandTest {
 	void testToAndFromBytes() {
 		byte[] elevatorMoveCommandBytes = expected.toBytes();
 		ElevatorMoveCommand actual = ElevatorMoveCommand.fromBytes(elevatorMoveCommandBytes);
-		ElevatorMoveCommand badActual1 = new ElevatorMoveCommand(1, 1, Direction.DOWN);
-		ElevatorMoveCommand badActual2 = new ElevatorMoveCommand(2, 1, Direction.UP);
+		ElevatorMoveCommand badActual1 = new ElevatorMoveCommand(1, Fault.TRANSIENT, Direction.DOWN);
+		ElevatorMoveCommand badActual2 = new ElevatorMoveCommand(2, Fault.TRANSIENT, Direction.UP);
 		assertEquals(expected, actual);
 		assertNotEquals(expected, badActual1);
 		assertNotEquals(expected, badActual2);

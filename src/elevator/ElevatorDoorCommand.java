@@ -1,9 +1,9 @@
 package elevator;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 
 public class ElevatorDoorCommand extends ElevatorCommand {
+	public static final byte COMMAND_IDENTIFIER = (byte) 0x02;
 	private DoorState intendedDoorState;
 
 	/**
@@ -11,7 +11,7 @@ public class ElevatorDoorCommand extends ElevatorCommand {
 	 * @param elevatorID an int indicating the ID of the elevator whose door should be changed
 	 * @param intendedDoorState a DoorState indicating what the ElevatorDoor should be set to
 	 */
-	public ElevatorDoorCommand(int elevatorID, int fault, DoorState intendedDoorState) {
+	public ElevatorDoorCommand(int elevatorID, Fault fault, DoorState intendedDoorState) {
 		super(elevatorID, fault);
 		this.intendedDoorState = intendedDoorState;
 	}
@@ -22,10 +22,11 @@ public class ElevatorDoorCommand extends ElevatorCommand {
 	 */
 	public byte[] toBytes() {
 		byte[] elevatorCommandBytes = super.toBytes();
-		byte[] doorStateBytes = intendedDoorState.name().getBytes();
-		byte[] elevatorDoorCommandBytes = new byte[elevatorCommandBytes.length + doorStateBytes.length];
-		System.arraycopy(elevatorCommandBytes, 0, elevatorDoorCommandBytes, 0, elevatorCommandBytes.length);
-		System.arraycopy(doorStateBytes, 0, elevatorDoorCommandBytes, elevatorCommandBytes.length, doorStateBytes.length);
+		byte[] doorStateBytes = intendedDoorState.toBytes();
+		byte[] elevatorDoorCommandBytes = new byte[elevatorCommandBytes.length + doorStateBytes.length + 1];
+		elevatorDoorCommandBytes[0] = ElevatorDoorCommand.COMMAND_IDENTIFIER;
+		System.arraycopy(elevatorCommandBytes, 0, elevatorDoorCommandBytes, 1, elevatorCommandBytes.length);
+		System.arraycopy(doorStateBytes, 0, elevatorDoorCommandBytes, elevatorCommandBytes.length + 1, doorStateBytes.length);
 		return elevatorDoorCommandBytes;
 	}
 	
@@ -37,24 +38,14 @@ public class ElevatorDoorCommand extends ElevatorCommand {
 	public static ElevatorDoorCommand fromBytes(byte[] bytes) {
 		// Create a ByteBuffer for bytes
 		ByteBuffer buffer = ByteBuffer.wrap(bytes);
-		// Use static constructor method from ElevatorCommand
-		byte elevatorCommandBytes[] = new byte[8]; 
-		buffer.get(elevatorCommandBytes, 0, 8);
-		ElevatorCommand tempCommand = ElevatorCommand.fromBytes(elevatorCommandBytes);
-		// Create byte[] with the same size as the remaining bytes in the buffer (Direction string bytes)
-		byte[] doorStateBytes = new byte[buffer.remaining()];
+		if(buffer.get() != ElevatorDoorCommand.COMMAND_IDENTIFIER) return null;
+		int elevatorID = buffer.getInt();
+		byte[] faultBytes = new byte[4];
+		byte[] intendedDoorStateBytes = new byte[4];
 		// Copy remaining ByteBuffer bytes over to directionBytes
-		buffer.get(doorStateBytes);
-		// Attempt to convert the directionBytes into a Direction enum
-		DoorState doorState = null;
-		String enumName = new String(doorStateBytes, Charset.defaultCharset()).trim();
-		try {
-			doorState = DoorState.valueOf(enumName);
-		} catch(IllegalArgumentException e) {
-			System.out.println(e.getMessage());
-		}
-		if(doorState == null) return null;
-		else return new ElevatorDoorCommand(tempCommand.getID(), tempCommand.getFault(), doorState);
+		buffer.get(faultBytes);
+		buffer.get(intendedDoorStateBytes);
+		return new ElevatorDoorCommand(elevatorID, Fault.fromBytes(faultBytes), DoorState.fromBytes(intendedDoorStateBytes));
 	}
 
 	public DoorState getIntendedDoorState() {
