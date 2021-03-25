@@ -24,6 +24,11 @@ public class Constants {
 	public static final int DOOR_TIME = 5000;
 	
 	/**
+	 * Time it takes for the system to overcome a transient fault in milliseconds.
+	 */
+	public static final int TRANSIENT_FAULT_TIME = 5000;
+	
+	/**
 	 * ElevatorSubsystem's base port. Every sequential elevator is assigned
 	 * this number plus its ID. E.g. ID0=100, ID1=101, ID2=102...
 	 */
@@ -42,7 +47,7 @@ public class Constants {
 	
 	/**
 	 * Multiplier to determine how simulated milliseconds pass in one real second.
-	 * E.g. If = 1000 then simulation is real-time. If = 2000 then simulation is twice as fast as real-time.
+	 * E.g. If = 1 then simulation is real-time. If = 2 then simulation is twice as fast as real-time.
 	 */
-	public static final int TIME_MULTIPLIER = 1000;
+	public static final int TIME_MULTIPLIER = 8;
 }
