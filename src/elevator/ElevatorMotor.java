@@ -1,6 +1,5 @@
 package elevator;
 
-import common.Clock;
 import common.Constants;
 
 /**
@@ -19,24 +18,22 @@ public class ElevatorMotor  {
 	 * @param input	The input contains the destination the elevator needs to move to amongst other data.
 	 */
 	public void move(Fault fault) {
-		long startTime = Clock.getTime();
+		long waitTime;
 		// No fault registered
 		if(fault.equals(Fault.NONE)) {
+			waitTime = (long) (Constants.MOVE_TIME / Constants.TIME_MULTIPLIER);
 			// While the elapsed moving time is less than the time required to move one floor
-			while(((Clock.getTime() - startTime)*Constants.TIME_MULTIPLIER) < Constants.MOVE_TIME) {
-				try {
-					Thread.sleep(1);
-				} catch (InterruptedException e) {}
-			}
+			try {
+				Thread.sleep(waitTime);
+			} catch (InterruptedException e) {}	
 		}
 		// Transient fault registered
 		else if(fault.equals(Fault.TRANSIENT)) {
+			waitTime = (long) ((Constants.MOVE_TIME + Constants.TRANSIENT_FAULT_TIME) / Constants.TIME_MULTIPLIER);
 			// While the elapsed moving time is less than the time required to move one floor + the transient fault time
-			while(((Clock.getTime() - startTime)*Constants.TIME_MULTIPLIER) < (Constants.MOVE_TIME + Constants.TRANSIENT_FAULT_TIME)) {
-				try {
-					Thread.sleep(1);
-				} catch (InterruptedException e) {}
-			}
+			try {
+				Thread.sleep(waitTime);
+			} catch (InterruptedException e) {}
 		}
 	}
 }

@@ -46,8 +46,8 @@ public class Constants {
 	public static final String INPUT_FILE = Paths.get("resources", "input.txt").toString();
 	
 	/**
-	 * Multiplier to determine how simulated milliseconds pass in one real second.
+	 * Multiplier to determine how fast simulated time runs compared to real-time.
 	 * E.g. If = 1 then simulation is real-time. If = 2 then simulation is twice as fast as real-time.
 	 */
-	public static final int TIME_MULTIPLIER = 8;
+	public static final float TIME_MULTIPLIER = 1f;
 }
