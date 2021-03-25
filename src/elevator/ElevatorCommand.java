@@ -1,53 +1,49 @@
 package elevator;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 
-public class ElevatorCommand {
+public abstract class ElevatorCommand {
 	private int elevatorID;
-	private Direction moveDirection;
+	private Fault fault;
 	
-	public ElevatorCommand(int elevatorID, Direction direction) {
-		this.moveDirection = direction;
+	public ElevatorCommand(int elevatorID, Fault fault) {
 		this.elevatorID = elevatorID;
-	}
-	
-	public byte[] toBytes() {
-		byte[] elevatorIDArray = ByteBuffer.allocate(4).putInt(elevatorID).array();
-		byte[] moveDirectionArray = moveDirection.name().getBytes();
-		byte[] eventArray = new byte[elevatorIDArray.length + moveDirectionArray.length];
-		System.arraycopy(elevatorIDArray, 0, eventArray, 0, elevatorIDArray.length);
-		System.arraycopy(moveDirectionArray, 0, eventArray, elevatorIDArray.length, moveDirectionArray.length);
-		return eventArray;
-	}
-	
-	public static ElevatorCommand fromBytes(byte[] bytes) {
-		// Create a ByteBuffer for bytes
-		ByteBuffer buffer = ByteBuffer.wrap(bytes);
-		// Save elevatorID value from ByteBuffer
-		int id = buffer.getInt();
-		// Create byte[] with the same size as the remaining bytes in the buffer (Direction string bytes)
-		byte[] directionBytes = new byte[buffer.remaining()];
-		// Copy remaining ByteBuffer bytes over to directionBytes
-		buffer.get(directionBytes);
-		// Attempt to convert the directionBytes into a Direction enum
-		Direction direction = null;
-		String enumName = new String(directionBytes, Charset.defaultCharset()).trim();
-		try {
-			direction = Direction.valueOf(enumName);
-		} catch(IllegalArgumentException e) {
-			System.out.println(e.getMessage());
-		}
-		if(direction == null) return null;
-		else return new ElevatorCommand(id, direction);
-	}
-	
-	public Direction getDirection() {
-		return this.moveDirection;
+		this.fault = fault;
 	}
 	
 	public int getID() {
 		return this.elevatorID;
+	}
+	
+	public Fault getFault() {
+		return this.fault;
+	}
+	
+	public byte[] toBytes() {
+		byte[] idBytes = ByteBuffer.allocate(4).putInt(elevatorID).array();
+		byte[] faultBytes = fault.toBytes();
+		byte[] commandBytes = new byte[faultBytes.length + idBytes.length];
+		System.arraycopy(idBytes, 0, commandBytes, 0, idBytes.length);
+		System.arraycopy(faultBytes, 0, commandBytes, idBytes.length, faultBytes.length);
+		return commandBytes;
+	}
+	
+	public static ElevatorCommand fromBytes(byte[] bytes) throws IllegalArgumentException {
+		// Returns either an ElevatorDoorCommand or an ElevatorMoveCommand
+		ElevatorCommand command;
+		switch(bytes[0]) {
+			case ElevatorDoorCommand.COMMAND_IDENTIFIER: 
+				command = ElevatorDoorCommand.fromBytes(bytes);
+				break;
+			case ElevatorMoveCommand.COMMAND_IDENTIFIER:
+				command = ElevatorMoveCommand.fromBytes(bytes);
+				break;
+			default:
+				command = null;
+				break;
+		}
+		if(command == null) throw new IllegalArgumentException("Byte array passed to fromBytes() does not represent an ElevatorCommand object");
+		else return command;
 	}
 	
 	@Override
@@ -55,6 +51,6 @@ public class ElevatorCommand {
 		if(o == this) return true;
 		if(!(o instanceof ElevatorCommand)) return false;
 		ElevatorCommand c = (ElevatorCommand) o;
-		return this.moveDirection.equals(c.getDirection()) && (this.elevatorID == c.getID());
+		return (elevatorID == c.getID()) && (fault == c.getFault());
 	}
 }
