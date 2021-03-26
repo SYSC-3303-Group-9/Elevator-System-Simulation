@@ -63,9 +63,6 @@ public class SystemSync implements Runnable {
 		// Construct a DatagramPacket for receiving packets
 		byte data[] = new byte[8];
 		receivePacket = new DatagramPacket(data, data.length);
-		byte expectedFloor[] = { 102, 108, 111, 111, 114, 0, 0, 0 };
-		byte expectedElevator[] = { 101, 108, 101, 118, 97, 116, 111, 114 };
-
 
 		try {
 			// Block until a datagram is received via sendReceiveSocket.
@@ -73,15 +70,15 @@ public class SystemSync implements Runnable {
 			System.out.println(Arrays.toString(receivePacket.getData()));
 
 			// Get string from packet and check if it's floor or elevator
-			String receivedString = new String(receivePacket.getData());
+			String receivedString = (new String(receivePacket.getData()).trim());
 			System.out.println(receivedString);
 
-			if ((receivedString).equals(new String(expectedFloor))) {
-				//get port number of floor
+			if (receivedString.equals("floor")) {
+				// get port number of floor
 				floorPort = receivePacket.getPort();
 				floorReady = true;
-			} else if ((receivedString).equals(new String(expectedElevator))) {
-				//get port number of elevator
+			} else if (receivedString.equals("elevator")) {
+				// get port number of elevator
 				elevatorPort = receivePacket.getPort();
 				elevatorReady = true;
 			}
