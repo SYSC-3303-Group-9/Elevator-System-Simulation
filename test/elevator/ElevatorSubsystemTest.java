@@ -22,7 +22,7 @@ public class ElevatorSubsystemTest {
 
 	DatagramPacket sendPacket, receivePacket;
 	DatagramSocket sendReceiveSocket;
-	Elevator elevator;
+	ElevatorMotor elevator;
 	ElevatorSubsystem system;
 	Random ran = new Random();
 	int upperBound = 100;
@@ -42,7 +42,7 @@ public class ElevatorSubsystemTest {
 
 	@Test
 	void moveToWaiting() {
-		elevator = new Elevator(ran.nextInt(upperBound), 1);
+		elevator = new ElevatorMotor(ran.nextInt(upperBound), 1);
 		system = new ElevatorSubsystem(elevator);
 
 		// Transition to WAITING state
@@ -52,7 +52,7 @@ public class ElevatorSubsystemTest {
 
 	@Test
 	void movedElevatorUp() throws IOException {
-		elevator = new Elevator(ran.nextInt(upperBound), 1);
+		elevator = new ElevatorMotor(ran.nextInt(upperBound), 1);
 		system = new ElevatorSubsystem(elevator);
 
 		// Transition to WAITING state
@@ -94,7 +94,7 @@ public class ElevatorSubsystemTest {
 
 	@Test
 	void movedElevatorDown() throws IOException {
-		elevator = new Elevator(ran.nextInt(upperBound), 3);
+		elevator = new ElevatorMotor(ran.nextInt(upperBound), 3);
 		system = new ElevatorSubsystem(elevator);
 
 		// Transition to WAITING state

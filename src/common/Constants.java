@@ -24,6 +24,16 @@ public class Constants {
 	public static final int DOOR_TIME = 5000;
 	
 	/**
+	 * Time it takes for the system to overcome a transient fault in milliseconds.
+	 */
+	public static final int TRANSIENT_FAULT_TIME = 5000;
+	
+	/**
+	 * Time it takes for the system to realize a permanent fault has occurred in milliseconds.
+	 */
+	public static final int PERMANENT_FAULT_TIME = 7000;
+	
+	/**
 	 * ElevatorSubsystem's base port. Every sequential elevator is assigned
 	 * this number plus its ID. E.g. ID0=100, ID1=101, ID2=102...
 	 */
@@ -35,14 +45,19 @@ public class Constants {
 	public static final int FLOOR_RECEIVER_PORT = 70;
 	
 	/**
+	 * SystemSync's port.
+	 */
+	public static final int SYSTEM_SYNC_PORT = 72;
+	
+	/**
 	 * The input file path.
 	 * File is located in resources/input.txt by default.
 	 */
 	public static final String INPUT_FILE = Paths.get("resources", "input.txt").toString();
 	
 	/**
-	 * Multiplier to determine how simulated milliseconds pass in one real second.
-	 * E.g. If = 1000 then simulation is real-time. If = 2000 then simulation is twice as fast as real-time.
+	 * Multiplier to determine how fast simulated time runs compared to real-time.
+	 * E.g. If = 1 then simulation is real-time. If = 2 then simulation is twice as fast as real-time.
 	 */
-	public static final int TIME_MULTIPLIER = 1000;
+	public static final float TIME_MULTIPLIER = 1f;
 }

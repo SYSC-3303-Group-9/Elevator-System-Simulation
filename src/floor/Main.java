@@ -1,7 +1,12 @@
 package floor;
 
+import common.Clock;
+
 public class Main {
 	public static void main(String[] args) {
+		// Sync the application clock with the other applications.
+		Clock.sync("floor");
+		
 		// Create the floor subsystem.
 		FloorSubsystem floorSubsystem = new FloorSubsystem();
 		

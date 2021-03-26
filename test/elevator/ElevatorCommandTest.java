@@ -13,7 +13,7 @@ class ElevatorCommandTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		doorCommand = new ElevatorDoorCommand(1, Fault.TRANSIENT, DoorState.OPEN);
-		moveCommand = new ElevatorMoveCommand(1, Fault.TRANSIENT, Direction.UP);
+		moveCommand = new ElevatorMoveCommand(1, Fault.TRANSIENT, Direction.UP, 7);
 	}
 
 	@AfterEach

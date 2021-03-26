@@ -8,19 +8,15 @@ import java.net.InetAddress;
 import common.Constants;
 
 public class ElevatorSubsystem implements Runnable {
-
-	private Elevator elevatorMotor; //TODO change Elevator to ElevatorMotor
-	private ElevatorDoor elevatorDoor;
-	private int id;
-	private int floor;
+	
+	private ElevatorMotor elevator;
 	private ElevatorState state;
 	ElevatorMoveCommand command = null;
 	private DatagramSocket sendReceiveSocket;
 	DatagramPacket receivePacket, sendPacket;
 
-	public ElevatorSubsystem(int id, int floor) {
-		this.elevatorMotor = new Elevator();
-		this.elevatorDoor = new ElevatorDoor();
+	public ElevatorSubsystem(ElevatorMotor elevator) {
+		this.elevator = elevator;
 		this.state = ElevatorState.INITIAL;
 		this.id = id;
 		this.floor = floor;
@@ -70,7 +66,7 @@ public class ElevatorSubsystem implements Runnable {
 		this.move(command.getDirection());
 
 		// Notify the scheduler that the elevator has moved down.
-		ElevatorEvent elevatorInfo = new ElevatorEvent(elevator.getFloor(), elevator.getId());// TO-DO: assign the service state of the elevator
+		ElevatorEvent elevatorInfo = new ElevatorEvent(elevator.getFloor(), elevator.getId(), true);// TO-DO: assign the service state of the elevator
 
 		// Send ElevatorEvent packet to ElevatorCommunicator.
 		try {
