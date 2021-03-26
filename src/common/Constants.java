@@ -29,6 +29,11 @@ public class Constants {
 	public static final int TRANSIENT_FAULT_TIME = 5000;
 	
 	/**
+	 * Time it takes for the system to realize a permanent fault has occurred in milliseconds.
+	 */
+	public static final int PERMANENT_FAULT_TIME = 7000;
+	
+	/**
 	 * ElevatorSubsystem's base port. Every sequential elevator is assigned
 	 * this number plus its ID. E.g. ID0=100, ID1=101, ID2=102...
 	 */
