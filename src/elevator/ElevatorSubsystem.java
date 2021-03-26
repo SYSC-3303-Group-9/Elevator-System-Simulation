@@ -9,13 +9,13 @@ import common.Constants;
 
 public class ElevatorSubsystem implements Runnable {
 	
-	private Elevator elevator;
+	private ElevatorMotor elevator;
 	private ElevatorState state;
 	ElevatorMoveCommand command = null;
 	private DatagramSocket sendReceiveSocket;
 	DatagramPacket receivePacket, sendPacket;
 
-	public ElevatorSubsystem(Elevator elevator) {
+	public ElevatorSubsystem(ElevatorMotor elevator) {
 		this.elevator = elevator;
 		this.state = ElevatorState.INITIAL;
 		try {
@@ -45,7 +45,7 @@ public class ElevatorSubsystem implements Runnable {
 		elevator.move(command.getDirection());
 
 		// Notify the scheduler that the elevator has moved down.
-		ElevatorEvent elevatorInfo = new ElevatorEvent(elevator.getFloor(), elevator.getId());// TO-DO: assign the service state of the elevator
+		ElevatorEvent elevatorInfo = new ElevatorEvent(elevator.getFloor(), elevator.getId(), true);// TO-DO: assign the service state of the elevator
 
 		// Send ElevatorEvent packet to ElevatorCommunicator.
 		try {

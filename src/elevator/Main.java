@@ -10,7 +10,7 @@ public class Main {
 		ArrayList<ElevatorSubsystem> elevators = new ArrayList<ElevatorSubsystem>();
 		for (int i = 0; i < Constants.NUM_ELEVATORS; i++) {
 			// Elevator IDs are assigned sequentially. All elevators start at floor 1.
-			elevators.add(new ElevatorSubsystem(new Elevator(i, 1)));
+			elevators.add(new ElevatorSubsystem(new ElevatorMotor()));
 		}
 		
 		// Create the elevator threads.
