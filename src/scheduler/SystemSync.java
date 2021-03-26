@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.Arrays;
 
 import common.Clock;
 import common.Constants;
@@ -12,8 +13,8 @@ import common.Constants;
 public class SystemSync implements Runnable {
 	private DatagramPacket sendPacket, receivePacket;
 	private DatagramSocket sendReceiveSocket;
-	private Boolean floorReady, elevatorReady;
-	private Clock clock;
+	private Boolean floorReady = false, elevatorReady = false;
+	int floorPort, elevatorPort;
 
 	public SystemSync() {
 		try {
@@ -27,47 +28,22 @@ public class SystemSync implements Runnable {
 
 	@Override
 	public void run() {
-		// Construct a DatagramPacket for receiving packets
-		byte data[] = new byte[8];
-		receivePacket = new DatagramPacket(data, data.length);
-
-		// Receive 2 packets only
-		for (int i = 0; i < 2; i++) {
-			try {
-				// Block until a datagram is received via sendReceiveSocket.
-				sendReceiveSocket.receive(receivePacket);
-
-				// Get string from packet
-				if (receivePacket.getData().toString().equals("floor")) {
-					floorReady = true;
-				} else if (receivePacket.getData().toString().equals("elevator")) {
-					elevatorReady = true;
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
-		}
-
-		if (elevatorReady && floorReady) {
-			
-				// send reply to floor
-				this.sendPacket(true);
-				
-				// send reply to elevator
-				this.sendPacket(false);
-				
-				//start system clock
-				this.clock.startClock();
-				
-
+		while (true) {
+			if (syncing())
+				break;
 		}
 
 	}
 
+	/**
+	 * Sends packet to floor is boolean is true, if boolean is false sends to
+	 * elevator
+	 * 
+	 * @param floor
+	 */
 	private void sendPacket(boolean floor) {
 
-		int port = floor ? Constants.FLOOR_RECEIVER_PORT : Constants.ELEVATOR_BASE_PORT;
+		int port = floor ? this.floorPort : this.elevatorPort;
 
 		// Construct a DatagramPacket for sending packet to floor
 		byte reply[] = "start".getBytes();
@@ -76,10 +52,60 @@ public class SystemSync implements Runnable {
 		try {
 			sendPacket = new DatagramPacket(reply, reply.length, InetAddress.getLocalHost(), port);
 			sendReceiveSocket.send(sendPacket);
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
+	}
+
+	public boolean syncing() {
+		// Construct a DatagramPacket for receiving packets
+		byte data[] = new byte[8];
+		receivePacket = new DatagramPacket(data, data.length);
+		byte expectedFloor[] = { 102, 108, 111, 111, 114, 0, 0, 0 };
+		byte expectedElevator[] = { 101, 108, 101, 118, 97, 116, 111, 114 };
+
+
+		try {
+			// Block until a datagram is received via sendReceiveSocket.
+			sendReceiveSocket.receive(receivePacket);
+			System.out.println(Arrays.toString(receivePacket.getData()));
+
+			// Get string from packet and check if it's floor or elevator
+			String receivedString = new String(receivePacket.getData());
+			System.out.println(receivedString);
+
+			if ((receivedString).equals(new String(expectedFloor))) {
+				//get port number of floor
+				floorPort = receivePacket.getPort();
+				floorReady = true;
+			} else if ((receivedString).equals(new String(expectedElevator))) {
+				//get port number of elevator
+				elevatorPort = receivePacket.getPort();
+				elevatorReady = true;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+
+		if (elevatorReady && floorReady) {
+
+			// send reply to floor
+			this.sendPacket(true);
+
+			// send reply to elevator
+			this.sendPacket(false);
+
+			// start system clock
+			Clock.startClock();
+
+			sendReceiveSocket.close();
+
+			return true;
+		}
+		return false;
+
 	}
 }
