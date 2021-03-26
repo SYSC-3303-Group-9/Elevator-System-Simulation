@@ -40,6 +40,11 @@ public class Constants {
 	public static final int FLOOR_RECEIVER_PORT = 70;
 	
 	/**
+	 * SystemSync's port.
+	 */
+	public static final int SYSTEM_SYNC_PORT = 72;
+	
+	/**
 	 * The input file path.
 	 * File is located in resources/input.txt by default.
 	 */

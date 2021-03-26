@@ -2,10 +2,14 @@ package elevator;
 
 import java.util.ArrayList;
 
+import common.Clock;
 import common.Constants;
 
 public class Main {
 	public static void main(String[] args) {
+		// Sync the application clock with the other applications.
+		Clock.sync("elevator");
+		
 		// Create the elevators.
 		ArrayList<ElevatorSubsystem> elevators = new ArrayList<ElevatorSubsystem>();
 		for (int i = 0; i < Constants.NUM_ELEVATORS; i++) {
