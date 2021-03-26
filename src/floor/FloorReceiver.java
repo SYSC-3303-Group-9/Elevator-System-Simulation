@@ -39,8 +39,9 @@ public class FloorReceiver implements Runnable {
 				System.out.println("Scheduler received " + inputData);
 				floorToScheduler.put(SchedulerMessage.fromInputData(inputData));
 				
-			} catch(IOException e) {
-				System.out.println("FloorReceiver, receiverPacket " + e);
+			} catch(IOException | ClassNotFoundException e) {
+				e.printStackTrace();
+				System.exit(1);
 			}
 			
 			//Send respond back to FloorSubsystem
@@ -49,7 +50,7 @@ public class FloorReceiver implements Runnable {
 				respond = new DatagramPacket(new byte[0], 0, InetAddress.getLocalHost(), receivePacket.getPort());
 				sendReceiveSocket.send(respond);
 			} catch (IOException e) {
-				System.out.println("FloorReceiver, run" + e);
+				e.printStackTrace();
 				System.exit(1);
 			}	
 		}

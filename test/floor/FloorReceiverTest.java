@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import common.Buffer;
 import common.Constants;
 import elevator.Direction;
+import elevator.Fault;
 import scheduler.SchedulerMessage;
 
 class FloorReceiverTest {
@@ -22,7 +23,7 @@ class FloorReceiverTest {
 		//arrange
 		Buffer<SchedulerMessage> buffer = new Buffer<>();
 		Thread thFloorReceiver = new Thread(new FloorReceiver(buffer));
-		InputData input = new InputData(LocalTime.now(), 0, Direction.UP, 1);
+		InputData input = new InputData(LocalTime.now(), 0, Direction.UP, 1, Fault.NONE);
 		
 		//act
 		thFloorReceiver.start();

@@ -3,6 +3,7 @@ package scheduler;
 import java.util.ArrayList;
 
 import elevator.Direction;
+import elevator.Fault;
 
 /**
  * Represents everything the scheduler knows about an elevator.
@@ -11,6 +12,7 @@ public class SchedulerElevator {
 	private int elevatorId;
 	private int lastKnownFloor;
 	private Direction direction;
+	private Fault pendingFault = Fault.NONE;
 	private ArrayList<ScheduledJob> assignedJobs = new ArrayList<ScheduledJob>();
 	
 	public SchedulerElevator(int elevatorId, int lastKnownFloor, Direction direction) {
@@ -61,6 +63,22 @@ public class SchedulerElevator {
 	}
 	
 	/**
+	 * Gets the elevator's pending fault.
+	 * @return The pending fault.
+	 */
+	public Fault getPendingFault() {
+		return pendingFault;
+	}
+	
+	/**
+	 * Sets the elevator's pending fault.
+	 * @param pendingFault The pending fault.
+	 */
+	public void setPendingFault(Fault pendingFault) {
+		this.pendingFault = pendingFault;
+	}
+	
+	/**
 	 * Gets the elevator's assigned jobs.
 	 * @return The assigned jobs.
 	 */
@@ -83,6 +101,26 @@ public class SchedulerElevator {
 		case WAITING:
 			break;
 		}
+	}
+	
+	/**
+	 * Gets the closest destination floor of the elevator's assigned jobs.
+	 * @param elevator The elevator to search.
+	 * @return The closest destination floor.
+	 */
+	public int findElevatorDestination() {
+		int destination = this.direction == Direction.UP ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+		
+		for (ScheduledJob job : this.assignedJobs) {
+			if (this.direction == Direction.UP && job.getInputData().getDestinationFloor() < destination) {
+				destination = job.getInputData().getDestinationFloor();
+			}
+			else if (this.direction == Direction.DOWN && job.getInputData().getDestinationFloor() > destination) {
+				destination = job.getInputData().getDestinationFloor();
+			}
+		}
+		
+		return destination;
 	}
 	
 }

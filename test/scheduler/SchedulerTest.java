@@ -1,7 +1,6 @@
 package scheduler;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalTime;
 
@@ -10,13 +9,12 @@ import org.junit.jupiter.api.Test;
 import common.Buffer;
 import elevator.Direction;
 import elevator.ElevatorMoveCommand;
+import elevator.Fault;
 import elevator.ElevatorEvent;
 import floor.InputData;
 
 public class SchedulerTest {
 	private void processNewJob(Scheduler subject, boolean shouldMoveElevator) {
-		subject.tick();
-		assertEquals(SchedulerState.PROCESSING_MESSAGE, subject.getState());
 		subject.tick();
 		assertEquals(SchedulerState.PROCESSING_NEW_JOB, subject.getState());
 		if (shouldMoveElevator) {
@@ -29,8 +27,6 @@ public class SchedulerTest {
 	
 	private void processElevatorEvent(Scheduler subject, boolean shouldMoveElevator) {
 		subject.tick();
-		assertEquals(SchedulerState.PROCESSING_MESSAGE, subject.getState());
-		subject.tick();
 		assertEquals(SchedulerState.PROCESSING_ELEVATOR_EVENT, subject.getState());
 		if (shouldMoveElevator) {
 			subject.tick();
@@ -41,8 +37,6 @@ public class SchedulerTest {
 	}
 	
 	private void processElevatorEventUnblockJob(Scheduler subject, boolean shouldMoveElevator) {
-		subject.tick();
-		assertEquals(SchedulerState.PROCESSING_MESSAGE, subject.getState());
 		subject.tick();
 		assertEquals(SchedulerState.PROCESSING_ELEVATOR_EVENT, subject.getState());
 		subject.tick();
@@ -56,7 +50,12 @@ public class SchedulerTest {
 	}
 	
 	private void mimicElevatorEvent(int floor, int elevatorId, Buffer<SchedulerMessage> messageBuffer) {
-		ElevatorEvent event = new ElevatorEvent(floor, elevatorId); //To-Do: assign elevator service state
+		ElevatorEvent event = new ElevatorEvent(floor, elevatorId, false);
+		messageBuffer.put(SchedulerMessage.fromElevatorEvent(event));
+	}
+	
+	private void mimicElevatorFaultEvent(int floor, int elevatorId, Buffer<SchedulerMessage> messageBuffer) {
+		ElevatorEvent event = new ElevatorEvent(floor, elevatorId, true);
 		messageBuffer.put(SchedulerMessage.fromElevatorEvent(event));
 	}
 	
@@ -72,7 +71,7 @@ public class SchedulerTest {
 		assertEquals(SchedulerState.WAITING_FOR_MESSAGE, subject.getState());
 		
 		// assert 1: Requesting 2 -> 3
-		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 2, Direction.UP, 3);
+		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 2, Direction.UP, 3, Fault.NONE);
 		messageBuffer.put(SchedulerMessage.fromInputData(request1));
 		
 		// assert 1: move up to floor 2 for pickup
@@ -103,7 +102,7 @@ public class SchedulerTest {
 		assertEquals(SchedulerState.WAITING_FOR_MESSAGE, subject.getState());
 		
 		// arrange 1: Requesting 3 -> 5
-		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 3, Direction.UP, 5);
+		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 3, Direction.UP, 5, Fault.NONE);
 		messageBuffer.put(SchedulerMessage.fromInputData(request1));		
 		
 		// assert 1: elevator was moved up to floor 2
@@ -144,7 +143,7 @@ public class SchedulerTest {
 		assertEquals(SchedulerState.WAITING_FOR_MESSAGE, subject.getState());
 		
 		// arrange 1: Requesting 5 -> 2
-		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 5, Direction.DOWN, 2);
+		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 5, Direction.DOWN, 2, Fault.NONE);
 		messageBuffer.put(SchedulerMessage.fromInputData(request1));
 		
 		// assert 1: elevator was moved up to floor 2
@@ -200,7 +199,7 @@ public class SchedulerTest {
 		assertEquals(SchedulerState.WAITING_FOR_MESSAGE, subject.getState());
 		
 		// arrange 1: Requesting 1 -> 2
-		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2);
+		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2, Fault.NONE);
 		messageBuffer.put(SchedulerMessage.fromInputData(request1));
 		
 		// assert 1: elevator was moved up to floor 2
@@ -211,7 +210,7 @@ public class SchedulerTest {
 		
 		// arrange 2: Requesting 1 -> 2
 		processElevatorEvent(subject, false);
-		InputData request2 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2);
+		InputData request2 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2, Fault.NONE);
 		messageBuffer.put(SchedulerMessage.fromInputData(request2));
 		
 		// assert 2: *different* elevator was moved up to floor 2
@@ -239,7 +238,7 @@ public class SchedulerTest {
 		assertEquals(SchedulerState.WAITING_FOR_MESSAGE, subject.getState());
 		
 		// arrange 1: Requesting 1 -> 3
-		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 3);
+		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 3, Fault.NONE);
 		messageBuffer.put(SchedulerMessage.fromInputData(request1));
 		
 		// assert 1: elevator was moved up to floor 2
@@ -247,7 +246,7 @@ public class SchedulerTest {
 		assertEquals(Direction.UP, commandBuffer.get().getDirection());
 		
 		/* before mimicking elevator event, i.e., before elevator has reached floor 2 but after it was scheduled to move there. */
-		InputData request2 = new InputData(LocalTime.of(1, 1, 1, 1), 2, Direction.UP, 4);
+		InputData request2 = new InputData(LocalTime.of(1, 1, 1, 1), 2, Direction.UP, 4, Fault.NONE);
 		messageBuffer.put(SchedulerMessage.fromInputData(request2));
 		processNewJob(subject, false);
 		/* now mimic elevator event, i.e., elevator has now reached floor 2, after having received another job starting on floor 2. */
@@ -282,9 +281,9 @@ public class SchedulerTest {
 		
 		// arrange 1: Requesting 1 -> 3 *and* 2 -> 1; Elevator will have to
 		// change direction to get to the pickup of the second request.
-		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 3);
+		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 3, Fault.NONE);
 		messageBuffer.put(SchedulerMessage.fromInputData(request1));
-		InputData request2 = new InputData(LocalTime.of(1, 1, 1, 1), 2, Direction.DOWN, 1);
+		InputData request2 = new InputData(LocalTime.of(1, 1, 1, 1), 2, Direction.DOWN, 1, Fault.NONE);
 		messageBuffer.put(SchedulerMessage.fromInputData(request2));
 		
 		// assert 1: elevator was moved up to floor 2
@@ -327,9 +326,9 @@ public class SchedulerTest {
 		
 		// arrange 1: Requesting 1 -> 3 *and* 4 -> 3; Elevator will have to
 		// keep going in the same direction to get to the pickup of the second request.
-		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 3);
+		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 3, Fault.NONE);
 		messageBuffer.put(SchedulerMessage.fromInputData(request1));
-		InputData request2 = new InputData(LocalTime.of(1, 1, 1, 1), 4, Direction.DOWN, 3);
+		InputData request2 = new InputData(LocalTime.of(1, 1, 1, 1), 4, Direction.DOWN, 3, Fault.NONE);
 		messageBuffer.put(SchedulerMessage.fromInputData(request2));
 		
 		// assert 1: elevator was moved up to floor 2
@@ -371,7 +370,7 @@ public class SchedulerTest {
 		assertEquals(SchedulerState.WAITING_FOR_MESSAGE, subject.getState());
 		
 		// arrange 1: Requesting 1 -> 3
-		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 3);
+		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 3, Fault.NONE);
 		messageBuffer.put(SchedulerMessage.fromInputData(request1));
 		
 		// assert 1: elevator was moved up to floor 2
@@ -381,7 +380,7 @@ public class SchedulerTest {
 		
 		// arrange 3: Requesting 1 -> 2; This request also moves up but we are already on floor 2,
 		// must wait until previous request finishes.
-		InputData request2 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2);
+		InputData request2 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2, Fault.NONE);
 		messageBuffer.put(SchedulerMessage.fromInputData(request2));
 		
 		// assert 3: elevator was moved up to floor 3 to drop off first request
@@ -424,9 +423,9 @@ public class SchedulerTest {
 		
 		// arrange 1: Requesting 2 -> 4 *and* 3 -> 1; Elevator will have to
 		// keep going in the same direction to get to the pickup of the second request.
-		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 2, Direction.UP, 4);
+		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 2, Direction.UP, 4, Fault.NONE);
 		messageBuffer.put(SchedulerMessage.fromInputData(request1));
-		InputData request2 = new InputData(LocalTime.of(1, 1, 1, 1), 3, Direction.DOWN, 1);
+		InputData request2 = new InputData(LocalTime.of(1, 1, 1, 1), 3, Direction.DOWN, 1, Fault.NONE);
 		messageBuffer.put(SchedulerMessage.fromInputData(request2));
 		
 		// assert 1: Both elevators were moved up to floor 2
@@ -475,6 +474,70 @@ public class SchedulerTest {
 		processElevatorEvent(subject, true);
 		assertEquals(Direction.DOWN, commandBuffer.get().getDirection());
 		mimicElevatorEvent(1, 0, messageBuffer);
+		
+		// assert the command buffer has no remaining commands
+		commandBuffer.setIsDisabled(true);
+		assertEquals(commandBuffer.get(), null);
+	}
+	
+	@Test
+	public void tick_shouldShutdownWhenAllElevatorsFailed() {
+		// arrange subject
+		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
+		Buffer<ElevatorMoveCommand> commandBuffer = new Buffer<ElevatorMoveCommand>();
+		Scheduler subject = new Scheduler(1 /* 1 elevators */, 5, messageBuffer, commandBuffer);
+		
+		// act 0: move out of initial state.
+		subject.tick();
+		assertEquals(SchedulerState.WAITING_FOR_MESSAGE, subject.getState());
+		
+		// arrange 1: Requesting 1 -> 2 with a permanent fault.
+		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 2, Direction.UP, 4, Fault.PERMANENT);
+		messageBuffer.put(SchedulerMessage.fromInputData(request1));
+		
+		// assert 1: Elevator return permanent fault.
+		processNewJob(subject, true);
+		assertEquals(Fault.PERMANENT, commandBuffer.get().getFault());
+		mimicElevatorFaultEvent(2, 0, messageBuffer);
+		
+		// assert 2: Scheduler shuts down when only elevator faults.
+		subject.tick();
+		assertEquals(SchedulerState.PROCESSING_ELEVATOR_EVENT, subject.getState());
+		subject.tick();
+		assertEquals(SchedulerState.FINAL, subject.getState());
+		assertTrue(subject.tick());
+		
+		// assert the command buffer has no remaining commands
+		commandBuffer.setIsDisabled(true);
+		assertEquals(commandBuffer.get(), null);
+	}
+	
+	@Test
+	public void tick_shouldReassignElevatorWhenPermanentFault() {
+		// arrange subject
+		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
+		Buffer<ElevatorMoveCommand> commandBuffer = new Buffer<ElevatorMoveCommand>();
+		Scheduler subject = new Scheduler(2 /* 2 elevators */, 5, messageBuffer, commandBuffer);
+		
+		// act 0: move out of initial state
+		subject.tick();
+		assertEquals(SchedulerState.WAITING_FOR_MESSAGE, subject.getState());
+		
+		// arrange 1: Requesting 1 -> 2 with a permanent fault.
+		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 2, Direction.UP, 4, Fault.PERMANENT);
+		messageBuffer.put(SchedulerMessage.fromInputData(request1));
+		
+		// assert 1: Elevator 0 return permanent fault.
+		processNewJob(subject, true);
+		assertEquals(Fault.PERMANENT, commandBuffer.get().getFault());
+		mimicElevatorFaultEvent(2, 0, messageBuffer);
+		
+		// assert 2: Elevator 1 handles request instead.
+		processElevatorEvent(subject, false);
+		// Job to reassign should be "new".
+		processNewJob(subject, true);
+		assertEquals(Direction.UP, commandBuffer.get().getDirection());
+		mimicElevatorEvent(2, 1, messageBuffer);
 		
 		// assert the command buffer has no remaining commands
 		commandBuffer.setIsDisabled(true);
