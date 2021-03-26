@@ -14,7 +14,9 @@ public class ElevatorSubsystem implements Runnable {
 	private ElevatorDoor door;
 	private int id;
 	private int floor;
-	private ElevatorMoveCommand command = null;
+	private ElevatorCommand command = null;
+	private ElevatorMoveCommand moveCmd = null;
+	private ElevatorDoorCommand doorCmd = null;
 	private DatagramSocket sendReceiveSocket;
 	private DatagramPacket receivePacket, sendPacket;
 
@@ -65,18 +67,11 @@ public class ElevatorSubsystem implements Runnable {
 	 * 
 	 * @param command
 	 */
-	public void sendCommand(ElevatorMoveCommand command) {
+	public void sendMoveCommand(ElevatorMoveCommand command) {
 		// Move the Elevator
 		this.move(command.getDirection());
 
-		// Notify the scheduler that the elevator has moved down.
-
-		ElevatorEvent elevatorInfo;
-		if (this.state == ElevatorState.DISABLED) {
-			elevatorInfo = new ElevatorEvent(this.floor, this.id, true);
-		} else {
-			elevatorInfo = new ElevatorEvent(this.floor, this.id, false);
-		}
+		ElevatorEvent elevatorInfo = new ElevatorEvent(this.floor, this.id, false);
 
 		// Send ElevatorEvent packet to ElevatorCommunicator.
 		try {
@@ -84,7 +79,7 @@ public class ElevatorSubsystem implements Runnable {
 					InetAddress.getLocalHost(), receivePacket.getPort());
 			sendReceiveSocket.send(sendPacket);
 		} catch (IOException e) {
-			System.out.println("ElevatorSubsystem, sendCommand " + e);
+			e.printStackTrace();
 			System.exit(1);
 		}
 
@@ -178,7 +173,7 @@ public class ElevatorSubsystem implements Runnable {
 				System.out.println("ElevatorSubsystem, run " + e);
 			}
 
-			command = ElevatorMoveCommand.fromBytes(receivePacket.getData());
+			command = ElevatorCommand.fromBytes(receivePacket.getData());
 
 			// If the buffer was disabled and returned null, stop execution.
 			if (command == null) {
@@ -190,40 +185,50 @@ public class ElevatorSubsystem implements Runnable {
 				if (command.getFault() == Fault.PERMANENT) {
 					this.state = ElevatorState.DISABLED;
 				} else {
-
-					if (command.getDirection() == Direction.UP) {
-						this.state = ElevatorState.MOVINGUP;
-					} else if (command.getDirection() == Direction.DOWN) {
-						this.state = ElevatorState.MOVINGDOWN;
-
+					// identify what kind of elevator command was passed
+					if (command instanceof ElevatorMoveCommand) {
+						moveCmd = (ElevatorMoveCommand) command;
+						if (moveCmd.getDirection() == Direction.UP) {
+							this.state = ElevatorState.MOVINGUP;
+						} else if (moveCmd.getDirection() == Direction.DOWN) {
+							this.state = ElevatorState.MOVINGDOWN;
+						}
+					} else if (command instanceof ElevatorDoorCommand) {
+						this.state = ElevatorState.OPENING_CLOSING_DOORS;
+						doorCmd = (ElevatorDoorCommand) command;
 					}
+
 				}
 			}
 			break;
 
 		case MOVINGDOWN: {
 			// Assuming at this point that the elevator has arrived.
-			sendCommand(command);
+			this.move(Direction.DOWN);
+			sendMoveCommand(moveCmd);
+			this.state = ElevatorState.WAITING;
 			break;
 		}
 
 		case MOVINGUP: {
 			// Assuming at this point that the elevator has arrived.
-			sendCommand(command);
+			this.move(Direction.UP);
+			sendMoveCommand(moveCmd);
+			this.state = ElevatorState.WAITING;
 			break;
 		}
 
 		case DISABLED: {
-			// Assuming at this point that the elevator has arrived.
-			sendCommand(command);
+			sendFault();
+			this.state = ElevatorState.FINAL;
 			break;
 		}
 
 		case FINAL:
 			return true;
-		case CLOSING_DOORS:
-			break;
-		case OPENING_DOORS:
+		case OPENING_CLOSING_DOORS:
+			door.openClose(doorCmd.getFault());
+			this.state = ElevatorState.WAITING;
 			break;
 		default:
 			break;
