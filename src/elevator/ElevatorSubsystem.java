@@ -8,16 +8,20 @@ import java.net.InetAddress;
 import common.Constants;
 
 public class ElevatorSubsystem implements Runnable {
-	
+
 	private ElevatorMotor elevator;
 	private ElevatorState state;
-	ElevatorMoveCommand command = null;
+	private ElevatorDoor door;
+	private int id;
+	private int floor;
+	private ElevatorMoveCommand command = null;
 	private DatagramSocket sendReceiveSocket;
-	DatagramPacket receivePacket, sendPacket;
+	private DatagramPacket receivePacket, sendPacket;
 
-	public ElevatorSubsystem(ElevatorMotor elevator) {
+	public ElevatorSubsystem(ElevatorMotor elevator, int floor, int id) {
 		this.elevator = elevator;
 		this.state = ElevatorState.INITIAL;
+		this.door = new ElevatorDoor();
 		this.id = id;
 		this.floor = floor;
 		try {
@@ -66,7 +70,13 @@ public class ElevatorSubsystem implements Runnable {
 		this.move(command.getDirection());
 
 		// Notify the scheduler that the elevator has moved down.
-		ElevatorEvent elevatorInfo = new ElevatorEvent(elevator.getFloor(), elevator.getId(), true);// TO-DO: assign the service state of the elevator
+
+		ElevatorEvent elevatorInfo;
+		if (this.state == ElevatorState.DISABLED) {
+			elevatorInfo = new ElevatorEvent(this.floor, this.id, true);
+		} else {
+			elevatorInfo = new ElevatorEvent(this.floor, this.id, false);
+		}
 
 		// Send ElevatorEvent packet to ElevatorCommunicator.
 		try {
@@ -81,17 +91,16 @@ public class ElevatorSubsystem implements Runnable {
 		// Move to next state
 		this.state = ElevatorState.WAITING;
 	}
-	
+
 	/**
 	 * Notifies the Scheduler that the elevator is disabled due to a permanent fault
 	 * 
 	 * @param command
 	 */
-	public void sendFault(ElevatorCommand command) {
+	public void sendFault() {
 
 		// Notify the scheduler that the elevator has a permanent fault
-		//TODO modify elevator event based on implementation
-		ElevatorEvent elevatorInfo = new ElevatorEvent(floor, id);
+		ElevatorEvent elevatorInfo = new ElevatorEvent(this.floor, this.id, true);
 
 		// Send ElevatorEvent packet to ElevatorCommunicator.
 		try {
@@ -102,7 +111,6 @@ public class ElevatorSubsystem implements Runnable {
 			System.out.println("ElevatorSubsystem, sendFault " + e);
 			System.exit(1);
 		}
-
 
 	}
 
@@ -115,15 +123,23 @@ public class ElevatorSubsystem implements Runnable {
 	 */
 	public void move(Direction direction) {
 
-		//opening and closing elevator door
-		elevatorDoor.openClose();
-		
-		//elevator is moving
-		elevatorMotor.move(command.getDirection());// TODO update when elevatorMotor move method is changed
-		
-		//opening and closing elevator door
-		elevatorDoor.openClose();
-		
+		// opening and closing elevator door
+		if (command.getFault() == Fault.TRANSIENT) {
+			door.openClose(Fault.TRANSIENT);
+		} else {
+			door.openClose(Fault.NONE);
+		}
+
+		// elevator is moving
+		elevator.move(Fault.NONE);
+
+		// opening and closing elevator door
+		if (command.getFault() == Fault.TRANSIENT) {
+			door.openClose(Fault.TRANSIENT);
+		} else {
+			door.openClose(Fault.NONE);
+		}
+
 		if (direction == Direction.UP) {
 			floor++;
 		} else {
@@ -171,7 +187,7 @@ public class ElevatorSubsystem implements Runnable {
 			} else {
 				// Change the state of the Elevator to Moving up or Moving down or
 				// notFunctional?
-				if (command.permanentFault() == true) {
+				if (command.getFault() == Fault.PERMANENT) {
 					this.state = ElevatorState.DISABLED;
 				} else {
 
@@ -179,6 +195,7 @@ public class ElevatorSubsystem implements Runnable {
 						this.state = ElevatorState.MOVINGUP;
 					} else if (command.getDirection() == Direction.DOWN) {
 						this.state = ElevatorState.MOVINGDOWN;
+
 					}
 				}
 			}
@@ -195,7 +212,7 @@ public class ElevatorSubsystem implements Runnable {
 			sendCommand(command);
 			break;
 		}
-		
+
 		case DISABLED: {
 			// Assuming at this point that the elevator has arrived.
 			sendCommand(command);
@@ -204,6 +221,12 @@ public class ElevatorSubsystem implements Runnable {
 
 		case FINAL:
 			return true;
+		case CLOSING_DOORS:
+			break;
+		case OPENING_DOORS:
+			break;
+		default:
+			break;
 		}
 		return false;
 	}
