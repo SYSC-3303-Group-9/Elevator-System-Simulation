@@ -3,19 +3,14 @@ package elevator;
 import common.Constants;
 
 /**
- * Moves from floor to floor based on the data it has been sent.
+ * Represents an Elevator's motor, that moves the carriage from one floor to the next
  */
 public class ElevatorMotor  {
-	/**
-	 * Creates a new instance of the Elevator class.
-	 */
-	public ElevatorMotor() {
-		
-	}
+	public ElevatorMotor() {}
 
 	/**
-	 * Moves the elevator to a specified floor and prints the floor it left and the destination floor.
-	 * @param input	The input contains the destination the elevator needs to move to amongst other data.
+	 * The real-time aspect of the elevator moving from one floor to the next
+	 * @param fault	Possible fault that occurs during the move action, extending the time taken
 	 */
 	public void move(Fault fault) {
 		long waitTime;
