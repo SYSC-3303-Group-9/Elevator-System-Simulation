@@ -1,6 +1,5 @@
 package scheduler;
 
-import elevator.Direction;
 import floor.InputData;
 
 /**
@@ -10,28 +9,15 @@ public class ScheduledJob {
 	private static int curJobId = 0;
 	
 	private int jobId;
-	private int startFloor;
-	private int endFloor;
-	private Direction direction;
 	private SchedulerElevator assignedElevator;
+	private InputData inputData;
 	private boolean isOnElevator = false;
-	
-	public ScheduledJob(SchedulerElevator assignedElevator, int startFloor, int endFloor, Direction direction) {
-		super();
-		this.jobId = curJobId++;
-		this.startFloor = startFloor;
-		this.endFloor = endFloor;
-		this.direction = direction;
-		this.assignedElevator = assignedElevator;
-	}
 	
 	public ScheduledJob(SchedulerElevator assignedElevator, InputData inputData) {
 		super();
 		this.jobId = curJobId++;
-		this.startFloor = inputData.getCurrentFloor();
-		this.endFloor = inputData.getDestinationFloor();
-		this.direction = inputData.getDirection();
 		this.assignedElevator = assignedElevator;
+		this.inputData = inputData;
 	}
 	
 	/**
@@ -43,27 +29,11 @@ public class ScheduledJob {
 	}
 	
 	/**
-	 * Gets this job's starting floor.
+	 * Gets this job's input data.
 	 * @return The start floor.
 	 */
-	public int getStartFloor() {
-		return startFloor;
-	}
-	
-	/**
-	 * Gets this job's ending floor.
-	 * @return The end floor.
-	 */
-	public int getEndFloor() {
-		return endFloor;
-	}
-	
-	/**
-	 * Gets this job's direction.
-	 * @return The direction.
-	 */
-	public Direction getDirection() {
-		return direction;
+	public InputData getInputData() {
+		return inputData;
 	}
 	
 	/**

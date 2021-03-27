@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import elevator.Direction;
+import elevator.Fault;
 
 /**
  * Handles the input file parsing.
@@ -35,7 +36,23 @@ public class InputParser {
 		int currentFloor = Integer.parseInt(split[1]);
 		Direction direction = Direction.valueOf(split[2].toUpperCase());
 		int destinationFloor = Integer.parseInt(split[3]);
+		int faultCode = Integer.parseInt(split[3]);
 		
-		return new InputData(time, currentFloor, direction, destinationFloor);
+		Fault fault;
+		switch (faultCode) {
+		case 0:
+			fault = Fault.NONE;
+			break;
+		case 1:
+			fault = Fault.TRANSIENT;
+			break;
+		case 2:
+			fault = Fault.PERMANENT;
+			break;
+		default:
+			throw new UnsupportedOperationException();
+		}
+		
+		return new InputData(time, currentFloor, direction, destinationFloor, fault);
 	}
 }
