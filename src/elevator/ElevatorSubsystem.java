@@ -203,16 +203,14 @@ public class ElevatorSubsystem implements Runnable {
 			break;
 
 		case MOVINGDOWN: {
-			// Assuming at this point that the elevator has arrived.
-			this.move(Direction.DOWN);
+			// Sending instruction to move elevator down
 			sendMoveCommand(moveCmd);
 			this.state = ElevatorState.WAITING;
 			break;
 		}
 
 		case MOVINGUP: {
-			// Assuming at this point that the elevator has arrived.
-			this.move(Direction.UP);
+			// Sending instruction to move elevator up
 			sendMoveCommand(moveCmd);
 			this.state = ElevatorState.WAITING;
 			break;

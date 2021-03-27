@@ -10,13 +10,10 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.time.LocalTime;
 import java.util.Random;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-
-import floor.InputData;
 
 public class ElevatorSubsystemTest {
 
@@ -42,8 +39,8 @@ public class ElevatorSubsystemTest {
 
 	@Test
 	void moveToWaiting() {
-		elevator = new ElevatorMotor(ran.nextInt(upperBound), 1);
-		system = new ElevatorSubsystem(elevator);
+		elevator = new ElevatorMotor();
+		system = new ElevatorSubsystem(elevator, 1, ran.nextInt(upperBound));
 
 		// Transition to WAITING state
 		system.next();
@@ -52,19 +49,19 @@ public class ElevatorSubsystemTest {
 
 	@Test
 	void movedElevatorUp() throws IOException {
-		elevator = new ElevatorMotor(ran.nextInt(upperBound), 1);
-		system = new ElevatorSubsystem(elevator);
+		elevator = new ElevatorMotor();
+		system = new ElevatorSubsystem(elevator, 1, ran.nextInt(upperBound));
 
 		// Transition to WAITING state
 		system.next();
 		assertEquals(ElevatorState.WAITING, system.getState());
 
 		// Move elevator one floor up
-		InputData request = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2);
+		ElevatorMoveCommand request = new ElevatorMoveCommand(system.getId(), Fault.NONE, Direction.UP, 2);
 
 		// Construct a datagram packet that is to be sent
 		sendPacket = new DatagramPacket(request.toBytes(), request.toBytes().length, InetAddress.getLocalHost(),
-				Constants.ELEVATOR_BASE_PORT + elevator.getId());
+				Constants.ELEVATOR_BASE_PORT + system.getId());
 
 		// Send the datagram packet to the server via the send/receive socket.
 		sendReceiveSocket.send(sendPacket);
@@ -75,8 +72,8 @@ public class ElevatorSubsystemTest {
 		system.next();
 
 		// Construct a DatagramPacket for receiving packets up
-		// to 8 bytes
-		byte data[] = new byte[8];
+		// to 12 bytes
+		byte data[] = new byte[12];
 		receivePacket = new DatagramPacket(data, data.length);
 
 		// Receiving Elevator command
@@ -87,26 +84,26 @@ public class ElevatorSubsystemTest {
 		sendReceiveSocket.close();
 
 		ElevatorEvent response = ElevatorEvent.fromBytes(data);
-		assertEquals(elevator.getId(), response.getElevatorId());
+		assertEquals(system.getId(), response.getElevatorId());
 		assertEquals(request.getDestinationFloor(), response.getFloor());
 
 	}
 
 	@Test
 	void movedElevatorDown() throws IOException {
-		elevator = new ElevatorMotor(ran.nextInt(upperBound), 3);
-		system = new ElevatorSubsystem(elevator);
+		elevator = new ElevatorMotor();
+		system = new ElevatorSubsystem(elevator, 3, ran.nextInt(upperBound));
 
 		// Transition to WAITING state
 		system.next();
 		assertEquals(ElevatorState.WAITING, system.getState());
 
 		// Move elevator one floor down
-		InputData request = new InputData(LocalTime.of(1, 1, 1, 1), 3, Direction.DOWN, 2);
+		ElevatorMoveCommand request = new ElevatorMoveCommand(system.getId(), Fault.NONE, Direction.DOWN, 2);
 
 		// Construct a datagram packet that is to be sent
 		sendPacket = new DatagramPacket(request.toBytes(), request.toBytes().length, InetAddress.getLocalHost(),
-				Constants.ELEVATOR_BASE_PORT + elevator.getId());
+				Constants.ELEVATOR_BASE_PORT + system.getId());
 
 		// Send the datagram packet to the server via the send/receive socket.
 		sendReceiveSocket.send(sendPacket);
@@ -118,7 +115,7 @@ public class ElevatorSubsystemTest {
 
 		// Construct a DatagramPacket for receiving packets up
 		// to 8 bytes
-		byte data[] = new byte[8];
+		byte data[] = new byte[12];
 		receivePacket = new DatagramPacket(data, data.length);
 
 		// Receiving Elevator command
@@ -129,8 +126,64 @@ public class ElevatorSubsystemTest {
 		sendReceiveSocket.close();
 
 		ElevatorEvent response = ElevatorEvent.fromBytes(data);
-		assertEquals(elevator.getId(), response.getElevatorId());
+		assertEquals(system.getId(), response.getElevatorId());
 		assertEquals(request.getDestinationFloor(), response.getFloor());
+	}
+
+	@Test
+	void permanentFaultElevator() throws IOException {
+		elevator = new ElevatorMotor();
+		system = new ElevatorSubsystem(elevator, 3, ran.nextInt(upperBound));
+
+		// Transition to WAITING state
+		system.next();
+		assertEquals(ElevatorState.WAITING, system.getState());
+
+		// Move elevator one floor down
+		ElevatorMoveCommand request = new ElevatorMoveCommand(system.getId(), Fault.PERMANENT, Direction.DOWN, 2);
+
+		// Construct a datagram packet that is to be sent
+		sendPacket = new DatagramPacket(request.toBytes(), request.toBytes().length, InetAddress.getLocalHost(),
+				Constants.ELEVATOR_BASE_PORT + system.getId());
+
+		// Send the datagram packet to the server via the send/receive socket.
+		sendReceiveSocket.send(sendPacket);
+
+		// Transition to DISABLED state
+		system.next();
+		assertEquals(ElevatorState.DISABLED, system.getState());
+
+		// Transition to FINAL state
+		system.next();
+		assertEquals(ElevatorState.FINAL, system.getState());
+	}
+
+	@Test
+	void openCloseStuckElevatorDoors() throws IOException {
+		elevator = new ElevatorMotor();
+		system = new ElevatorSubsystem(elevator, 3, ran.nextInt(upperBound));
+
+		// Transition to WAITING state
+		system.next();
+		assertEquals(ElevatorState.WAITING, system.getState());
+
+		// Move elevator one floor down
+		ElevatorDoorCommand request = new ElevatorDoorCommand(system.getId(), Fault.NONE);
+
+		// Construct a datagram packet that is to be sent
+		sendPacket = new DatagramPacket(request.toBytes(), request.toBytes().length, InetAddress.getLocalHost(),
+				Constants.ELEVATOR_BASE_PORT + system.getId());
+
+		// Send the datagram packet to the server via the send/receive socket.
+		sendReceiveSocket.send(sendPacket);
+
+		// Transition to OPENING_CLOSING_DOORS state
+		system.next();
+		assertEquals(ElevatorState.OPENING_CLOSING_DOORS, system.getState());
+
+		// Transition to WAITING state
+		system.next();
+		assertEquals(ElevatorState.WAITING, system.getState());
 	}
 
 }
