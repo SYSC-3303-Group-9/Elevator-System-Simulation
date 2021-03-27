@@ -6,9 +6,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import elevator.Direction;
-import elevator.ElevatorMoveCommand;
-
 class ElevatorMoveCommandTest {
 	ElevatorMoveCommand expected;
 	@BeforeEach
