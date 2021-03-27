@@ -12,7 +12,7 @@ class ElevatorCommandTest {
 	
 	@BeforeEach
 	void setUp() throws Exception {
-		doorCommand = new ElevatorDoorCommand(1, Fault.TRANSIENT, DoorState.OPEN);
+		doorCommand = new ElevatorDoorCommand(1, Fault.TRANSIENT);
 		moveCommand = new ElevatorMoveCommand(1, Fault.TRANSIENT, Direction.UP, 7);
 	}
 
@@ -41,14 +41,6 @@ class ElevatorCommandTest {
 	void testCorruptedMoveDirectionThrowsException() {
 		// Create illegal byte array using 'corrupted' move direction
 		byte[] wrongBytes1 = moveCommand.toBytes();
-		wrongBytes1[11] = (byte) 0x69;
-		assertThrows(IllegalArgumentException.class, () -> {ElevatorCommand.fromBytes(wrongBytes1);});
-	}
-	
-	@Test
-	void testCorruptedDoorStateThrowsException() {
-		// Create illegal byte array using 'corrupted' move direction
-		byte[] wrongBytes1 = doorCommand.toBytes();
 		wrongBytes1[11] = (byte) 0x69;
 		assertThrows(IllegalArgumentException.class, () -> {ElevatorCommand.fromBytes(wrongBytes1);});
 	}
