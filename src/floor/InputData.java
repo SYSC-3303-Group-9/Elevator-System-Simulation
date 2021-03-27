@@ -101,7 +101,8 @@ public class InputData implements Serializable {
 			InputData other = (InputData) o;
 			return getTime().equals(other.getTime()) && getCurrentFloor() == other.getCurrentFloor()
 					&& getDirection().equals(other.getDirection())
-					&& getDestinationFloor() == other.getDestinationFloor();
+					&& getDestinationFloor() == other.getDestinationFloor()
+					&& getFault().equals(other.getFault());
 		}
 		return false;
 	}

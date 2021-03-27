@@ -47,7 +47,7 @@ public class Constants {
 	/**
 	 * SystemSync's port.
 	 */
-	public static final int SYSTEM_SYNC_PORT = 72;
+	public static final int SYSTEM_SYNC_PORT = 78;
 	
 	/**
 	 * The input file path.

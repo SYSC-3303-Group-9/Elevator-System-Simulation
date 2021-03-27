@@ -29,7 +29,7 @@ public class FloorReceiver implements Runnable {
 	public synchronized void run() {
 		//Receive InputData packet from the FloorSubsystem
 		while(true) {
-			byte data[] = new byte[100];
+			byte data[] = new byte[500];
 		    DatagramPacket receivePacket = new DatagramPacket(data, data.length);
 		    
 		    //Receive Packet from FloorSubsystem
