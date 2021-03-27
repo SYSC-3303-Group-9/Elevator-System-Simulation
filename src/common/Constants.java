@@ -50,6 +50,11 @@ public class Constants {
 	public static final int SYSTEM_SYNC_PORT = 78;
 	
 	/**
+	 * ElevatorEventReceiver's port.
+	 */
+	public static final int ELEVATOR_EVENT_RECEIVER_PORT = 110;
+	
+	/**
 	 * The input file path.
 	 * File is located in resources/input.txt by default.
 	 */
@@ -59,5 +64,5 @@ public class Constants {
 	 * Multiplier to determine how fast simulated time runs compared to real-time.
 	 * E.g. If = 1 then simulation is real-time. If = 2 then simulation is twice as fast as real-time.
 	 */
-	public static final float TIME_MULTIPLIER = 1f;
+	public static final float TIME_MULTIPLIER = 5f;
 }

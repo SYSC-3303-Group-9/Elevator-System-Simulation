@@ -109,7 +109,7 @@ public class InputData implements Serializable {
 
 	@Override
 	public String toString() {
-		return time.toString() + " " + currentFloor + " " + direction.toString() + " " + destinationFloor;
+		return time.toString() + " " + currentFloor + " " + direction.toString() + " " + destinationFloor + " " + fault;
 	}
 
 }
