@@ -74,11 +74,11 @@ public class SystemSync {
 		try {
 			// Block until a datagram is received via sendReceiveSocket.
 			sendReceiveSocket.receive(receivePacket);
-			//System.out.println(Arrays.toString(receivePacket.getData()));
+			
 
 			// Get string from packet and check if it's floor or elevator
 			String receivedString = (new String(receivePacket.getData()).trim());
-			//System.out.println(receivedString);
+			
 
 			if (receivedString.equals("floor")) {
 				// get port number of floor

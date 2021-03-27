@@ -43,13 +43,13 @@ public class SystemSyncTest {
 				Constants.SYSTEM_SYNC_PORT);
 		FloorsendSocket.send(floorSendPacket);
 		sync.syncing();
-		// System.out.print(sendPacket.getData());
+	
 		elevatorSendPacket = new DatagramPacket(elevator, elevator.length, InetAddress.getLocalHost(),
 				Constants.SYSTEM_SYNC_PORT);
 		ElevatorsendSocket.send(elevatorSendPacket);
 		sync.syncing();
 
-		// System.out.print(sendPacket.getData());
+		
 
 		FloorsendSocket.receive(floorReceive);
 		ElevatorsendSocket.receive(elevatorReceive);
