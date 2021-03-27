@@ -6,19 +6,33 @@ import common.IBufferInput;
 import common.IBufferOutput;
 import elevator.Direction;
 import elevator.ElevatorMoveCommand;
+import elevator.Fault;
 import elevator.ElevatorEvent;
 import floor.InputData;
 
 public class Scheduler implements Runnable {
 	// State specific variables
 	private SchedulerState state;
-	private SchedulerMessage message;
 	private InputData inputData;
 	private ElevatorEvent elevatorEvent;
 	private SchedulerElevator elevatorToCommand;
 	
+	/**
+	 * The list of active elevators.
+	 */
 	private ArrayList<SchedulerElevator> elevators = new ArrayList<SchedulerElevator>();
+	
+	/**
+	 * List of input requests that could not be handled by any elevators on arrival.
+	 * These should not be attempted until an active elevator runs out of jobs.
+	 */
 	private ArrayList<InputData> blockedInput = new ArrayList<InputData>();
+	
+	/**
+	 * List of input requests that were orphaned by its assigned elevator permanently failing.
+	 * These should be attempted as soon as possible, they may be able to be assigned to active elevators.
+	 */
+	private ArrayList<InputData> reprocessList = new ArrayList<InputData>();
 
 	private int numFloors;
 	private IBufferOutput<SchedulerMessage> outputBuffer;
@@ -80,21 +94,29 @@ public class Scheduler implements Runnable {
 		}
 		case WAITING_FOR_MESSAGE:
 		{
-			// Wait for a new message and move to message processing state.
-			this.message = outputBuffer.get();
-			this.state = SchedulerState.PROCESSING_MESSAGE;
-			break;
-		}
-		case PROCESSING_MESSAGE:
-		{
-			// If the message is an InputData, process the new job.
-			if ((this.inputData = this.message.getInputData()) != null) {
+			// Check if the reprocess list has items.
+			if (reprocessList.size() > 0) {
+				// Get an item from the reprocess list.
+				this.inputData = reprocessList.get(0);
+				
+				// Remove the item from the list.
+				reprocessList.remove(0);
+				
 				this.state = SchedulerState.PROCESSING_NEW_JOB;
 			}
-			// Otherwise the message is an elevator event, process it.
+			// Otherwise wait for a new message.
 			else {
-				this.elevatorEvent = this.message.getElevatorEvent();
-				this.state = SchedulerState.PROCESSING_ELEVATOR_EVENT;
+				SchedulerMessage msg = outputBuffer.get();
+				
+				// If the message is an InputData, process the new job.
+				if ((this.inputData = msg.getInputData()) != null) {
+					this.state = SchedulerState.PROCESSING_NEW_JOB;
+				}
+				// Otherwise the message is an elevator event, process it.
+				else {
+					this.elevatorEvent = msg.getElevatorEvent();
+					this.state = SchedulerState.PROCESSING_ELEVATOR_EVENT;
+				}
 			}
 			break;
 		}
@@ -118,6 +140,11 @@ public class Scheduler implements Runnable {
 			if (elevator.getDirection() == Direction.WAITING) {
 				moveToPickup(elevator, job);
 				this.elevatorToCommand = elevator;
+				
+				// Set the elevator's fault code to the input's fault code.
+				this.elevatorToCommand.setPendingFault(this.inputData.getFault());
+				
+				// Move to scheduling state.
 				this.state = SchedulerState.SCHEDULING_ELEVATOR;
 			}
 			// Otherwise the elevator should already be moving towards the pickup
@@ -129,7 +156,7 @@ public class Scheduler implements Runnable {
 			break;
 		}
 		case PROCESSING_ELEVATOR_EVENT:
-		{			
+		{
 			// Get elevator matching ID.
 			SchedulerElevator elevator = this.elevators.stream()
 					.filter(el -> el.getElevatorId() == this.elevatorEvent.getElevatorId())
@@ -148,17 +175,44 @@ public class Scheduler implements Runnable {
 				System.exit(1);
 			}
 			
+			// Permanent fault handling
+			if (this.elevatorEvent.getOutOfService()) {
+				/* 
+				 * Elevator has encountered a permanent fault, must reassign all jobs
+				 * and remove the elevator from future use.
+				 */
+				
+				// Add the assigned jobs to the reprocessing list.
+				for (ScheduledJob job : elevator.getAssignedJobs()) {
+					reprocessList.add(job.getInputData());
+				}
+				
+				// Remove the elevator from use.
+				elevators.remove(elevator);
+				
+				// If no elevators left, exit.
+				if (elevators.size() == 0) {
+					System.out.println("Ran out of functioning elevators, exiting");
+					this.state = SchedulerState.FINAL;
+				}
+				else {
+					this.state = SchedulerState.WAITING_FOR_MESSAGE;
+				}
+				
+				break;
+			}	
+			
 			// Check if elevator should pickup or drop off a passenger.
 			ArrayList<ScheduledJob> completedJobs = new ArrayList<ScheduledJob>();
 			for (ScheduledJob job : elevator.getAssignedJobs()) {
 				// If picking up passenger.
-				if (this.elevatorEvent.getFloor() == job.getStartFloor()) {
+				if (this.elevatorEvent.getFloor() == job.getInputData().getCurrentFloor()) {
 					System.out.println("Elevator " + elevator.getElevatorId() + " picked up passenger on floor " + this.elevatorEvent.getFloor());
 					job.setOnElevator(true);
 					moveToDropOff(elevator, job);
 				}
 				// If dropping off passenger.
-				else if (job.getIsOnElevator() && this.elevatorEvent.getFloor() == job.getEndFloor()) {
+				else if (job.getIsOnElevator() && this.elevatorEvent.getFloor() == job.getInputData().getDestinationFloor()) {
 					System.out.println("Elevator " + elevator.getElevatorId() + " dropped off passenger on floor " + this.elevatorEvent.getFloor());
 					completedJobs.add(job);
 				}
@@ -208,7 +262,15 @@ public class Scheduler implements Runnable {
 			this.elevatorToCommand.updateLastKnownFloor();
 			
 			// Add the elevator command to the buffer and move to waiting for message.
-			this.inputBuffer.put(new ElevatorMoveCommand(this.elevatorToCommand.getElevatorId(), this.elevatorToCommand.getDirection()));
+			this.inputBuffer.put(new ElevatorMoveCommand(
+					this.elevatorToCommand.getElevatorId(),
+					this.elevatorToCommand.getPendingFault(),
+					this.elevatorToCommand.getDirection(),
+					this.elevatorToCommand.findElevatorDestination()));
+			
+			// Reset elevator fault code now that the command is sent.
+			this.elevatorToCommand.setPendingFault(Fault.NONE);
+			
 			this.state = SchedulerState.WAITING_FOR_MESSAGE;
 			break;
 		}
@@ -280,14 +342,14 @@ public class Scheduler implements Runnable {
 	 */
 	private void moveToPickup(SchedulerElevator elevator, ScheduledJob job) {
 		// If the elevator is already on the start floor.
-		if (elevator.getLastKnownFloor() == job.getStartFloor()) {
+		if (elevator.getLastKnownFloor() == job.getInputData().getCurrentFloor()) {
 			// Put the person on the elevator and start moving towards drop off.
 			System.out.println("Elevator " + elevator.getElevatorId() + " picked up passenger on floor " + elevator.getLastKnownFloor());
 			job.setOnElevator(true);
 			moveToDropOff(elevator, job);
 		}
 		// If the elevator is below the start floor, move up towards it.
-		else if (elevator.getLastKnownFloor() < job.getStartFloor()) {
+		else if (elevator.getLastKnownFloor() < job.getInputData().getCurrentFloor()) {
 			elevator.setDirection(Direction.UP);
 		}
 		// If the elevator is above the start floor, move down towards it.
@@ -303,7 +365,7 @@ public class Scheduler implements Runnable {
 	 */
 	private void moveToDropOff(SchedulerElevator elevator, ScheduledJob job) {
 		// If the elevator is below the end floor, move up towards it.
-		if (elevator.getLastKnownFloor() < job.getEndFloor()) {
+		if (elevator.getLastKnownFloor() < job.getInputData().getDestinationFloor()) {
 			elevator.setDirection(Direction.UP);
 		}
 		// If the elevator is above the start floor, move down towards it.
