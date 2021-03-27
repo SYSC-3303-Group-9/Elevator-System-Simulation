@@ -4,16 +4,14 @@ import java.nio.ByteBuffer;
 
 public class ElevatorDoorCommand extends ElevatorCommand {
 	public static final byte COMMAND_IDENTIFIER = (byte) 0x02;
-	private DoorState intendedDoorState;
 
 	/**
 	 * Used to construct an ElevatorDoorCommand to be sent to the ElevatorDoor by the Scheduler
 	 * @param elevatorID an int indicating the ID of the elevator whose door should be changed
 	 * @param intendedDoorState a DoorState indicating what the ElevatorDoor should be set to
 	 */
-	public ElevatorDoorCommand(int elevatorID, Fault fault, DoorState intendedDoorState) {
+	public ElevatorDoorCommand(int elevatorID, Fault fault) {
 		super(elevatorID, fault);
-		this.intendedDoorState = intendedDoorState;
 	}
 	
 	/**
@@ -22,11 +20,9 @@ public class ElevatorDoorCommand extends ElevatorCommand {
 	 */
 	public byte[] toBytes() {
 		byte[] elevatorCommandBytes = super.toBytes();
-		byte[] doorStateBytes = intendedDoorState.toBytes();
-		byte[] elevatorDoorCommandBytes = new byte[elevatorCommandBytes.length + doorStateBytes.length + 1];
+		byte[] elevatorDoorCommandBytes = new byte[elevatorCommandBytes.length + 1];
 		elevatorDoorCommandBytes[0] = ElevatorDoorCommand.COMMAND_IDENTIFIER;
 		System.arraycopy(elevatorCommandBytes, 0, elevatorDoorCommandBytes, 1, elevatorCommandBytes.length);
-		System.arraycopy(doorStateBytes, 0, elevatorDoorCommandBytes, elevatorCommandBytes.length + 1, doorStateBytes.length);
 		return elevatorDoorCommandBytes;
 	}
 	
@@ -41,22 +37,16 @@ public class ElevatorDoorCommand extends ElevatorCommand {
 		if(buffer.get() != ElevatorDoorCommand.COMMAND_IDENTIFIER) return null;
 		int elevatorID = buffer.getInt();
 		byte[] faultBytes = new byte[4];
-		byte[] intendedDoorStateBytes = new byte[4];
 		// Copy remaining ByteBuffer bytes over to directionBytes
 		buffer.get(faultBytes);
-		buffer.get(intendedDoorStateBytes);
-		return new ElevatorDoorCommand(elevatorID, Fault.fromBytes(faultBytes), DoorState.fromBytes(intendedDoorStateBytes));
+		return new ElevatorDoorCommand(elevatorID, Fault.fromBytes(faultBytes));
 	}
 
-	public DoorState getIntendedDoorState() {
-		return this.intendedDoorState;
-	}
-	
 	@Override
 	public boolean equals(Object o) {
 		if(o == this) return true;
 		if(!(o instanceof ElevatorDoorCommand)) return false;
 		ElevatorDoorCommand c = (ElevatorDoorCommand) o;
-		return super.equals(c) && intendedDoorState.equals(c.getIntendedDoorState());
+		return super.equals(c);
 	}
 }
