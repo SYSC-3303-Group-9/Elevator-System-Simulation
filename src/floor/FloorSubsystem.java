@@ -44,6 +44,7 @@ public class FloorSubsystem implements Runnable {
 		}
 		
 		// Send all the input data to the FloorReceiver.
+		Clock.getTime();
 		for (InputData x : data) {
 			System.out.println("[" + x.getTime() + "] Floor " + x.getCurrentFloor() + " requested elevator");	
 			try {

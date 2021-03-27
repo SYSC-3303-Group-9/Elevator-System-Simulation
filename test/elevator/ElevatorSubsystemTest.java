@@ -159,7 +159,7 @@ public class ElevatorSubsystemTest {
 	}
 
 	@Test
-	void openAndCloseElevatorDoors() throws IOException {
+	void openCloseStuckElevatorDoors() throws IOException {
 		elevator = new ElevatorMotor();
 		system = new ElevatorSubsystem(elevator, 3, ran.nextInt(upperBound));
 
@@ -168,35 +168,7 @@ public class ElevatorSubsystemTest {
 		assertEquals(ElevatorState.WAITING, system.getState());
 
 		// Move elevator one floor down
-		ElevatorDoorCommand request = new ElevatorDoorCommand(system.getId(), Fault.NONE, DoorState.OPEN); //Will change this after Noah's merge
-
-		// Construct a datagram packet that is to be sent
-		sendPacket = new DatagramPacket(request.toBytes(), request.toBytes().length, InetAddress.getLocalHost(),
-				Constants.ELEVATOR_BASE_PORT + system.getId());
-
-		// Send the datagram packet to the server via the send/receive socket.
-		sendReceiveSocket.send(sendPacket);
-
-		// Transition to OPENING_CLOSING_DOORS state
-		system.next();
-		assertEquals(ElevatorState.OPENING_CLOSING_DOORS, system.getState());
-
-		// Transition to WAITING state
-		system.next();
-		assertEquals(ElevatorState.WAITING, system.getState());
-	}
-
-	@Test
-	void stuckElevatorDoors() throws IOException {
-		elevator = new ElevatorMotor();
-		system = new ElevatorSubsystem(elevator, 3, ran.nextInt(upperBound));
-
-		// Transition to WAITING state
-		system.next();
-		assertEquals(ElevatorState.WAITING, system.getState());
-
-		// Move elevator one floor down
-		ElevatorDoorCommand request = new ElevatorDoorCommand(system.getId(), Fault.NONE, DoorState.STUCK);
+		ElevatorDoorCommand request = new ElevatorDoorCommand(system.getId(), Fault.NONE);
 
 		// Construct a datagram packet that is to be sent
 		sendPacket = new DatagramPacket(request.toBytes(), request.toBytes().length, InetAddress.getLocalHost(),
