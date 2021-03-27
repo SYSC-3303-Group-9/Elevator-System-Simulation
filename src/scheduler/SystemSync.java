@@ -10,12 +10,16 @@ import java.util.Arrays;
 import common.Clock;
 import common.Constants;
 
-public class SystemSync implements Runnable {
+public class SystemSync {
 	private DatagramPacket sendPacket, receivePacket;
 	private DatagramSocket sendReceiveSocket;
 	private Boolean floorReady = false, elevatorReady = false;
 	int floorPort, elevatorPort;
 
+	/**
+	 * Receives packets from floor and elevator sync classes and starts clock
+	 * after sending a confirmation packet
+	 */
 	public SystemSync() {
 		try {
 			sendReceiveSocket = new DatagramSocket(Constants.SYSTEM_SYNC_PORT);
@@ -26,7 +30,6 @@ public class SystemSync implements Runnable {
 		}
 	}
 
-	@Override
 	public void run() {
 		while (true) {
 			if (syncing())
@@ -59,6 +62,10 @@ public class SystemSync implements Runnable {
 		}
 	}
 
+	/** Checks for elevator and floor sync packets and returns a confirmation when both are received
+	 * Starts the system clock after ending conffirmation packet
+	 * @return true is both elevator and floor packets are received
+	 */
 	public boolean syncing() {
 		// Construct a DatagramPacket for receiving packets
 		byte data[] = new byte[8];

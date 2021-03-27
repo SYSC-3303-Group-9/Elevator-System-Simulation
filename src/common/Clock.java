@@ -34,7 +34,7 @@ public class Clock {
 			socket.send(new DatagramPacket(data, data.length, InetAddress.getLocalHost(), Constants.SYSTEM_SYNC_PORT));
 			
 			// Wait for a response packet from SystemSync.
-			socket.receive(new DatagramPacket(new byte[0], 0));
+			socket.receive(new DatagramPacket(new byte[5], 5));
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(1);
