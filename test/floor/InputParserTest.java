@@ -17,8 +17,8 @@ public class InputParserTest {
 	@Test
 	void parseShouldGetMultipleInputData() {
 		// arrange		
-		String text = "14:05:15.0 2 Up 4\n"
-				+ "05:02:01.1 3 Down 1\n";
+		String text = "14:05:15.0 2 Up 4 0\n"
+				+ "05:02:01.1 3 Down 1 1\n";
 		
 		BufferedReader reader = new BufferedReader(new StringReader(text));
 		
@@ -35,7 +35,7 @@ public class InputParserTest {
 		// check second input data
 		int nanoSecondsInSecond = 1000000000;
 		int nanoSeconds = (int)(0.1 * nanoSecondsInSecond);
-		InputData expected2 = new InputData(LocalTime.of(5, 2, 1, nanoSeconds), 3, Direction.DOWN, 1, Fault.NONE);
+		InputData expected2 = new InputData(LocalTime.of(5, 2, 1, nanoSeconds), 3, Direction.DOWN, 1, Fault.TRANSIENT);
 		assertEquals(expected2, data.get(1));
 	}
 

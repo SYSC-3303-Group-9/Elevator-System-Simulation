@@ -36,7 +36,7 @@ public class InputParser {
 		int currentFloor = Integer.parseInt(split[1]);
 		Direction direction = Direction.valueOf(split[2].toUpperCase());
 		int destinationFloor = Integer.parseInt(split[3]);
-		int faultCode = Integer.parseInt(split[3]);
+		int faultCode = Integer.parseInt(split[4]);
 		
 		Fault fault;
 		switch (faultCode) {
