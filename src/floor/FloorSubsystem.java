@@ -9,6 +9,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.time.temporal.ChronoField;
 import java.util.List;
 
 import common.Clock;
@@ -44,9 +45,11 @@ public class FloorSubsystem implements Runnable {
 		}
 		
 		// Send all the input data to the FloorReceiver.
-		Clock.getTime();
 		for (InputData x : data) {
-			System.out.println("[" + x.getTime() + "] Floor " + x.getCurrentFloor() + " requested elevator");	
+			System.out.println("[" + x.getTime() + "] Floor " + x.getCurrentFloor() + " requested elevator");
+			
+			//Don't send InputData until it's actual time has come
+			while(Clock.getTime() < x.getTime().getLong(ChronoField.MILLI_OF_DAY)) {}
 			try {
 				sendPacket = new DatagramPacket(x.toBytes(), x.toBytes().length, InetAddress.getLocalHost(), Constants.FLOOR_RECEIVER_PORT);
 				sendReceiveSocket.send(sendPacket);
