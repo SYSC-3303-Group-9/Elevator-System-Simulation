@@ -9,6 +9,9 @@ import floor.FloorReceiver;
 public class Main {
 
 	public static void main(String[] args) {
+		
+		SystemSync sync = new SystemSync();
+		sync.run();
 		// Create the buffers.
 		Buffer<ElevatorMoveCommand> commandBuffer = new Buffer<ElevatorMoveCommand>();
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
