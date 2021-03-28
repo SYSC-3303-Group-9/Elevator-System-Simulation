@@ -78,4 +78,9 @@ public class ElevatorMoveCommand extends ElevatorCommand {
 		ElevatorMoveCommand c = (ElevatorMoveCommand) o;
 		return super.equals(c) && moveDirection.equals(c.getDirection()) && (destinationFloor == c.getDestinationFloor());
 	}
+	
+	@Override
+	public String toString() {
+		return super.toString() + "move " + moveDirection;
+	}
 }

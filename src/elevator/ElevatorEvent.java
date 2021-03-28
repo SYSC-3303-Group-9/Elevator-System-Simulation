@@ -63,19 +63,16 @@ public class ElevatorEvent {
 	 * @return
 	 */
 	public static ElevatorEvent fromBytes(byte[] bytes) {
-		if(bytes.length != 12) return null;
-		else {
-			ByteBuffer buffer = ByteBuffer.wrap(bytes);
-			int floor = buffer.getInt();
-			int id = buffer.getInt();
-			boolean outOfService = buffer.getInt() == 1 ? true : false;
-			return new ElevatorEvent(floor, id, outOfService);
-		}
+		ByteBuffer buffer = ByteBuffer.wrap(bytes);
+		int floor = buffer.getInt();
+		int id = buffer.getInt();
+		boolean outOfService = buffer.getInt() == 1 ? true : false;
+		return new ElevatorEvent(floor, id, outOfService);
 	}
 	
 	@Override
 	public String toString() {
-		String outOfService = (this.getOutOfService()) ? "out of service." : " in service.";
+		String outOfService = (this.getOutOfService()) ? "out of service." : "in service.";
 		return "Elevator " + Integer.toString(elevatorId) + " arrived at floor " + Integer.toString(floor) + " and is " + outOfService;
 		
 	}

@@ -53,4 +53,10 @@ public abstract class ElevatorCommand {
 		ElevatorCommand c = (ElevatorCommand) o;
 		return (elevatorID == c.getID()) && (fault == c.getFault());
 	}
+	
+	@Override
+	public String toString() {
+		// Concrete subclasses should concatenate their intention to this.
+		return "(" + fault + ") Command Elevator " + elevatorID + " to ";
+	}
 }
