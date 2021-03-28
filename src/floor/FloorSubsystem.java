@@ -46,10 +46,9 @@ public class FloorSubsystem implements Runnable {
 		
 		// Send all the input data to the FloorReceiver.
 		for (InputData x : data) {
-			System.out.println("[" + x.getTime() + "] Floor " + x.getCurrentFloor() + " requested elevator");
-			
 			//Don't send InputData until it's actual time has come
-			while(Clock.getTime() < x.getTime().getLong(ChronoField.MILLI_OF_DAY)) {}
+			while((Clock.getTime() * Constants.TIME_MULTIPLIER) < x.getTime().getLong(ChronoField.MILLI_OF_DAY)) {}
+			System.out.println("[" + x.getTime() + "] Floor " + x.getCurrentFloor() + " requested elevator");
 			try {
 				sendPacket = new DatagramPacket(x.toBytes(), x.toBytes().length, InetAddress.getLocalHost(), Constants.FLOOR_RECEIVER_PORT);
 				sendReceiveSocket.send(sendPacket);

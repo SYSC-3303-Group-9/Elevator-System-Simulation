@@ -36,7 +36,7 @@ public class FloorReceiver implements Runnable {
 			try {
 				sendReceiveSocket.receive(receivePacket);
 				InputData inputData = InputData.fromBytes(receivePacket.getData());
-				System.out.println("Scheduler received " + inputData);
+				System.out.println("[FloorReceiver] Received " + inputData);
 				floorToScheduler.put(SchedulerMessage.fromInputData(inputData));
 				
 			} catch(IOException | ClassNotFoundException e) {

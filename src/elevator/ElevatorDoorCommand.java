@@ -49,4 +49,9 @@ public class ElevatorDoorCommand extends ElevatorCommand {
 		ElevatorDoorCommand c = (ElevatorDoorCommand) o;
 		return super.equals(c);
 	}
+	
+	@Override
+	public String toString() {
+		return super.toString() + "open and close doors";
+	}
 }

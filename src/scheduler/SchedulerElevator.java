@@ -13,6 +13,7 @@ public class SchedulerElevator {
 	private int lastKnownFloor;
 	private Direction direction;
 	private Fault pendingFault = Fault.NONE;
+	private boolean doorsOpening = false;
 	private ArrayList<ScheduledJob> assignedJobs = new ArrayList<ScheduledJob>();
 	
 	public SchedulerElevator(int elevatorId, int lastKnownFloor, Direction direction) {
@@ -79,6 +80,22 @@ public class SchedulerElevator {
 	}
 	
 	/**
+	 * Gets whether the elevator's doors have been requested to open.
+	 * @return Whether the doors have been requested to open.
+	 */
+	public boolean getDoorsOpening() {
+		return doorsOpening;
+	}
+	
+	/**
+	 * Sets whether the elevator's doors have been requested to open.
+	 * @param doorsOpening Whether the doors have been requested to open.
+	 */
+	public void setDoorsOpening(boolean doorsOpening) {
+		this.doorsOpening = doorsOpening;
+	}
+	
+	/**
 	 * Gets the elevator's assigned jobs.
 	 * @return The assigned jobs.
 	 */
@@ -112,11 +129,21 @@ public class SchedulerElevator {
 		int destination = this.direction == Direction.UP ? Integer.MAX_VALUE : Integer.MIN_VALUE;
 		
 		for (ScheduledJob job : this.assignedJobs) {
-			if (this.direction == Direction.UP && job.getInputData().getDestinationFloor() < destination) {
-				destination = job.getInputData().getDestinationFloor();
+			if (this.direction == Direction.UP) {
+				if (job.getIsOnElevator() && job.getInputData().getDestinationFloor() < destination) {
+					destination = job.getInputData().getDestinationFloor();
+				}
+				else if (!job.getIsOnElevator() && job.getInputData().getCurrentFloor() < destination) {
+					destination = job.getInputData().getCurrentFloor();
+				}
 			}
-			else if (this.direction == Direction.DOWN && job.getInputData().getDestinationFloor() > destination) {
-				destination = job.getInputData().getDestinationFloor();
+			else if (this.direction == Direction.DOWN) {
+				if (job.getIsOnElevator() && job.getInputData().getDestinationFloor() > destination) {
+					destination = job.getInputData().getDestinationFloor();
+				}
+				else if (!job.getIsOnElevator() && job.getInputData().getCurrentFloor() > destination) {
+					destination = job.getInputData().getCurrentFloor();
+				}
 			}
 		}
 		

@@ -67,24 +67,18 @@ public class ElevatorSubsystem implements Runnable {
 	 * 
 	 * @param command
 	 */
-	public void sendMoveCommand(ElevatorMoveCommand command) {
-		// Move the Elevator
-		this.move(command.getDirection());
-
+	public void sendElevatorEvent() {
 		ElevatorEvent elevatorInfo = new ElevatorEvent(this.floor, this.id, false);
 
 		// Send ElevatorEvent packet to ElevatorCommunicator.
 		try {
 			sendPacket = new DatagramPacket(elevatorInfo.toBytes(), elevatorInfo.toBytes().length,
-					InetAddress.getLocalHost(), receivePacket.getPort());
+					InetAddress.getLocalHost(), Constants.ELEVATOR_EVENT_RECEIVER_PORT);
 			sendReceiveSocket.send(sendPacket);
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
-
-		// Move to next state
-		this.state = ElevatorState.WAITING;
 	}
 
 	/**
@@ -100,7 +94,7 @@ public class ElevatorSubsystem implements Runnable {
 		// Send ElevatorEvent packet to ElevatorCommunicator.
 		try {
 			sendPacket = new DatagramPacket(elevatorInfo.toBytes(), elevatorInfo.toBytes().length,
-					InetAddress.getLocalHost(), receivePacket.getPort());
+					InetAddress.getLocalHost(), Constants.ELEVATOR_EVENT_RECEIVER_PORT);
 			sendReceiveSocket.send(sendPacket);
 		} catch (IOException e) {
 			System.out.println("ElevatorSubsystem, sendFault " + e);
@@ -117,32 +111,18 @@ public class ElevatorSubsystem implements Runnable {
 	 *              amongst other data.
 	 */
 	public void move(Direction direction) {
-
-		// opening and closing elevator door
-		if (command.getFault() == Fault.TRANSIENT) {
-			door.openClose(Fault.TRANSIENT);
-		} else {
-			door.openClose(Fault.NONE);
-		}
-
+		System.out.println(this + " is moving " + direction);
+		
 		// elevator is moving
 		elevator.move(Fault.NONE);
-
-		// opening and closing elevator door
-		if (command.getFault() == Fault.TRANSIENT) {
-			door.openClose(Fault.TRANSIENT);
-		} else {
-			door.openClose(Fault.NONE);
-		}
 
 		if (direction == Direction.UP) {
 			floor++;
 		} else {
 			floor--;
 		}
-
-		System.out.println("Elevator " + this.getId() + " is moving " + direction);
-		System.out.println("Elevator " + this.getId() + " arrived at floor " + floor);
+		
+		System.out.println(this + " arrived at floor " + floor + ". Destination floor " + this.moveCmd.getDestinationFloor());
 
 	}
 
@@ -188,6 +168,7 @@ public class ElevatorSubsystem implements Runnable {
 					// identify what kind of elevator command was passed
 					if (command instanceof ElevatorMoveCommand) {
 						moveCmd = (ElevatorMoveCommand) command;
+						
 						if (moveCmd.getDirection() == Direction.UP) {
 							this.state = ElevatorState.MOVINGUP;
 						} else if (moveCmd.getDirection() == Direction.DOWN) {
@@ -203,15 +184,17 @@ public class ElevatorSubsystem implements Runnable {
 			break;
 
 		case MOVINGDOWN: {
-			// Sending instruction to move elevator down
-			sendMoveCommand(moveCmd);
+			// Assuming at this point that the elevator has arrived.
+			move(Direction.DOWN);
+			sendElevatorEvent();
 			this.state = ElevatorState.WAITING;
 			break;
 		}
 
 		case MOVINGUP: {
-			// Sending instruction to move elevator up
-			sendMoveCommand(moveCmd);
+			// Assuming at this point that the elevator has arrived.
+			move(Direction.UP);
+			sendElevatorEvent();
 			this.state = ElevatorState.WAITING;
 			break;
 		}
@@ -225,7 +208,12 @@ public class ElevatorSubsystem implements Runnable {
 		case FINAL:
 			return true;
 		case OPENING_CLOSING_DOORS:
+			System.out.println(this + " opening doors");
 			door.openClose(doorCmd.getFault());
+			System.out.println(this + " closed doors");
+			
+			sendElevatorEvent();
+			
 			this.state = ElevatorState.WAITING;
 			break;
 		default:
@@ -245,5 +233,10 @@ public class ElevatorSubsystem implements Runnable {
 			}
 		}
 
+	}
+	
+	@Override
+	public String toString() {
+		return "Elevator " + this.id;
 	}
 }
