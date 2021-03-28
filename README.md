@@ -390,16 +390,18 @@ Aubin
 
 Chris
 
-- Implemented Clock
+- Implementing Clock
 - Updating README file
 
 
 James
 
-- Implemented Clock
+- Implementing Clock
 - Updating Input data
 - Updating Constant
 - Updating Statemachine diagram
+- Updating Scheduler to handle faults
+- Implementing ElevatorDoor to open and close
 
 Liya
 
