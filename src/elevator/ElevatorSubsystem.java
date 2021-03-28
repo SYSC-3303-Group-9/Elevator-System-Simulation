@@ -141,8 +141,8 @@ public class ElevatorSubsystem implements Runnable {
 			floor--;
 		}
 
-		System.out.println(this + " is moving " + direction);
-		System.out.println(this + " arrived at floor " + floor);
+		System.out.println("Elevator " + this.getId() + " is moving " + direction);
+		System.out.println("Elevator " + this.getId() + " arrived at floor " + floor);
 
 	}
 
