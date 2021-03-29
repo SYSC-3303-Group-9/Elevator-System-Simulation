@@ -29,7 +29,7 @@ class ElevatorMotorTest {
 		// Elapsed time should be more than the time it takes to move floors
 		assertTrue(elapsedTime >= Constants.MOVE_TIME);
 		// Elapsed time should not be that much greater than the time it takes to move floors
-		assertTrue(elapsedTime < (Constants.MOVE_TIME + 50));
+		assertTrue(elapsedTime < Constants.MOVE_TIME * 1.1);
 	}
 	
 	@Test
@@ -40,7 +40,7 @@ class ElevatorMotorTest {
 		// Elapsed time should be more than the time it takes to move floors + fault time
 		assertTrue(elapsedTime >= (Constants.MOVE_TIME + Constants.TRANSIENT_FAULT_TIME));
 		// Elapsed time should not be that much greater than the time it takes to move floors + fault time
-		assertTrue(elapsedTime < (Constants.MOVE_TIME + Constants.TRANSIENT_FAULT_TIME + 50));
+		assertTrue(elapsedTime < (Constants.MOVE_TIME + Constants.TRANSIENT_FAULT_TIME) * 1.1);
 	}
 	
 	@Test
@@ -51,6 +51,6 @@ class ElevatorMotorTest {
 		// Elapsed time should be more than the time it takes to move floors + fault time
 		assertTrue(elapsedTime >= Constants.PERMANENT_FAULT_TIME);
 		// Elapsed time should not be that much greater than the time it takes to move floors + fault time
-		assertTrue(elapsedTime < Constants.PERMANENT_FAULT_TIME + 50);
+		assertTrue(elapsedTime < Constants.PERMANENT_FAULT_TIME * 1.1);
 	}
 }
