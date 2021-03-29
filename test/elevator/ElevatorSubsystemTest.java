@@ -13,22 +13,21 @@ import java.net.InetAddress;
 import java.util.Random;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 
 public class ElevatorSubsystemTest {
+	private static DatagramSocket sendReceiveSocket;
 
 	DatagramPacket sendPacket, receivePacket;
-	DatagramSocket sendReceiveSocket;
+	
 	ElevatorMotor elevator;
 	ElevatorSubsystem system;
 	Random ran = new Random();
 	int upperBound = 100;
-
-	@BeforeEach
-	void setup() throws IOException {
-		// Construct a datagram socket and bind it to any available
-		// port on the local host machine.
-		sendReceiveSocket = new DatagramSocket();
+	
+	@BeforeAll
+	public static void setup() throws IOException {
+		sendReceiveSocket = new DatagramSocket(Constants.ELEVATOR_EVENT_RECEIVER_PORT);
 	}
 
 	@AfterEach
@@ -80,9 +79,6 @@ public class ElevatorSubsystemTest {
 		// Block until a datagram is received via sendReceiveSocket.
 		sendReceiveSocket.receive(receivePacket);
 
-		// Close the socket.
-		sendReceiveSocket.close();
-
 		ElevatorEvent response = ElevatorEvent.fromBytes(data);
 		assertEquals(system.getId(), response.getElevatorId());
 		assertEquals(request.getDestinationFloor(), response.getFloor());
@@ -121,9 +117,6 @@ public class ElevatorSubsystemTest {
 		// Receiving Elevator command
 		// Block until a datagram is received via sendReceiveSocket.
 		sendReceiveSocket.receive(receivePacket);
-
-		// Close the socket.
-		sendReceiveSocket.close();
 
 		ElevatorEvent response = ElevatorEvent.fromBytes(data);
 		assertEquals(system.getId(), response.getElevatorId());
