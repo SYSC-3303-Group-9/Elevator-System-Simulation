@@ -13,13 +13,25 @@ public class SystemSync {
 	private DatagramPacket sendPacket, receivePacket;
 	private DatagramSocket sendReceiveSocket;
 	private Boolean floorReady = false, elevatorReady = false;
-	int floorPort, elevatorPort;
+	private int floorPort, elevatorPort;
+	private RunTimeConfig configData;
+	private ConfigurationFrame configFrame;
 
 	/**
-	 * Receives packets from floor and elevator sync classes and starts clock
-	 * after sending a confirmation packet
+	 * Receives packets from floor and elevator sync classes and starts clock after
+	 * sending a confirmation packet
 	 */
 	public SystemSync() {
+		//create a configuration frame
+		configFrame = new ConfigurationFrame();
+
+		//do nothing while configuration frame is not done
+		while (configFrame.isDone() == false) {
+			System.out.print("waiting in SystemSync()");
+		}
+		//create a RunTimeConfig object using data entered in configuration frame
+		configData = new RunTimeConfig(configFrame.getFloorNum(), configFrame.getElevatorNum(),
+				configFrame.getInputFile());
 		try {
 			sendReceiveSocket = new DatagramSocket(Constants.SYSTEM_SYNC_PORT);
 		} catch (SocketException se) {
@@ -46,9 +58,9 @@ public class SystemSync {
 	private void sendPacket(boolean floor) {
 
 		int port = floor ? this.floorPort : this.elevatorPort;
-
+		
 		// Construct a DatagramPacket for sending packet to floor
-		byte reply[] = "start".getBytes();
+		byte reply[] = configData.toBytes();
 
 		// send reply packet
 		try {
@@ -61,8 +73,10 @@ public class SystemSync {
 		}
 	}
 
-	/** Checks for elevator and floor sync packets and returns a confirmation when both are received
-	 * Starts the system clock after ending conffirmation packet
+	/**
+	 * Checks for elevator and floor sync packets and returns a confirmation when
+	 * both are received Starts the system clock after ending conffirmation packet
+	 * 
 	 * @return true is both elevator and floor packets are received
 	 */
 	public boolean syncing() {
@@ -73,11 +87,9 @@ public class SystemSync {
 		try {
 			// Block until a datagram is received via sendReceiveSocket.
 			sendReceiveSocket.receive(receivePacket);
-			
 
 			// Get string from packet and check if it's floor or elevator
 			String receivedString = (new String(receivePacket.getData()).trim());
-			
 
 			if (receivedString.equals("floor")) {
 				// get port number of floor

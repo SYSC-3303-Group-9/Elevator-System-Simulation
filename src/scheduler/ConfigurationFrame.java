@@ -21,12 +21,17 @@ public class ConfigurationFrame extends JFrame implements ActionListener {
 	/**
 	 * integers to contain elevator and floor value from entered from text field
 	 */
-	int floorNum = 0, elevatorNum = 0;
+	private int floorNum = 0, elevatorNum = 0;
 
 	/**
 	 * JFrame for configuration data
 	 */
 	private JFrame frame;
+
+	/**
+	 * used to check if values are registered and frame has been closed
+	 */
+	private boolean done = false;
 
 	public ConfigurationFrame() {
 		// Create the frame
@@ -96,6 +101,7 @@ public class ConfigurationFrame extends JFrame implements ActionListener {
 
 		// if value is entered for all fields, close frame
 		if (elevatorNum != 0 && floorNum != 0 && inputFile != null) {
+			this.done = true;
 			frame.dispose();
 		}
 	}
@@ -106,6 +112,10 @@ public class ConfigurationFrame extends JFrame implements ActionListener {
 
 	public int getFloorNum() {
 		return floorNum;
+	}
+
+	public boolean isDone() {
+		return done;
 	}
 
 	public String getInputFile() {

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,8 +28,8 @@ public class SystemSyncTest {
 		sync = new SystemSync();
 		FloorsendSocket = new DatagramSocket();
 		ElevatorsendSocket = new DatagramSocket();
-		floorReceive = new DatagramPacket(new byte[5], 5);
-		elevatorReceive = new DatagramPacket(new byte[5], 5);
+		floorReceive = new DatagramPacket(new byte[30], 30);
+		elevatorReceive = new DatagramPacket(new byte[30], 30);
 	}
 
 	@AfterEach
@@ -38,22 +39,23 @@ public class SystemSyncTest {
 
 	@Test
 	void shouldRecieveAndSendBack() throws IOException {
-
+		//create packet and send from floor socket
 		floorSendPacket = new DatagramPacket(floor, floor.length, InetAddress.getLocalHost(),
 				Constants.SYSTEM_SYNC_PORT);
 		FloorsendSocket.send(floorSendPacket);
 		sync.syncing();
-	
+		
+		//create packet and send from elevator socket
 		elevatorSendPacket = new DatagramPacket(elevator, elevator.length, InetAddress.getLocalHost(),
 				Constants.SYSTEM_SYNC_PORT);
 		ElevatorsendSocket.send(elevatorSendPacket);
 		sync.syncing();
 
-		
-
+		//receive packets in both floor and elevator sockets
 		FloorsendSocket.receive(floorReceive);
 		ElevatorsendSocket.receive(elevatorReceive);
 
+		//close both elevator and floor sockets
 		ElevatorsendSocket.close();
 		FloorsendSocket.close();
 
@@ -61,10 +63,11 @@ public class SystemSyncTest {
 		String floorReply = new String(floorReceive.getData());
 		String elevatorReply = new String(elevatorReceive.getData());
 
-		System.out.print("floor" + floorReply);
-		System.out.print("elevator" + elevatorReply);
+		//create a RunTimeConfig object and verify 
+		RunTimeConfig data = RunTimeConfig.fromBytes(floorReceive.getData());
 
 		assertTrue(floorReply.equals(elevatorReply));
+		assertTrue(data.toString().equals("22 4 input.txt"));
 	}
 
 }
