@@ -3,6 +3,8 @@ package scheduler;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+import floor.InputData;
+
 public class RunTimeConfig {
 
 	private int floorNum;
@@ -31,31 +33,50 @@ public class RunTimeConfig {
 	 * Creates an RunTimeConfig object based on the information provided in the
 	 * provided byte array
 	 * 
-	 * @return
+	 * @return RunTimeConfig object
 	 */
 	public static RunTimeConfig fromBytes(byte[] bytes) {
 
 		ByteBuffer buffer = ByteBuffer.wrap(bytes);
 		int floors = buffer.getInt();
-		//System.out.print("floors: " + floors);
 		int elevators = buffer.getInt();
-		//System.out.print("elevators: " + elevators);
 
 		byte[] fileArray = new byte[9];
-		//System.arraycopy(bytes, 8, fileArray, 0, 9);
+		System.arraycopy(bytes, 8, fileArray, 0, 9);
 		String file = new String(fileArray);
-		//System.out.print("file: " + file);
 		return new RunTimeConfig(floors, elevators, file);
 
 	}
 
-//	public static void main(String[] args) {
-//		RunTimeConfig run = new RunTimeConfig(12, 4, "input.txt");
-//
-//		System.out.println(Arrays.toString(run.toBytes()));
-//
-//		run.fromBytes(run.toBytes());
-//
-//	}
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
+
+		if (o instanceof RunTimeConfig) {
+			RunTimeConfig other = (RunTimeConfig) o;
+			return getFloorNum() == (other.getFloorNum()) && getElevatorNum() == other.getElevatorNum()
+					&& getInputFile().equals(other.getInputFile());
+		}
+		return false;
+	}
+
+	public int getFloorNum() {
+		return floorNum;
+	}
+
+	public int getElevatorNum() {
+		return elevatorNum;
+	}
+
+	public String getInputFile() {
+		return inputFile;
+	}
+
+	@Override
+	public String toString() {
+		return floorNum + " " + elevatorNum + " " + inputFile;
+	}
 
 }
