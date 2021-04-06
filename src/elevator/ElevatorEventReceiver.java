@@ -9,6 +9,9 @@ import common.Constants;
 import common.IBufferInput;
 import scheduler.SchedulerMessage;
 
+/**
+ * Responsible for receiving ElevatorEvents from the ElevatorSubsystem.
+ */
 public class ElevatorEventReceiver implements Runnable {
 	private IBufferInput<SchedulerMessage> messageBuffer;
 	private DatagramSocket socket;
@@ -37,6 +40,12 @@ public class ElevatorEventReceiver implements Runnable {
 				// If event is not null put event in the scheduler buffer
 				if (event != null) {
 					messageBuffer.put(SchedulerMessage.fromElevatorEvent(event));
+					
+					// If event is a door event, forward to the SchedulerReceiver.
+					if (event.getIsDoorEvent()) {
+						receivePacket.setPort(Constants.SCHEDULER_RECEIVER_PORT);
+						socket.send(receivePacket);
+					}
 				}
 
 			} catch (IOException e) {

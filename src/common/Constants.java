@@ -60,6 +60,11 @@ public class Constants {
 	public static final int ELEVATOR_EVENT_RECEIVER_PORT = 110;
 	
 	/**
+	 * SchedulerReceiver's port.
+	 */
+	public static final int SCHEDULER_RECEIVER_PORT = 123;
+	
+	/**
 	 * The input file path.
 	 * File is located in resources/input.txt by default.
 	 */
