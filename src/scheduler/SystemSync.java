@@ -8,6 +8,7 @@ import java.net.SocketException;
 
 import common.Clock;
 import common.Constants;
+import scheduler.GUI.ConfigurationFrame;
 
 public class SystemSync {
 	private DatagramPacket sendPacket, receivePacket;

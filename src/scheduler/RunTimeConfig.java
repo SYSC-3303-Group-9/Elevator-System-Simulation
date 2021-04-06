@@ -1,9 +1,7 @@
 package scheduler;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-
-import floor.InputData;
 
 public class RunTimeConfig {
 
@@ -24,9 +22,18 @@ public class RunTimeConfig {
 	 * @return RunTimeConfig byte array
 	 */
 	public byte[] toBytes() {
-		byte[] configArray = ByteBuffer.allocate(17).putInt(floorNum).putInt(elevatorNum).put(inputFile.getBytes())
-				.array();
-		return configArray;
+		// add floor and elevator int into a byte array
+		byte[] floorElevatorByte = ByteBuffer.allocate(8).putInt(floorNum).putInt(elevatorNum).array();
+		// get file path byte array
+		byte[] filePathByte = this.inputFile.getBytes();
+
+		// concatenate the two byte arrays
+		byte[] configArray = new byte[floorElevatorByte.length + filePathByte.length];
+		ByteBuffer buff = ByteBuffer.wrap(configArray);
+		buff.put(floorElevatorByte);
+		buff.put(filePathByte);
+
+		return buff.array();
 	}
 
 	/**
@@ -34,16 +41,19 @@ public class RunTimeConfig {
 	 * provided byte array
 	 * 
 	 * @return RunTimeConfig object
+	 * @throws IOException
+	 * @throws ClassNotFoundException
 	 */
-	public static RunTimeConfig fromBytes(byte[] bytes) {
+	public static RunTimeConfig fromBytes(byte[] bytes) throws IOException, ClassNotFoundException {
 
 		ByteBuffer buffer = ByteBuffer.wrap(bytes);
 		int floors = buffer.getInt();
 		int elevators = buffer.getInt();
 
-		byte[] fileArray = new byte[9];
-		System.arraycopy(bytes, 8, fileArray, 0, 9);
+		byte[] fileArray = new byte[bytes.length - 8];
+		System.arraycopy(bytes, 8, fileArray, 0, bytes.length - 8);
 		String file = new String(fileArray);
+
 		return new RunTimeConfig(floors, elevators, file);
 
 	}

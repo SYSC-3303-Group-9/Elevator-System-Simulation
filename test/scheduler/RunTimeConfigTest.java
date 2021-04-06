@@ -9,6 +9,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 public class RunTimeConfigTest {
@@ -79,7 +80,7 @@ public class RunTimeConfigTest {
 	}
 
 	@Test
-	void toAndFromBytes(){
+	void toAndFromBytes() throws ClassNotFoundException, IOException{
 		// arrange
 		RunTimeConfig obj1 = new RunTimeConfig(11, 4, "test1.txt");
 		RunTimeConfig obj2 = new RunTimeConfig(12, 5, "test2.txt");
@@ -100,7 +101,7 @@ public class RunTimeConfigTest {
 	}
 
 	@Test
-	void toAndFromBytes_longBuffer() {
+	void toAndFromBytes_longBuffer() throws ClassNotFoundException, IOException {
 		// arrange
 		RunTimeConfig obj1 = new RunTimeConfig(11, 4, "test1.txt");
 
@@ -114,7 +115,7 @@ public class RunTimeConfigTest {
 	}
 
 	@Test
-	void differentToAndFromBytes() {
+	void differentToAndFromBytes() throws ClassNotFoundException, IOException {
 		// arrange
 		RunTimeConfig obj1 = new RunTimeConfig(11, 4, "test1.txt");
 		RunTimeConfig obj2 = new RunTimeConfig(12, 5, "test2.txt");

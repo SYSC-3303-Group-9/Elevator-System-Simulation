@@ -38,7 +38,7 @@ public class SystemSyncTest {
 	}
 
 	@Test
-	void shouldRecieveAndSendBack() throws IOException {
+	void shouldRecieveAndSendBack() throws IOException, ClassNotFoundException {
 		//create packet and send from floor socket
 		floorSendPacket = new DatagramPacket(floor, floor.length, InetAddress.getLocalHost(),
 				Constants.SYSTEM_SYNC_PORT);
