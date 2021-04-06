@@ -9,7 +9,7 @@ import common.Constants;
 
 public class ElevatorSubsystem implements Runnable {
 
-	private ElevatorMotor elevator;
+	private ElevatorMotor motor;
 	private ElevatorState state;
 	private ElevatorDoor door;
 	private int id;
@@ -20,8 +20,8 @@ public class ElevatorSubsystem implements Runnable {
 	private DatagramSocket sendReceiveSocket;
 	private DatagramPacket receivePacket, sendPacket;
 
-	public ElevatorSubsystem(ElevatorMotor elevator, int floor, int id) {
-		this.elevator = elevator;
+	public ElevatorSubsystem(ElevatorMotor motor, int floor, int id) {
+		this.motor = motor;
 		this.state = ElevatorState.INITIAL;
 		this.door = new ElevatorDoor();
 		this.id = id;
@@ -114,7 +114,7 @@ public class ElevatorSubsystem implements Runnable {
 		System.out.println(this + " is moving " + direction);
 		
 		// elevator is moving
-		elevator.move(Fault.NONE);
+		motor.move(Fault.NONE);
 
 		if (direction == Direction.UP) {
 			floor++;
