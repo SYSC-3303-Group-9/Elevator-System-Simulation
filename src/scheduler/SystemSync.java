@@ -27,7 +27,7 @@ public class SystemSync {
 		configFrame = new ConfigurationFrame();
 
 		//do nothing while configuration frame is not done
-		while (configFrame.isDone() == false) {
+		while (!configFrame.isDone()) {
 			System.out.print("waiting in SystemSync()");
 		}
 		//create a RunTimeConfig object using data entered in configuration frame

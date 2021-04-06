@@ -21,10 +21,7 @@ public class RunTimeConfigTest {
 		RunTimeConfig obj2 = new RunTimeConfig(11, 4, "test.txt");
 
 		// act
-		boolean result = obj1.equals(obj2);
-
-		// arrange
-		assertTrue(result);
+		assertEquals(obj1, obj2);
 	}
 
 	@Test
@@ -34,10 +31,7 @@ public class RunTimeConfigTest {
 		RunTimeConfig obj2 = null;
 
 		// act
-		boolean result = obj1.equals(obj2);
-
-		// arrange
-		assertFalse(result);
+		assertNotEquals(obj1, obj2);
 	}
 
 	@Test
@@ -47,10 +41,7 @@ public class RunTimeConfigTest {
 		RunTimeConfig obj2 = new RunTimeConfig(11, 6, "test1.txt");
 
 		// act
-		boolean result = obj1.equals(obj2);
-
-		// arrange
-		assertFalse(result);
+		assertNotEquals(obj1, obj2);
 	}
 
 	@Test
@@ -60,10 +51,7 @@ public class RunTimeConfigTest {
 		RunTimeConfig obj2 = new RunTimeConfig(13, 4, "test1.txt");
 
 		// act
-		boolean result = obj1.equals(obj2);
-
-		// arrange
-		assertFalse(result);
+		assertNotEquals(obj1, obj2);
 	}
 
 	@Test
@@ -73,10 +61,7 @@ public class RunTimeConfigTest {
 		RunTimeConfig obj2 = new RunTimeConfig(11, 4, "test2.txt");
 
 		// act
-		boolean result = obj1.equals(obj2);
-
-		// arrange
-		assertFalse(result);
+		assertNotEquals(obj1, obj2);
 	}
 
 	@Test
