@@ -9,44 +9,43 @@ public class ElevatorDoor {
 	public ElevatorDoor() {}
 	
 	/**
-	 * The real-time aspect of the elevator opening and closing its door
+	 * The real-time aspect of the elevator opening and closing its doors.
 	 * @param fault	Possible fault that occurs during the door action, extending the time taken
+	 * @return boolean based on whether the door event was completed (false if a Permanent fault occurred)
 	 */
 	public boolean openClose(Fault fault) {
-		long waitTime = 0;
-		// No fault registered
-		if(fault.equals(Fault.NONE)) {
-			// While the elapsed moving time is less than the time required to open/close the door
-			open();
+		if(open(fault)) { // In this system, we assume that all faults will happen while opening the doors
 			load();
 			close();
 		}
-		// Transient fault registered
-		else if(fault.equals(Fault.TRANSIENT)) {
-			// While the elapsed moving time is less than the time required to open/close the door + the transient fault time
-			waitTime = (long) (Constants.TRANSIENT_FAULT_TIME / Constants.TIME_MULTIPLIER);
-		}
-		// Permanent fault registered
-		else if(fault.equals(Fault.PERMANENT)) {
-			// Sleep this thread for the time it takes to register that a permanent fault has occurred
-			waitTime = (long) (Constants.PERMANENT_FAULT_TIME / Constants.TIME_MULTIPLIER);
-		}
-		try {
-			Thread.sleep(waitTime);
-		} catch (InterruptedException e) {}
 		return !fault.equals(Fault.PERMANENT);
 	}
 	
-	
-	private void open() {
+	/**
+	 * Private method called by openClose to open the elevator doors. Any possible faults will happen during the execution
+	 * of this method.
+	 * @param fault possible fault that will occur during the doors opening
+	 * @return boolean based on whether the doors ended up open
+	 */
+	private boolean open(Fault fault) {
 		// TODO: Update elevator in GUI to OPENING at the beginning
 		long waitTime = (long) (Constants.DOOR_TIME / Constants.TIME_MULTIPLIER);
+		if(fault.equals(Fault.TRANSIENT)) {
+			waitTime += (long) (Constants.TRANSIENT_FAULT_TIME / Constants.TIME_MULTIPLIER);
+		}
+		else if(fault.equals(Fault.PERMANENT)) {
+			waitTime += (long) (Constants.PERMANENT_FAULT_TIME / Constants.TIME_MULTIPLIER);
+		}
 		try {
 			Thread.sleep(waitTime);
 		} catch (InterruptedException e) {}
-		// TODO: Update elevator in GUI to OPEN
+		// TODO: Update elevator in GUI to OPEN if the fault was transient or none, else stuck
+		return !fault.equals(Fault.PERMANENT);
 	}
 	
+	/**
+	 * Private method called by openClose to close the elevator doors.
+	 */
 	private void close() {
 		//TODO: Update elevator in GUI to CLOSING at the beginning
 		long waitTime = (long) (Constants.DOOR_TIME / Constants.TIME_MULTIPLIER);
@@ -56,6 +55,9 @@ public class ElevatorDoor {
 		// TODO: Update elevator in GUI to CLOSED after close()
 	}
 	
+	/**
+	 * Private method called by openClose to pass the time it takes to load/unload some passengers.
+	 */
 	private void load() {
 		long waitTime = (long) (Constants.LOADING_TIME / Constants.TIME_MULTIPLIER);
 		try {
