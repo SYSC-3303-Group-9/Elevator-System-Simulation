@@ -438,3 +438,122 @@ to an out of service elevator.
 
 
 </details>
+
+<details><summary>Iteration 5</summary>
+
+# Iteration 5
+
+## Folders/Files included
+
+    * resources
+        + input.txt
+
+    * src
+        - common
+            + Buffer.java
+            + Clock.java
+            + Constants.java
+            + IBufferInput.java
+            + IBufferOutput.java
+        - elevator
+            + Direction.java
+            + ElevatorCommand.java
+            + ElevatorCommunicator.java
+            + ElevatorDoor.java
+            + ElevatorDoorCommand.java
+            + ElevatorEvent.java
+            + ElevatorMotor.java
+            + ElevatorMoveCommand.java
+            + ElevatorState.java
+            + ElevatorSubsystem.java
+            + Fault.java
+            + Main.java
+        - floor
+            + FloorReceiver.java
+            + FloorSubsystem.java
+            + InputData.java
+            + InputParser.java
+            + Main.java
+        - main
+            + Main.java
+            + SystemBuilder
+        - scheduler
+            + Main.java
+            + ScheduledJob.java
+            + Scheduler.java
+            + SchedulerElevator.java
+            + SchedulerMessage.java
+            + SchedulerState.java
+            + SystemSync.java
+
+    * UML Diagrams
+            + StateDiagram.mdj
+            + StateDiagram.png
+            + UML-Class-Diagram-IT1 .png
+            + UML-Class-Diagram-IT1 .violet
+            + UML-Class-Diagram-IT3 .png
+            + UML-Class-Diagram-IT3 .violet
+            + UML-Sequence-Diagram-IT1 .png
+            + UML-Sequence-Diagram-IT1 .violet
+
+    * test
+        - elevator
+            + ElevatorCommandTest.java
+            + ElevatorDoorCommandTest.java
+            + ElevatorDoorTest.java
+            + ElevatorEventTest.java
+            + ElevatorMotorTest.java
+            + ElevatorMoveCommandTest.java
+            + ElevatorSubsystemTest.java
+            + Elevator.java
+        - floor
+            + FloorSubsystemTest.java
+            + InputDataTest.java
+            + InputParserTest.java
+        - scheduler
+            + BufferTest.java
+            + SchedulerTest.java
+            + SystemSyncTest.java
+
+## Team Responsibilities
+
+Aubin
+
+- 
+
+
+Chris
+
+- 
+
+
+James
+
+- 
+
+Liya
+
+- 
+
+Noah
+
+- Add boolean flag isDoorEvent to ElevatorEvent
+- Modify sync() in Clock to return RunTimeConfig
+- Split up ElevatorDoor wait timers
+
+## Detailed Set Up
+
+The Elevator System now simulates real time and the floor, scheduler and elevator subsystems now detects and handles faults. The scheduler instantiates  a `SystemSync` which is utilized to synchronize all three subsystems. Before the `Clock` can starts, the `SystemSync` must wait until the elevator and floor subsystem send a message using UDP to notify it that they're ready to start.
+Once both ready messages have been received, the `SystemSync` will start the Clock and the `FloorSubsystem` can begin reading requests from the input.txt file. The last parameter in a request will determine the fault type. Parameter value of 1 will have no fault, 2 will has a transient fault and 3 will be a permanent fault. The `FloorSubsystem` sends the requests in the form of `InputData` 
+to the `FloorReceiver` on port 70.
+
+The `InputData` is then turned into a `ScheduleMessage` and placed into an IBufferInput where the `Scheduler` can access it. The `Scheduler` creates a `ScheduledJob` and assigns it to an appropriate elevator by creating an `ElevatorMoveCommand` and putting it into a buffer where the `ElevatorCommunicator` can access it. The `ElevatorCommunicator` will then 
+send this command to the appropriate `ElevatorSubsystem` on its distinct port.
+
+The `ElevatorSubsystem` determines if the command is an `ElevatorMoveCommand` or an `ElevatorDoorCommand`. If the command contains a parameter indicating it has a permanent fault, the `ElevatorSubsystem` will set its state to `DISABLED`. In the case of a `ElevatorMoveCommand`, the `ElevatorMotor` will move the elevator 
+1 floor in real time in the appropriate direction if it does not contain a fault. Whereas a transient fault will delay the elevator in the time required to overcome a transient fault and move one floor. In the case of a `ElevatorDoorCommand`, the `ElevatorDoor` will wait the appropriate time to open/close doors if there is no fault. If there is a transient fault, the elevator will wait until the 
+transient fault has been overcome and the time required to open/close the doors. Once the command has been processed, a `ElevatorEvent` is created and sent to the `ElevatorCommunicator` to notify the `Scheduler` that the elevator has processed the task. If a permanent fault occurs to an elevator with `ScheduledJob`s, the jobs are then reassigned and the elevator is removed to prevent scheduling jobs 
+to an out of service elevator.
+
+
+</details>
