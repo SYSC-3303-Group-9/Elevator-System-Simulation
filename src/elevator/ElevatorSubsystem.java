@@ -64,11 +64,9 @@ public class ElevatorSubsystem implements Runnable {
 
 	/**
 	 * Notifies the Scheduler that the elevator has moved
-	 * 
-	 * @param command
 	 */
-	public void sendElevatorEvent() {
-		ElevatorEvent elevatorInfo = new ElevatorEvent(this.floor, this.id, false);
+	public void sendElevatorEvent(Boolean isDoorEvent) {
+		ElevatorEvent elevatorInfo = new ElevatorEvent(this.floor, this.id, false, isDoorEvent);
 
 		// Send ElevatorEvent packet to ElevatorCommunicator.
 		try {
@@ -80,16 +78,17 @@ public class ElevatorSubsystem implements Runnable {
 			System.exit(1);
 		}
 	}
+	
 
 	/**
 	 * Notifies the Scheduler that the elevator is disabled due to a permanent fault
 	 * 
 	 * @param command
 	 */
-	public void sendFault() {
+	public void sendFault(boolean isDoorEvent) {
 
 		// Notify the scheduler that the elevator has a permanent fault
-		ElevatorEvent elevatorInfo = new ElevatorEvent(this.floor, this.id, true);
+		ElevatorEvent elevatorInfo = new ElevatorEvent(this.floor, this.id, true, isDoorEvent);
 
 		// Send ElevatorEvent packet to ElevatorCommunicator.
 		try {
@@ -186,7 +185,7 @@ public class ElevatorSubsystem implements Runnable {
 		case MOVINGDOWN: {
 			// Assuming at this point that the elevator has arrived.
 			move(Direction.DOWN);
-			sendElevatorEvent();
+			sendElevatorEvent(false);
 			this.state = ElevatorState.WAITING;
 			break;
 		}
@@ -194,13 +193,13 @@ public class ElevatorSubsystem implements Runnable {
 		case MOVINGUP: {
 			// Assuming at this point that the elevator has arrived.
 			move(Direction.UP);
-			sendElevatorEvent();
+			sendElevatorEvent(false);
 			this.state = ElevatorState.WAITING;
 			break;
 		}
 
 		case DISABLED: {
-			sendFault();
+			sendFault(false);
 			this.state = ElevatorState.FINAL;
 			break;
 		}
@@ -212,7 +211,7 @@ public class ElevatorSubsystem implements Runnable {
 			door.openClose(doorCmd.getFault());
 			System.out.println(this + " closed doors");
 			
-			sendElevatorEvent();
+			sendElevatorEvent(true);
 			
 			this.state = ElevatorState.WAITING;
 			break;
