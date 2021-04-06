@@ -17,12 +17,14 @@ public class ElevatorDoor {
 		// No fault registered
 		if(fault.equals(Fault.NONE)) {
 			// While the elapsed moving time is less than the time required to open/close the door
-			waitTime = (long) (Constants.DOOR_TIME / Constants.TIME_MULTIPLIER);
+			open();
+			load();
+			close();
 		}
 		// Transient fault registered
 		else if(fault.equals(Fault.TRANSIENT)) {
 			// While the elapsed moving time is less than the time required to open/close the door + the transient fault time
-			waitTime = (long) ((Constants.DOOR_TIME + Constants.TRANSIENT_FAULT_TIME) / Constants.TIME_MULTIPLIER);
+			waitTime = (long) (Constants.TRANSIENT_FAULT_TIME / Constants.TIME_MULTIPLIER);
 		}
 		// Permanent fault registered
 		else if(fault.equals(Fault.PERMANENT)) {
@@ -33,5 +35,31 @@ public class ElevatorDoor {
 			Thread.sleep(waitTime);
 		} catch (InterruptedException e) {}
 		return !fault.equals(Fault.PERMANENT);
+	}
+	
+	
+	private void open() {
+		// TODO: Update elevator in GUI to OPENING at the beginning
+		long waitTime = (long) (Constants.DOOR_TIME / Constants.TIME_MULTIPLIER);
+		try {
+			Thread.sleep(waitTime);
+		} catch (InterruptedException e) {}
+		// TODO: Update elevator in GUI to OPEN
+	}
+	
+	private void close() {
+		//TODO: Update elevator in GUI to CLOSING at the beginning
+		long waitTime = (long) (Constants.DOOR_TIME / Constants.TIME_MULTIPLIER);
+		try {
+			Thread.sleep(waitTime);
+		} catch (InterruptedException e) {}
+		// TODO: Update elevator in GUI to CLOSED after close()
+	}
+	
+	private void load() {
+		long waitTime = (long) (Constants.LOADING_TIME / Constants.TIME_MULTIPLIER);
+		try {
+			Thread.sleep(waitTime);
+		} catch (InterruptedException e) {}
 	}
 }
