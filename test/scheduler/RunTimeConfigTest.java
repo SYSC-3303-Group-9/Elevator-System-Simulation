@@ -20,10 +20,7 @@ public class RunTimeConfigTest {
 		RunTimeConfig obj2 = new RunTimeConfig(11, 4, "test.txt");
 
 		// act
-		boolean result = obj1.equals(obj2);
-
-		// arrange
-		assertTrue(result);
+		assertEquals(obj1, obj2);
 	}
 
 	@Test
