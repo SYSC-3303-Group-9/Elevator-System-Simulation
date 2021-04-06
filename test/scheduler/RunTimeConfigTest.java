@@ -30,10 +30,7 @@ public class RunTimeConfigTest {
 		RunTimeConfig obj2 = null;
 
 		// act
-		boolean result = obj1.equals(obj2);
-
-		// arrange
-		assertFalse(result);
+		assertNotEquals(obj1, obj2);
 	}
 
 	@Test
