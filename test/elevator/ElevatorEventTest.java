@@ -11,8 +11,8 @@ class ElevatorEventTest {
 	ElevatorEvent event2;
 	@BeforeEach
 	void setUp() throws Exception {
-		event1 = new ElevatorEvent(6, 1, false);
-		event2 = new ElevatorEvent(6, 1, true);
+		event1 = new ElevatorEvent(6, 1, false, true);
+		event2 = new ElevatorEvent(6, 1, true, false);
 	}
 
 	@AfterEach
@@ -34,8 +34,8 @@ class ElevatorEventTest {
 	
 	@Test
 	void testDifferentEventsNotEqual() {
-		byte[] differentEvent1 = new ElevatorEvent(4, 3, false).toBytes();
-		byte[] differentEvent2 = new ElevatorEvent(4, 3, true).toBytes();
+		byte[] differentEvent1 = new ElevatorEvent(4, 3, false, false).toBytes();
+		byte[] differentEvent2 = new ElevatorEvent(4, 3, true, true).toBytes();
 		
 		byte[] event1Bytes = event1.toBytes();
 		byte[] event2Bytes = event2.toBytes();
