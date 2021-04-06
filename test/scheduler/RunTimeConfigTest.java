@@ -43,10 +43,7 @@ public class RunTimeConfigTest {
 		RunTimeConfig obj2 = new RunTimeConfig(11, 6, "test1.txt");
 
 		// act
-		boolean result = obj1.equals(obj2);
-
-		// arrange
-		assertFalse(result);
+		assertNotEquals(obj1, obj2);
 	}
 
 	@Test
