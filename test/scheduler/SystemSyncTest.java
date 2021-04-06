@@ -66,8 +66,8 @@ public class SystemSyncTest {
 		//create a RunTimeConfig object and verify 
 		RunTimeConfig data = RunTimeConfig.fromBytes(floorReceive.getData());
 
-		assertTrue(floorReply.equals(elevatorReply));
-		assertTrue(data.toString().equals("22 4 input.txt"));
+		assertEquals(floorReply, elevatorReply);
+		assertEquals(data.toString(), "22 4 input.txt");
 	}
 
 }
