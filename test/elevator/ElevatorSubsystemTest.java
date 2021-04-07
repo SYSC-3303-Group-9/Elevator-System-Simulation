@@ -71,8 +71,8 @@ public class ElevatorSubsystemTest {
 		system.next();
 
 		// Construct a DatagramPacket for receiving packets up
-		// to 12 bytes
-		byte data[] = new byte[12];
+		// to 100 bytes
+		byte data[] = new byte[100];
 		receivePacket = new DatagramPacket(data, data.length);
 
 		// Receiving Elevator command
@@ -110,8 +110,8 @@ public class ElevatorSubsystemTest {
 		system.next();
 
 		// Construct a DatagramPacket for receiving packets up
-		// to 8 bytes
-		byte data[] = new byte[12];
+		// to 100 bytes
+		byte data[] = new byte[100];
 		receivePacket = new DatagramPacket(data, data.length);
 
 		// Receiving Elevator command
@@ -142,6 +142,9 @@ public class ElevatorSubsystemTest {
 		// Send the datagram packet to the server via the send/receive socket.
 		sendReceiveSocket.send(sendPacket);
 
+		// Transition to MOVINGDOWN state
+		system.next();
+		assertEquals(ElevatorState.MOVINGDOWN, system.getState());
 		// Transition to DISABLED state
 		system.next();
 		assertEquals(ElevatorState.DISABLED, system.getState());
