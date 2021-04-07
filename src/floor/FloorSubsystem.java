@@ -14,13 +14,16 @@ import java.util.List;
 
 import common.Clock;
 import common.Constants;
+import scheduler.RunTimeConfig;
 
 public class FloorSubsystem implements Runnable {
 	private DatagramPacket sendPacket, receivePacket;
 	private DatagramSocket sendReceiveSocket;
-
-	public FloorSubsystem() {		
+	private RunTimeConfig config;
+	
+	public FloorSubsystem(RunTimeConfig config) {		
 		try {
+			this.config = config;
 			sendReceiveSocket = new DatagramSocket();
 		} catch(SocketException se) {
 			sendReceiveSocket.close();
@@ -35,7 +38,7 @@ public class FloorSubsystem implements Runnable {
 		// Reads input data from the provided text file and adds each line of data to
 		// the Buffer after converting it to a InputData type.
 		try {
-			File inputFile = new File(Constants.INPUT_FILE);
+			File inputFile = new File(config.getInputFile());
 			BufferedReader reader = new BufferedReader(new FileReader(inputFile));
 			data = InputParser.parse(reader);
 		} catch (FileNotFoundException e) {

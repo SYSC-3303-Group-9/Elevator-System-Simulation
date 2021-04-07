@@ -20,7 +20,7 @@ public class Main {
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
 		
 		// Create the scheduler and its receivers.
-		Scheduler scheduler = new Scheduler(Constants.NUM_ELEVATORS, Constants.NUM_FLOORS, messageBuffer, commandBuffer);
+		Scheduler scheduler = new Scheduler(sync.getConfigData().getNumElevators(), sync.getConfigData().getNumFloors(), messageBuffer, commandBuffer);
 		FloorReceiver floorReceiver = new FloorReceiver(messageBuffer);
 		ElevatorEventReceiver elevatorCommunicator = new ElevatorEventReceiver(messageBuffer);
 		ElevatorCommandSender commandSender = new ElevatorCommandSender(commandBuffer);

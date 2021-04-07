@@ -124,4 +124,9 @@ public class SystemSync {
 		return false;
 
 	}
+	
+	public RunTimeConfig getConfigData() {
+		return configData;
+	}
+	
 }
