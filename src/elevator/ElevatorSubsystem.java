@@ -67,7 +67,7 @@ public class ElevatorSubsystem implements Runnable {
 	 * Notifies the Scheduler that the elevator has moved or opened/closed its doors
 	 * @param isDoorEvent boolean whether the ElevatorEvent that occurred was a door event
 	 */
-	public void sendElevatorEvent(Boolean isDoorEvent) {
+	public void sendElevatorEvent(boolean isDoorEvent) {
 		ElevatorEvent elevatorInfo = new ElevatorEvent(this.floor, this.id, false, isDoorEvent);
 
 		// Send ElevatorEvent packet to ElevatorCommunicator.
