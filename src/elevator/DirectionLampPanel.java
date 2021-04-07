@@ -2,13 +2,12 @@ package elevator;
 
 import java.awt.Color;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import common.Constants;
 
 public class DirectionLampPanel extends JPanel {
-	
+
 	private DirectionLampButton up;
 	private DirectionLampButton down;
 
@@ -16,35 +15,36 @@ public class DirectionLampPanel extends JPanel {
 	 * Creates a DirectionLampPanel instance
 	 */
 	public DirectionLampPanel() {
-		up = new DirectionLampButton(Direction.UP, "/resources/upArrow.png");
-		down = new DirectionLampButton(Direction.DOWN, "/resources/downArrow.png");
+		up = new DirectionLampButton(Direction.UP, Constants.UP_ARROW);
+		down = new DirectionLampButton(Direction.DOWN, Constants.DOWN_ARROW);
 		this.add(down);
 		this.add(up);
 	}
-	
+
 	/**
 	 * Changes the color of the direction button to 'ON'
-	 * @param lamp the lamp to turn on
+	 * 
+	 * @param ldirection the direction lamp to turn on
 	 */
-	public void turnOnLamp(DirectionLampButton lamp) {
-		lamp.setBackground(Color.YELLOW);
+	public void turnOnLamp(Direction direction) {
+		if (direction == Direction.UP) {
+			up.setBackground(Color.YELLOW);
+		} else if (direction == Direction.DOWN) {
+			down.setBackground(Color.YELLOW);
+		}
 	}
-	
+
 	/**
 	 * Changes the color of the direction button to 'OFF'
-	 * @param lamp the lamp to turn off
+	 * 
+	 * @param direction the direction lamp to turn off
 	 */
-	public void turnOffLamp(DirectionLampButton lamp) {
-		lamp.setBackground(Color.GRAY);
-	}
-	
-	public static void main(String[] args) {
-		
-		JFrame frame = new JFrame("DirectionLampPanel");
-		DirectionLampPanel lamps = new DirectionLampPanel();
-		frame.setSize(700, 700);
-		frame.add(lamps);
-		frame.setVisible(true);
+	public void turnOffLamp(Direction direction) {
+		if (direction == Direction.UP) {
+			up.setBackground(Color.GRAY);
+		} else if (direction == Direction.DOWN) {
+			down.setBackground(Color.GRAY);
+		}
 	}
 
 }
