@@ -1,13 +1,18 @@
-package floor;
+package floor.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+
+import javax.swing.JFrame;
 import javax.swing.JPanel;
+
+import elevator.Direction;
+import elevator.gui.DirectionLampPanel;
 
 public class FloorLampPanel extends JPanel {
 
-	private FloorLampButton[][] floorGrid;
+	private FloorLamp[][] floorGrid;
 	private int columns;
 	private int rows;
 
@@ -17,15 +22,15 @@ public class FloorLampPanel extends JPanel {
 	public FloorLampPanel() {
 		this.rows = 11;
 		this.columns = 2;
-		this.floorGrid = new FloorLampButton[columns][rows];
+		this.floorGrid = new FloorLamp[columns][rows];
 		this.setLayout(new GridLayout(this.rows, this.columns));
-		this.setPreferredSize(new Dimension(30, 30));
+		this.setSize(30,30);
 
 		// Set button number
 		int floor = 1;
 		for (int i = 0; i < this.rows; i++) {
 			for (int j = 0; j < this.columns; j++) {
-				this.floorGrid[j][i] = new FloorLampButton(floor);
+				this.floorGrid[j][i] = new FloorLamp(floor);
 				floor++;
 				this.add(this.floorGrid[j][i]);
 			}
@@ -65,9 +70,9 @@ public class FloorLampPanel extends JPanel {
 	/**
 	 * Gets the floorGrid
 	 * 
-	 * @return a floor grid of type FloorLampButton
+	 * @return a floor grid of type FloorLamp
 	 */
-	public FloorLampButton[][] getFloorGrid() {
+	public FloorLamp[][] getFloorGrid() {
 		return floorGrid;
 	}
 

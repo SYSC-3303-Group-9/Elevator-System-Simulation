@@ -13,22 +13,21 @@ import java.net.InetAddress;
 import java.util.Random;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 
 public class ElevatorSubsystemTest {
+	private static DatagramSocket sendReceiveSocket;
 
 	DatagramPacket sendPacket, receivePacket;
-	DatagramSocket sendReceiveSocket;
+	
 	ElevatorMotor elevator;
 	ElevatorSubsystem system;
 	Random ran = new Random();
 	int upperBound = 100;
-
-	@BeforeEach
-	void setup() throws IOException {
-		// Construct a datagram socket and bind it to any available
-		// port on the local host machine.
-		sendReceiveSocket = new DatagramSocket();
+	
+	@BeforeAll
+	public static void setup() throws IOException {
+		sendReceiveSocket = new DatagramSocket(Constants.ELEVATOR_EVENT_RECEIVER_PORT);
 	}
 
 	@AfterEach
@@ -72,16 +71,13 @@ public class ElevatorSubsystemTest {
 		system.next();
 
 		// Construct a DatagramPacket for receiving packets up
-		// to 12 bytes
-		byte data[] = new byte[12];
+		// to 100 bytes
+		byte data[] = new byte[100];
 		receivePacket = new DatagramPacket(data, data.length);
 
 		// Receiving Elevator command
 		// Block until a datagram is received via sendReceiveSocket.
 		sendReceiveSocket.receive(receivePacket);
-
-		// Close the socket.
-		sendReceiveSocket.close();
 
 		ElevatorEvent response = ElevatorEvent.fromBytes(data);
 		assertEquals(system.getId(), response.getElevatorId());
@@ -114,16 +110,13 @@ public class ElevatorSubsystemTest {
 		system.next();
 
 		// Construct a DatagramPacket for receiving packets up
-		// to 8 bytes
-		byte data[] = new byte[12];
+		// to 100 bytes
+		byte data[] = new byte[100];
 		receivePacket = new DatagramPacket(data, data.length);
 
 		// Receiving Elevator command
 		// Block until a datagram is received via sendReceiveSocket.
 		sendReceiveSocket.receive(receivePacket);
-
-		// Close the socket.
-		sendReceiveSocket.close();
 
 		ElevatorEvent response = ElevatorEvent.fromBytes(data);
 		assertEquals(system.getId(), response.getElevatorId());
@@ -149,6 +142,9 @@ public class ElevatorSubsystemTest {
 		// Send the datagram packet to the server via the send/receive socket.
 		sendReceiveSocket.send(sendPacket);
 
+		// Transition to MOVINGDOWN state
+		system.next();
+		assertEquals(ElevatorState.MOVINGDOWN, system.getState());
 		// Transition to DISABLED state
 		system.next();
 		assertEquals(ElevatorState.DISABLED, system.getState());

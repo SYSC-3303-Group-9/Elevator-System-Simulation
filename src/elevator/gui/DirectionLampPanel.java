@@ -1,22 +1,24 @@
-package elevator;
+package elevator.gui;
 
 import java.awt.Color;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import common.Constants;
+import elevator.Direction;
 
 public class DirectionLampPanel extends JPanel {
 
-	private DirectionLampButton up;
-	private DirectionLampButton down;
+	private DirectionLamp up;
+	private DirectionLamp down;
 
 	/**
 	 * Creates a DirectionLampPanel instance
 	 */
 	public DirectionLampPanel() {
-		up = new DirectionLampButton(Direction.UP, Constants.UP_ARROW);
-		down = new DirectionLampButton(Direction.DOWN, Constants.DOWN_ARROW);
+		up = new DirectionLamp(Direction.UP, Constants.UP_ARROW);
+		down = new DirectionLamp(Direction.DOWN, Constants.DOWN_ARROW);
 		this.add(down);
 		this.add(up);
 	}

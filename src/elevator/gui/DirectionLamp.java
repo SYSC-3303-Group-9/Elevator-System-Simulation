@@ -1,12 +1,16 @@
-package elevator;
+package elevator.gui;
 
+import java.awt.Color;
 import java.awt.Image;
 
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
+import javax.swing.JLabel;
 
-public class DirectionLampButton extends JButton {
+import elevator.Direction;
+
+public class DirectionLamp extends JLabel {
 
 	private Direction direction;
 	private String source;
@@ -17,11 +21,11 @@ public class DirectionLampButton extends JButton {
 	 * @param direction the direction lamp will be pointing to
 	 * @param source    the file name that contains the direction icon
 	 */
-	public DirectionLampButton(Direction direction, String source) {
+	public DirectionLamp(Direction direction, String source) {
 		System.out.println(source);
 		this.direction = direction;
 		this.source = source;
-		this.setEnabled(false);
+		this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		this.setOpaque(true); // Only way color change is seen on Mac OS
 		this.setBounds(0, 0, 30, 30);
 		this.setIcon(resizeIcon(new ImageIcon(source), this.getWidth(), this.getHeight()));

@@ -70,12 +70,12 @@ public class SchedulerTest {
 	}
 	
 	private void mimicElevatorEvent(int floor, int elevatorId, Buffer<SchedulerMessage> messageBuffer) {
-		ElevatorEvent event = new ElevatorEvent(floor, elevatorId, false);
+		ElevatorEvent event = new ElevatorEvent(floor, elevatorId, false, false);
 		messageBuffer.put(SchedulerMessage.fromElevatorEvent(event));
 	}
 	
 	private void mimicElevatorFaultEvent(int floor, int elevatorId, Buffer<SchedulerMessage> messageBuffer) {
-		ElevatorEvent event = new ElevatorEvent(floor, elevatorId, true);
+		ElevatorEvent event = new ElevatorEvent(floor, elevatorId, true, false);
 		messageBuffer.put(SchedulerMessage.fromElevatorEvent(event));
 	}
 	

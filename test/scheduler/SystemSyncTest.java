@@ -1,6 +1,6 @@
 package scheduler;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -18,17 +18,17 @@ public class SystemSyncTest {
 	byte floor[] = "floor".getBytes();
 	byte elevator[] = "elevator".getBytes();
 	DatagramPacket floorReceive, elevatorReceive, floorSendPacket, elevatorSendPacket;
-	DatagramSocket FloorsendSocket, ElevatorsendSocket;
+	DatagramSocket floorSendSocket, elevatorSendSocket;
 
 	@BeforeEach
 	void setup() throws IOException {
 		// Construct a datagram socket and bind it to any available
 		// port on the local host machine.
 		sync = new SystemSync();
-		FloorsendSocket = new DatagramSocket();
-		ElevatorsendSocket = new DatagramSocket();
-		floorReceive = new DatagramPacket(new byte[5], 5);
-		elevatorReceive = new DatagramPacket(new byte[5], 5);
+		floorSendSocket = new DatagramSocket();
+		elevatorSendSocket = new DatagramSocket();
+		floorReceive = new DatagramPacket(new byte[30], 30);
+		elevatorReceive = new DatagramPacket(new byte[30], 30);
 	}
 
 	@AfterEach
@@ -37,34 +37,39 @@ public class SystemSyncTest {
 	}
 
 	@Test
-	void shouldRecieveAndSendBack() throws IOException {
-
+	void shouldRecieveAndSendBack() throws IOException, ClassNotFoundException {
+		//create packet and send from floor socket
 		floorSendPacket = new DatagramPacket(floor, floor.length, InetAddress.getLocalHost(),
 				Constants.SYSTEM_SYNC_PORT);
-		FloorsendSocket.send(floorSendPacket);
+		floorSendSocket.send(floorSendPacket);
 		sync.syncing();
-	
+		
+		//create packet and send from elevator socket
 		elevatorSendPacket = new DatagramPacket(elevator, elevator.length, InetAddress.getLocalHost(),
 				Constants.SYSTEM_SYNC_PORT);
-		ElevatorsendSocket.send(elevatorSendPacket);
+		elevatorSendSocket.send(elevatorSendPacket);
 		sync.syncing();
 
-		
+		//receive packets in both floor and elevator sockets
+		floorSendSocket.receive(floorReceive);
+		elevatorSendSocket.receive(elevatorReceive);
 
-		FloorsendSocket.receive(floorReceive);
-		ElevatorsendSocket.receive(elevatorReceive);
-
-		ElevatorsendSocket.close();
-		FloorsendSocket.close();
+		//close both elevator and floor sockets
+		elevatorSendSocket.close();
+		floorSendSocket.close();
 
 		// arrange
 		String floorReply = new String(floorReceive.getData());
 		String elevatorReply = new String(elevatorReceive.getData());
 
-		System.out.print("floor" + floorReply);
-		System.out.print("elevator" + elevatorReply);
+		//create a RunTimeConfig object and verify 
+		RunTimeConfig data = RunTimeConfig.fromBytes(floorReceive.getData());
 
-		assertTrue(floorReply.equals(elevatorReply));
+		assertNotEquals(0, data.getNumElevators());
+		assertNotEquals(0, data.getNumFloors());
+		assertNotEquals(null, data.getInputFile());
+		assertEquals(floorReply, elevatorReply);
+		assertEquals("22 4 input.txt", data.toString());
 	}
 
 }

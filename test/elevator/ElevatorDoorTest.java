@@ -11,6 +11,7 @@ import common.Constants;
 
 class ElevatorDoorTest {
 	ElevatorDoor door;
+	public static final int TOTAL_DOOR_TIME = 2 * Constants.DOOR_TIME + Constants.LOADING_TIME;
 	@BeforeEach
 	void setUp() throws Exception {
 		door = new ElevatorDoor();
@@ -27,9 +28,9 @@ class ElevatorDoorTest {
 		assertTrue(door.openClose(Fault.NONE));
 		long elapsedTime = (long) ((Clock.getTime() - startTime) * Constants.TIME_MULTIPLIER);
 		// Elapsed time should be more than the time it takes to move floors
-		assertTrue(elapsedTime >= Constants.DOOR_TIME);
+		assertTrue(elapsedTime >= TOTAL_DOOR_TIME);
 		// Elapsed time should not be that much greater than the time it takes to move floors
-		assertTrue(elapsedTime < (Constants.DOOR_TIME + 50));
+		assertTrue(elapsedTime < TOTAL_DOOR_TIME * 1.1);
 	}
 	
 	@Test
@@ -38,9 +39,9 @@ class ElevatorDoorTest {
 		assertTrue(door.openClose(Fault.TRANSIENT));
 		long elapsedTime = (long) ((Clock.getTime() - startTime) * Constants.TIME_MULTIPLIER);
 		// Elapsed time should be more than the time it takes to move floors + fault time
-		assertTrue(elapsedTime >= (Constants.DOOR_TIME + Constants.TRANSIENT_FAULT_TIME));
+		assertTrue(elapsedTime >= (TOTAL_DOOR_TIME + Constants.TRANSIENT_FAULT_TIME));
 		// Elapsed time should not be that much greater than the time it takes to move floors + fault time
-		assertTrue(elapsedTime < (Constants.DOOR_TIME + Constants.TRANSIENT_FAULT_TIME + 50));
+		assertTrue(elapsedTime < (TOTAL_DOOR_TIME + Constants.TRANSIENT_FAULT_TIME) * 1.1);
 	}
 	
 	@Test
@@ -49,8 +50,8 @@ class ElevatorDoorTest {
 		assertFalse(door.openClose(Fault.PERMANENT));
 		long elapsedTime = (long) ((Clock.getTime() - startTime) * Constants.TIME_MULTIPLIER);
 		// Elapsed time should be more than the time it takes to move floors + fault time
-		assertTrue(elapsedTime >= Constants.PERMANENT_FAULT_TIME);
+		assertTrue(elapsedTime >= Constants.DOOR_TIME + Constants.PERMANENT_FAULT_TIME);
 		// Elapsed time should not be that much greater than the time it takes to move floors + fault time
-		assertTrue(elapsedTime < Constants.PERMANENT_FAULT_TIME + 50);
+		assertTrue(elapsedTime < (Constants.DOOR_TIME + Constants.PERMANENT_FAULT_TIME) * 1.1);
 	}
 }

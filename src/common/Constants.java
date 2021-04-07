@@ -19,14 +19,19 @@ public class Constants {
 	public static final int MOVE_TIME = 4000;
 	
 	/**
-	 * Time it takes to open *and* close the doors in milliseconds.
+	 * Time it takes to open or close the doors in milliseconds.
 	 */
-	public static final int DOOR_TIME = 5000;
+	public static final int DOOR_TIME = 2500;
+	
+	/**
+	 * Time it takes for passengers to load or unload from the elevator in milliseconds.
+	 */
+	public static final int LOADING_TIME = 4000;
 	
 	/**
 	 * Time it takes for the system to overcome a transient fault in milliseconds.
 	 */
-	public static final int TRANSIENT_FAULT_TIME = 5000;
+	public static final int TRANSIENT_FAULT_TIME = 3000;
 	
 	/**
 	 * Time it takes for the system to realize a permanent fault has occurred in milliseconds.
@@ -55,18 +60,25 @@ public class Constants {
 	public static final int ELEVATOR_EVENT_RECEIVER_PORT = 110;
 	
 	/**
+	 * SchedulerReceiver's port.
+	 */
+	public static final int SCHEDULER_RECEIVER_PORT = 123;
+	
+	/**
 	 * The input file path.
 	 * File is located in resources/input.txt by default.
 	 */
 	public static final String INPUT_FILE = Paths.get("resources", "input.txt").toString();
 	
 	/**
-	 * 
+	 * The up arrow image file path
+	 * File is located at resources/upArrow.png
 	 */
 	public static final String UP_ARROW = Paths.get("resources", "upArrow.png").toString();
 	
 	/**
-	 * 
+	 * The up arrow image file path
+	 * File is located at resources/downArrow.png
 	 */
 	public static final String DOWN_ARROW = Paths.get("resources", "downArrow.png").toString();
 	
