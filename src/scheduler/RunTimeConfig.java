@@ -5,13 +5,13 @@ import java.nio.ByteBuffer;
 
 public class RunTimeConfig {
 
-	private int floorNum;
-	private int elevatorNum;
+	private int numFloors;
+	private int numElevators;
 	private String inputFile;
 
 	public RunTimeConfig(int floors, int elevators, String filePath) {
-		this.floorNum = floors;
-		this.elevatorNum = elevators;
+		this.numFloors = floors;
+		this.numElevators = elevators;
 		this.inputFile = filePath;
 	}
 
@@ -23,7 +23,7 @@ public class RunTimeConfig {
 	 */
 	public byte[] toBytes() {
 		// add floor and elevator int into a byte array
-		byte[] floorElevatorByte = ByteBuffer.allocate(8).putInt(floorNum).putInt(elevatorNum).array();
+		byte[] floorElevatorByte = ByteBuffer.allocate(8).putInt(numFloors).putInt(numElevators).array();
 		// get file path byte array
 		byte[] filePathByte = this.inputFile.getBytes();
 
@@ -44,7 +44,7 @@ public class RunTimeConfig {
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
-	public static RunTimeConfig fromBytes(byte[] bytes) throws IOException, ClassNotFoundException {
+	public static RunTimeConfig fromBytes(byte[] bytes) {
 
 		ByteBuffer buffer = ByteBuffer.wrap(bytes);
 		int floors = buffer.getInt();
@@ -54,7 +54,7 @@ public class RunTimeConfig {
 		System.arraycopy(bytes, 8, fileArray, 0, bytes.length - 8);
 		String file = new String(fileArray);
 
-		return new RunTimeConfig(floors, elevators, file);
+		return new RunTimeConfig(floors, elevators, file.trim());
 
 	}
 
@@ -66,18 +66,18 @@ public class RunTimeConfig {
 
 		if (o instanceof RunTimeConfig) {
 			RunTimeConfig other = (RunTimeConfig) o;
-			return getFloorNum() == (other.getFloorNum()) && getElevatorNum() == other.getElevatorNum()
+			return getNumFloors() == (other.getNumFloors()) && getNumElevators() == other.getNumElevators()
 					&& getInputFile().equals(other.getInputFile());
 		}
 		return false;
 	}
 
-	public int getFloorNum() {
-		return floorNum;
+	public int getNumFloors() {
+		return numFloors;
 	}
 
-	public int getElevatorNum() {
-		return elevatorNum;
+	public int getNumElevators() {
+		return numElevators;
 	}
 
 	public String getInputFile() {
@@ -86,7 +86,7 @@ public class RunTimeConfig {
 
 	@Override
 	public String toString() {
-		return floorNum + " " + elevatorNum + " " + inputFile;
+		return numFloors + " " + numElevators + " " + inputFile;
 	}
 
 }
