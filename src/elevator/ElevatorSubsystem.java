@@ -14,7 +14,6 @@ public class ElevatorSubsystem implements Runnable {
 	private ElevatorDoor door;
 	private int id;
 	private int floor;
-	private boolean isDoorEvent;
 	private ElevatorCommand command = null;
 	private ElevatorMoveCommand moveCmd = null;
 	private ElevatorDoorCommand doorCmd = null;
@@ -64,11 +63,12 @@ public class ElevatorSubsystem implements Runnable {
 	}
 
 	/**
-	 * Notifies the Scheduler that the elevator has moved or opened/closed its doors
-	 * @param isDoorEvent boolean whether the ElevatorEvent that occurred was a door event
+	 * Sends an ElevatorEvent to the scheduler.
+	 * @param isPermanentFault Whether this elevator encountered a permanent fault.
+	 * @param isDoorEvent Whether this was a door event.
 	 */
-	public void sendElevatorEvent(boolean isDoorEvent) {
-		ElevatorEvent elevatorInfo = new ElevatorEvent(this.floor, this.id, false, isDoorEvent);
+	private void sendElevatorEvent(boolean isPermanentFault, boolean isDoorEvent) {
+		ElevatorEvent elevatorInfo = new ElevatorEvent(this.floor, this.id, isPermanentFault, isDoorEvent);
 
 		// Send ElevatorEvent packet to ElevatorCommunicator.
 		try {
@@ -86,21 +86,22 @@ public class ElevatorSubsystem implements Runnable {
 	 * Notifies the Scheduler that the elevator is disabled due to a permanent fault
 	 * @param isDoorEvent boolean whether the ElevatorEvent that occurred was a door event
 	 */
-	public void sendFault(boolean isDoorEvent) {
-
-		// Notify the scheduler that the elevator has a permanent fault
-		ElevatorEvent elevatorInfo = new ElevatorEvent(this.floor, this.id, true, isDoorEvent);
-
-		// Send ElevatorEvent packet to ElevatorCommunicator.
-		try {
-			sendPacket = new DatagramPacket(elevatorInfo.toBytes(), elevatorInfo.toBytes().length,
-					InetAddress.getLocalHost(), Constants.ELEVATOR_EVENT_RECEIVER_PORT);
-			sendReceiveSocket.send(sendPacket);
-		} catch (IOException e) {
-			System.out.println("ElevatorSubsystem, sendFault " + e);
-			System.exit(1);
-		}
-
+	private void sendElevatorMoveEvent() {
+		sendElevatorEvent(false, false);
+	}
+	
+	/**
+	 * Notifies the Scheduler that the elevator opened and closed its doors.
+	 */
+	private void sendElevatorDoorEvent() {
+		sendElevatorEvent(false, true);
+	}
+	
+	/**
+	 * Notifies the Scheduler that the elevator encountered a permanent fault.
+	 */
+	private void sendElevatorFaultEvent() {
+		sendElevatorEvent(true, false);
 	}
 
 	/**
@@ -164,7 +165,6 @@ public class ElevatorSubsystem implements Runnable {
 				else {
 					// Identify what kind of elevator command was passed
 					if (command instanceof ElevatorMoveCommand) {
-						isDoorEvent = false;
 						moveCmd = (ElevatorMoveCommand) command;
 						// Change the state of the Elevator to Moving up or Moving down or 
 						if (moveCmd.getDirection() == Direction.UP) {
@@ -175,7 +175,6 @@ public class ElevatorSubsystem implements Runnable {
 						}
 					} 
 					else if (command instanceof ElevatorDoorCommand) {
-						isDoorEvent = true;
 						this.state = ElevatorState.OPENING_CLOSING_DOORS;
 						doorCmd = (ElevatorDoorCommand) command;
 					}
@@ -186,7 +185,7 @@ public class ElevatorSubsystem implements Runnable {
 			case MOVINGDOWN: 
 				if(move(Direction.DOWN, moveCmd.getFault())) {
 					// Move down was successful, so send back ElevatorEvent indicating such
-					sendElevatorEvent(isDoorEvent);
+					sendElevatorMoveEvent();
 					this.state = ElevatorState.WAITING;					
 				}
 				// A permanent fault has occurred, so disable the elevator
@@ -198,7 +197,7 @@ public class ElevatorSubsystem implements Runnable {
 			case MOVINGUP: 
 				if(move(Direction.UP, moveCmd.getFault())) {
 					// Move down was successful, so send back ElevatorEvent indicating such*
-					sendElevatorEvent(isDoorEvent);
+					sendElevatorMoveEvent();
 					this.state = ElevatorState.WAITING;					
 				}
 				// A permanent fault has occurred, so disable the elevator
@@ -208,7 +207,7 @@ public class ElevatorSubsystem implements Runnable {
 				break;
 	
 			case DISABLED: 
-				sendFault(isDoorEvent);
+				sendElevatorFaultEvent();
 				this.state = ElevatorState.FINAL;
 				break;
 	
@@ -219,7 +218,7 @@ public class ElevatorSubsystem implements Runnable {
 				System.out.println(this + " opening doors");
 				if(door.openClose(doorCmd.getFault())) {
 					System.out.println(this + " closed doors");
-					sendElevatorEvent(isDoorEvent);
+					sendElevatorDoorEvent();
 					this.state = ElevatorState.WAITING;
 				}
 				else {

@@ -85,9 +85,12 @@ public class ElevatorEvent {
 	
 	@Override
 	public String toString() {
-		String outOfService = (this.getOutOfService()) ? "out of service." : "in service.";
-		return "Elevator " + Integer.toString(elevatorId) + " arrived at floor " + Integer.toString(floor) + " and is " + outOfService;
-		
+		if (isDoorEvent) {
+			return "Elevator " + Integer.toString(elevatorId) + " opened and closed doors on floor " + Integer.toString(floor);
+		} else {
+			String outOfService = (this.getOutOfService()) ? "out of service." : "in service.";
+			return "Elevator " + Integer.toString(elevatorId) + " arrived at floor " + Integer.toString(floor) + " and is " + outOfService;
+		}
 	}
 	
 	@Override

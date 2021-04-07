@@ -529,7 +529,9 @@ Chris
 
 James
 
-- 
+- Modify ElevatorSubsystem to set a door event flag on outgoing ElevatorEvents
+- Create SchedulerReceiver to receive ElevatorEvents sent from the scheduler application to the floor application
+- Modify ElevatorEventReceiver to forward ElevatorEvents with (door flag == true) to SchedulerReceiver
 
 Liya
 

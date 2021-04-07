@@ -1,6 +1,9 @@
 package scheduler.GUI;
 
 import javax.swing.*;
+
+import common.Constants;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -72,7 +75,7 @@ public class ConfigurationFrame extends JFrame implements ActionListener {
 		// third panel containing file text field
 		JPanel panel3 = new JPanel((new FlowLayout(FlowLayout.LEFT)));
 		JLabel label3 = new JLabel("Input file path");
-		file = new JTextField(20);
+		file = new JTextField(Constants.INPUT_FILE, 20);
 		label3.setLabelFor(file);
 
 		// creating a button for open file
