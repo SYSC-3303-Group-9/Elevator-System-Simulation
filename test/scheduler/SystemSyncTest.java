@@ -1,5 +1,7 @@
 package scheduler;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -66,6 +68,9 @@ public class SystemSyncTest {
 		//create a RunTimeConfig object and verify 
 		RunTimeConfig data = RunTimeConfig.fromBytes(floorReceive.getData());
 
+		assertNotEquals(data.getElevatorNum(), null);
+		assertNotEquals(data.getFloorNum(), null);
+		assertNotEquals(data.getInputFile(), null);
 		assertEquals(floorReply, elevatorReply);
 		assertEquals(data.toString(), "22 4 input.txt");
 	}
