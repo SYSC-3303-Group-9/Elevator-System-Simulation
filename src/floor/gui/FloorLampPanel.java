@@ -27,11 +27,16 @@ public class FloorLampPanel extends JPanel {
 		this.setSize(30,30);
 
 		// Set button number
-		int floor = 1;
+		int floor = 22;
 		for (int i = 0; i < this.rows; i++) {
 			for (int j = 0; j < this.columns; j++) {
 				this.floorGrid[j][i] = new FloorLamp(floor);
-				floor++;
+				floor--;
+				if(this.floorGrid[j][i].getFloor() % 2 == 0) {
+					this.floorGrid[j][i] = new FloorLamp(this.floorGrid[j][i].getFloor() - 1);
+				} else {
+					this.floorGrid[j][i] = new FloorLamp(this.floorGrid[j][i].getFloor() + 1);
+				}
 				this.add(this.floorGrid[j][i]);
 			}
 		}
@@ -93,4 +98,5 @@ public class FloorLampPanel extends JPanel {
 	public int getRows() {
 		return rows;
 	}
+	
 }
