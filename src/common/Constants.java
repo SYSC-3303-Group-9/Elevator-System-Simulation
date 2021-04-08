@@ -3,16 +3,7 @@ package common;
 import java.nio.file.Paths;
 
 public class Constants {
-	/**
-	 * The number of elevators.
-	 */
-	//public static final int NUM_ELEVATORS = 4;
-	
-	/**
-	 * The number of floors.
-	 */
-	//public static final int NUM_FLOORS = 22;
-	
+
 	/**
 	 * Time it takes to move one floor in milliseconds.
 	 */
