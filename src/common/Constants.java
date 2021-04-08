@@ -71,6 +71,18 @@ public class Constants {
 	public static final String INPUT_FILE = Paths.get("resources", "input.txt").toString();
 	
 	/**
+	 * The up arrow image file path
+	 * File is located at resources/upArrow.png
+	 */
+	public static final String UP_ARROW = Paths.get("resources", "upArrow.png").toString();
+	
+	/**
+	 * The up arrow image file path
+	 * File is located at resources/downArrow.png
+	 */
+	public static final String DOWN_ARROW = Paths.get("resources", "downArrow.png").toString();
+	
+	/**
 	 * Multiplier to determine how fast simulated time runs compared to real-time.
 	 * E.g. If = 1 then simulation is real-time. If = 2 then simulation is twice as fast as real-time.
 	 */
