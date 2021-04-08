@@ -5,12 +5,13 @@ import java.net.SocketException;
 import common.Buffer;
 import common.Clock;
 import elevator.ElevatorEvent;
+import scheduler.RunTimeConfig;
 import scheduler.SchedulerReceiver;
 
 public class Main {
 	public static void main(String[] args) throws SocketException {
 		// Sync the application clock with the other applications.
-		Clock.sync("floor");
+		RunTimeConfig config = Clock.sync("floor");
 		
 		// Create the ElevatorEvent buffer.
 		// TODO: Connect the output side of this buffer to the FloorFrame UI.
@@ -20,7 +21,7 @@ public class Main {
 		SchedulerReceiver schedulerReceiver = new SchedulerReceiver(elevatorEventBuffer);
 		
 		// Create the floor subsystem.
-		FloorSubsystem floorSubsystem = new FloorSubsystem();
+		FloorSubsystem floorSubsystem = new FloorSubsystem(config);
 		
 		// Create the thread.
 		Thread thSchedulerReceiver = new Thread(schedulerReceiver);
