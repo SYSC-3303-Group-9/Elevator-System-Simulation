@@ -75,7 +75,7 @@ public class Scheduler implements Runnable {
 		try {
 			this.sendSocket = new DatagramSocket();
 		} catch (SocketException e) {
-			System.out.println("Scheduler: Scheduler(), " + e);
+			e.printStackTrace();
 		}
 		
 	}
@@ -269,9 +269,9 @@ public class Scheduler implements Runnable {
 							DatagramPacket sendPacket = new DatagramPacket(job.getInputData().toBytes(), job.getInputData().toBytes().length, InetAddress.getLocalHost(), Constants.MEASUREMENT_RECEIVER_PORT);
 							sendSocket.send(sendPacket);
 						} catch (UnknownHostException e) {
-							System.out.println("Scheduler: tick(), " + e);
+							e.printStackTrace();
 						} catch (IOException e) {
-							System.out.println("Scheduler: tick(), " + e);
+							e.printStackTrace();
 						}
 						
 						
