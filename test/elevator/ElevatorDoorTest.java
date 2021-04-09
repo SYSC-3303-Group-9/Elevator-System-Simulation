@@ -25,33 +25,11 @@ class ElevatorDoorTest {
 	@Test
 	void testTimeElapsesNoFault() {
 		long startTime = Clock.getTime();
-		assertTrue(door.openClose(Fault.NONE));
+		door.openClose();
 		long elapsedTime = (long) ((Clock.getTime() - startTime) * Constants.TIME_MULTIPLIER);
 		// Elapsed time should be more than the time it takes to move floors
 		assertTrue(elapsedTime >= TOTAL_DOOR_TIME);
 		// Elapsed time should not be that much greater than the time it takes to move floors
 		assertTrue(elapsedTime < TOTAL_DOOR_TIME * 1.1);
-	}
-	
-	@Test
-	void testTimeElapsesTransientFault() {
-		long startTime = Clock.getTime();
-		assertTrue(door.openClose(Fault.TRANSIENT));
-		long elapsedTime = (long) ((Clock.getTime() - startTime) * Constants.TIME_MULTIPLIER);
-		// Elapsed time should be more than the time it takes to move floors + fault time
-		assertTrue(elapsedTime >= (TOTAL_DOOR_TIME + Constants.TRANSIENT_FAULT_TIME));
-		// Elapsed time should not be that much greater than the time it takes to move floors + fault time
-		assertTrue(elapsedTime < (TOTAL_DOOR_TIME + Constants.TRANSIENT_FAULT_TIME) * 1.1);
-	}
-	
-	@Test
-	void testTimeElapsesPermanentFault() {
-		long startTime = Clock.getTime();
-		assertFalse(door.openClose(Fault.PERMANENT));
-		long elapsedTime = (long) ((Clock.getTime() - startTime) * Constants.TIME_MULTIPLIER);
-		// Elapsed time should be more than the time it takes to move floors + fault time
-		assertTrue(elapsedTime >= Constants.DOOR_TIME + Constants.PERMANENT_FAULT_TIME);
-		// Elapsed time should not be that much greater than the time it takes to move floors + fault time
-		assertTrue(elapsedTime < (Constants.DOOR_TIME + Constants.PERMANENT_FAULT_TIME) * 1.1);
 	}
 }

@@ -111,22 +111,16 @@ public class ElevatorSubsystem implements Runnable {
 	 * @param direction The direction that the elevator will move in.
 	 * @param fault A possible fault that will occur during the move action.
 	 */
-	public boolean move(Direction direction, Fault fault) {
+	public void move(Direction direction) {
 		System.out.println(this + " is moving " + direction);
 		// elevator is moving
-		if(motor.move(fault)) {
-			if (direction == Direction.UP) {
-				floor++;
-			} else {
-				floor--;
-			}	
-			System.out.println(this + " arrived at floor " + floor + ". Destination floor " + this.moveCmd.getDestinationFloor());
-			return true;
-		}
-		else {
-			System.out.println(this + " has encountered a permanent error. Shutting down.");
-			return false;
-		}
+		motor.move();
+		if (direction == Direction.UP) {
+			floor++;
+		} else {
+			floor--;
+		}	
+		System.out.println(this + " arrived at floor " + floor + ". Destination floor " + this.moveCmd.getDestinationFloor());
 	}
 
 	/**
@@ -137,6 +131,7 @@ public class ElevatorSubsystem implements Runnable {
 	 * @return
 	 */
 	public boolean next() {
+		long waitTime;
 		switch (this.state) {
 			case INITIAL:
 				// Immediately move to the next state
@@ -166,46 +161,64 @@ public class ElevatorSubsystem implements Runnable {
 					// Identify what kind of elevator command was passed
 					if (command instanceof ElevatorMoveCommand) {
 						moveCmd = (ElevatorMoveCommand) command;
-						// Change the state of the Elevator to Moving up or Moving down or 
-						if (moveCmd.getDirection() == Direction.UP) {
-							this.state = ElevatorState.MOVINGUP;
-						} 
-						else if (moveCmd.getDirection() == Direction.DOWN) {
-							this.state = ElevatorState.MOVINGDOWN;
+						// Check if there is a permanent fault
+						if(moveCmd.getFault() == Fault.PERMANENT) {
+							this.state = ElevatorState.PERMANENT_FAULT;
+						}
+						else {
+							// Change the state of the Elevator to Moving up or Moving down or 
+							if (moveCmd.getDirection() == Direction.UP) {
+								this.state = ElevatorState.MOVING_UP;
+							} 
+							else if (moveCmd.getDirection() == Direction.DOWN) {
+								this.state = ElevatorState.MOVING_DOWN;
+							}
 						}
 					} 
 					else if (command instanceof ElevatorDoorCommand) {
-						this.state = ElevatorState.OPENING_CLOSING_DOORS;
 						doorCmd = (ElevatorDoorCommand) command;
+						if(doorCmd.getFault() == Fault.TRANSIENT) {
+							this.state = ElevatorState.TRANSIENT_FAULT;
+						}
+						else {							
+							this.state = ElevatorState.OPENING_CLOSING_DOORS;
+						}
 					}
-	
 				}
 				break;
-	
-			case MOVINGDOWN: 
-				if(move(Direction.DOWN, moveCmd.getFault())) {
-					// Move down was successful, so send back ElevatorEvent indicating such
-					sendElevatorMoveEvent();
-					this.state = ElevatorState.WAITING;					
-				}
-				// A permanent fault has occurred, so disable the elevator
-				else {
-					this.state = ElevatorState.DISABLED;
-				}
+			
+			case TRANSIENT_FAULT:
+				System.out.println(this + " has encountered a fault. Attempting to overcome it.");
+				waitTime = (long) (Constants.TRANSIENT_FAULT_TIME / Constants.TIME_MULTIPLIER);
+				try {
+					Thread.sleep(waitTime);
+				} catch (InterruptedException e) {}
+				System.out.println(this + " has overcome a transient fault.");
+				this.state = ElevatorState.OPENING_CLOSING_DOORS;
+				break;
+				
+			case PERMANENT_FAULT:
+				System.out.println(this + " has encountered a fault. Attempting to overcome it.");
+				waitTime = (long) (Constants.PERMANENT_FAULT_TIME / Constants.TIME_MULTIPLIER);
+				try {
+					Thread.sleep(waitTime);
+				} catch (InterruptedException e) {}
+				System.out.println(this + " has encountered a permanent fault. Shutting down.");
+				this.state = ElevatorState.DISABLED;
+				break;
+				
+			case MOVING_DOWN: 
+				move(Direction.DOWN);
+				sendElevatorMoveEvent();
+				this.state = ElevatorState.WAITING;	
 				break;
 	
-			case MOVINGUP: 
-				if(move(Direction.UP, moveCmd.getFault())) {
-					// Move down was successful, so send back ElevatorEvent indicating such*
-					sendElevatorMoveEvent();
-					this.state = ElevatorState.WAITING;					
-				}
-				// A permanent fault has occurred, so disable the elevator
-				else {
-					this.state = ElevatorState.DISABLED;
-				}
+			case MOVING_UP: 
+				move(Direction.UP);
+				sendElevatorMoveEvent();
+				this.state = ElevatorState.WAITING;	
 				break;
-	
+				
 			case DISABLED: 
 				sendElevatorFaultEvent();
 				this.state = ElevatorState.FINAL;
@@ -216,14 +229,10 @@ public class ElevatorSubsystem implements Runnable {
 				
 			case OPENING_CLOSING_DOORS:
 				System.out.println(this + " opening doors");
-				if(door.openClose(doorCmd.getFault())) {
-					System.out.println(this + " closed doors");
-					sendElevatorDoorEvent();
-					this.state = ElevatorState.WAITING;
-				}
-				else {
-					this.state = ElevatorState.DISABLED;
-				}
+				door.openClose();
+				System.out.println(this + " closed doors");
+				sendElevatorDoorEvent();
+				this.state = ElevatorState.WAITING;
 				break;		
 		}
 		return false;

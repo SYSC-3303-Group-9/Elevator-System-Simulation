@@ -67,7 +67,7 @@ public class ElevatorSubsystemTest {
 
 		// Transition to MOVINGUP state
 		system.next();
-		assertEquals(ElevatorState.MOVINGUP, system.getState());
+		assertEquals(ElevatorState.MOVING_UP, system.getState());
 		system.next();
 
 		// Construct a DatagramPacket for receiving packets up
@@ -106,7 +106,7 @@ public class ElevatorSubsystemTest {
 
 		// Transition to MOVINGUP state
 		system.next();
-		assertEquals(ElevatorState.MOVINGDOWN, system.getState());
+		assertEquals(ElevatorState.MOVING_DOWN, system.getState());
 		system.next();
 
 		// Construct a DatagramPacket for receiving packets up
@@ -144,7 +144,8 @@ public class ElevatorSubsystemTest {
 
 		// Transition to MOVINGDOWN state
 		system.next();
-		assertEquals(ElevatorState.MOVINGDOWN, system.getState());
+		assertEquals(ElevatorState.PERMANENT_FAULT, system.getState());
+		
 		// Transition to DISABLED state
 		system.next();
 		assertEquals(ElevatorState.DISABLED, system.getState());
@@ -155,7 +156,7 @@ public class ElevatorSubsystemTest {
 	}
 
 	@Test
-	void openCloseStuckElevatorDoors() throws IOException {
+	void openCloseElevatorDoors() throws IOException {
 		elevator = new ElevatorMotor();
 		system = new ElevatorSubsystem(elevator, 3, ran.nextInt(upperBound));
 
@@ -173,6 +174,38 @@ public class ElevatorSubsystemTest {
 		// Send the datagram packet to the server via the send/receive socket.
 		sendReceiveSocket.send(sendPacket);
 
+		// Transition to OPENING_CLOSING_DOORS state
+		system.next();
+		assertEquals(ElevatorState.OPENING_CLOSING_DOORS, system.getState());
+
+		// Transition to WAITING state
+		system.next();
+		assertEquals(ElevatorState.WAITING, system.getState());
+	}
+	
+	@Test
+	void transientFaultElevator() throws IOException {
+		elevator = new ElevatorMotor();
+		system = new ElevatorSubsystem(elevator, 3, ran.nextInt(upperBound));
+
+		// Transition to WAITING state
+		system.next();
+		assertEquals(ElevatorState.WAITING, system.getState());
+
+		// Move elevator one floor down
+		ElevatorDoorCommand request = new ElevatorDoorCommand(system.getId(), Fault.TRANSIENT);
+
+		// Construct a datagram packet that is to be sent
+		sendPacket = new DatagramPacket(request.toBytes(), request.toBytes().length, InetAddress.getLocalHost(),
+				Constants.ELEVATOR_BASE_PORT + system.getId());
+
+		// Send the datagram packet to the server via the send/receive socket.
+		sendReceiveSocket.send(sendPacket);
+
+		// Transition to TRANSIENT_FAULT state
+		system.next();
+		assertEquals(ElevatorState.TRANSIENT_FAULT, system.getState());
+		
 		// Transition to OPENING_CLOSING_DOORS state
 		system.next();
 		assertEquals(ElevatorState.OPENING_CLOSING_DOORS, system.getState());
