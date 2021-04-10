@@ -3,7 +3,6 @@ package elevator;
 import java.util.ArrayList;
 import scheduler.RunTimeConfig;
 import common.Clock;
-import common.Constants;
 
 public class Main {
 	public static void main(String[] args) {

@@ -24,33 +24,11 @@ class ElevatorMotorTest {
 	@Test
 	void testTimeElapsesNoFault() {
 		long startTime = Clock.getTime();
-		assertTrue(motor.move(Fault.NONE));
+		motor.move();
 		long elapsedTime = (long) ((Clock.getTime() - startTime) * Constants.TIME_MULTIPLIER);
 		// Elapsed time should be more than the time it takes to move floors
 		assertTrue(elapsedTime >= Constants.MOVE_TIME);
 		// Elapsed time should not be that much greater than the time it takes to move floors
 		assertTrue(elapsedTime < Constants.MOVE_TIME * 1.1);
-	}
-	
-	@Test
-	void testTimeElapsesTransientFault() {
-		long startTime = Clock.getTime();
-		assertTrue(motor.move(Fault.TRANSIENT));
-		long elapsedTime = (long) ((Clock.getTime() - startTime) * Constants.TIME_MULTIPLIER);
-		// Elapsed time should be more than the time it takes to move floors + fault time
-		assertTrue(elapsedTime >= (Constants.MOVE_TIME + Constants.TRANSIENT_FAULT_TIME));
-		// Elapsed time should not be that much greater than the time it takes to move floors + fault time
-		assertTrue(elapsedTime < (Constants.MOVE_TIME + Constants.TRANSIENT_FAULT_TIME) * 1.1);
-	}
-	
-	@Test
-	void testTimeElapsesPermanentFault() {
-		long startTime = Clock.getTime();
-		assertFalse(motor.move(Fault.PERMANENT));
-		long elapsedTime = (long) ((Clock.getTime() - startTime) * Constants.TIME_MULTIPLIER);
-		// Elapsed time should be more than the time it takes to move floors + fault time
-		assertTrue(elapsedTime >= Constants.PERMANENT_FAULT_TIME);
-		// Elapsed time should not be that much greater than the time it takes to move floors + fault time
-		assertTrue(elapsedTime < Constants.PERMANENT_FAULT_TIME * 1.1);
 	}
 }
