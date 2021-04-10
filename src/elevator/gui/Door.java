@@ -48,6 +48,7 @@ public class Door extends JLabel {
 		this.setText(state.toString());
 	}
 	
+	// Remove when done testing
 	public static void main(String args[]) {
 		Door d = new Door();
 		JFrame frame = new JFrame();

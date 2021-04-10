@@ -1,7 +1,9 @@
 package elevator.gui;
 
 import java.awt.Color;
+import java.awt.GridLayout;
 
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -17,6 +19,7 @@ public class DirectionLampPanel extends JPanel {
 	 * Creates a DirectionLampPanel instance
 	 */
 	public DirectionLampPanel() {
+		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		up = new DirectionLamp(Direction.UP, Constants.UP_ARROW);
 		down = new DirectionLamp(Direction.DOWN, Constants.DOWN_ARROW);
 		this.add(down);
