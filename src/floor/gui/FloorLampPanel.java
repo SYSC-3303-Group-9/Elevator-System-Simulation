@@ -88,6 +88,9 @@ public class FloorLampPanel extends JPanel {
 		if(fault == Fault.TRANSIENT) {
 			c = Color.ORANGE;
 		}
+		else if(fault == Fault.NONE) {
+			c = Color.YELLOW;
+		}
 		else {
 			c = Color.RED;
 		}
