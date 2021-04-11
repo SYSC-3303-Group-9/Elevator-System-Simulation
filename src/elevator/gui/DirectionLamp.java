@@ -22,7 +22,6 @@ public class DirectionLamp extends JLabel {
 	 * @param source    the file name that contains the direction icon
 	 */
 	public DirectionLamp(Direction direction, String source) {
-		System.out.println(source);
 		this.direction = direction;
 		this.source = source;
 		this.setBorder(BorderFactory.createLineBorder(Color.BLACK));

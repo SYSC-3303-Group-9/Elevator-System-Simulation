@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 
 import common.Clock;
 import common.Constants;
+import elevator.gui.Door;
 
 class ElevatorDoorTest {
 	ElevatorDoor door;
 	public static final int TOTAL_DOOR_TIME = 2 * Constants.DOOR_TIME + Constants.LOADING_TIME;
 	@BeforeEach
 	void setUp() throws Exception {
-		door = new ElevatorDoor();
+		door = new ElevatorDoor(new Door());
 	}
 
 	@AfterEach

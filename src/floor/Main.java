@@ -12,7 +12,13 @@ public class Main {
 	public static void main(String[] args) throws SocketException {
 		// Sync the application clock with the other applications.
 		RunTimeConfig config = Clock.sync("floor");
-		
+		// This is a TEMPORARY FIX to avoid floor getting ahead of elevator subsystem
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		// Create the ElevatorEvent buffer.
 		// TODO: Connect the output side of this buffer to the FloorFrame UI.
 		Buffer<ElevatorEvent> elevatorEventBuffer = new Buffer<ElevatorEvent>();

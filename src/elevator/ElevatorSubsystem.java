@@ -23,6 +23,7 @@ public class ElevatorSubsystem implements Runnable {
 	private DatagramPacket receivePacket, sendPacket;
 
 	public ElevatorSubsystem(int id, ElevatorPanel panel) {
+		this.panel = panel;
 		this.state = ElevatorState.INITIAL;
 		this.motor = new ElevatorMotor();
 		this.door = new ElevatorDoor(panel.getDoor());
@@ -143,6 +144,7 @@ public class ElevatorSubsystem implements Runnable {
 			case WAITING:
 				// Receive new ElevatorCommand packet from ElevatorComunicator via Elevator Base
 				// Port + Elevator ID.
+				panel.setElevatorState(this.state);
 				byte data[] = new byte[100];
 				receivePacket = new DatagramPacket(data, data.length);
 	
@@ -151,7 +153,6 @@ public class ElevatorSubsystem implements Runnable {
 				} catch (IOException e) {
 					System.out.println("ElevatorSubsystem, run " + e);
 				}
-	
 				command = ElevatorCommand.fromBytes(receivePacket.getData());
 	
 				// If the buffer was disabled and returned null, stop execution.
@@ -190,6 +191,7 @@ public class ElevatorSubsystem implements Runnable {
 				break;
 			
 			case TRANSIENT_FAULT:
+				panel.setElevatorState(this.state);
 				System.out.println(this + " has encountered a fault. Attempting to overcome it.");
 				waitTime = (long) (Constants.TRANSIENT_FAULT_TIME / Constants.TIME_MULTIPLIER);
 				try {
@@ -200,6 +202,7 @@ public class ElevatorSubsystem implements Runnable {
 				break;
 				
 			case PERMANENT_FAULT:
+				panel.setElevatorState(this.state);
 				System.out.println(this + " has encountered a fault. Attempting to overcome it.");
 				waitTime = (long) (Constants.PERMANENT_FAULT_TIME / Constants.TIME_MULTIPLIER);
 				try {
@@ -210,26 +213,31 @@ public class ElevatorSubsystem implements Runnable {
 				break;
 				
 			case MOVING_DOWN: 
+				panel.setElevatorState(this.state);
 				move(Direction.DOWN);
 				sendElevatorMoveEvent();
 				this.state = ElevatorState.WAITING;	
 				break;
 	
 			case MOVING_UP: 
+				panel.setElevatorState(this.state);
 				move(Direction.UP);
 				sendElevatorMoveEvent();
 				this.state = ElevatorState.WAITING;	
 				break;
 				
 			case DISABLED: 
+				panel.setElevatorState(this.state);
 				sendElevatorFaultEvent();
 				this.state = ElevatorState.FINAL;
 				break;
 	
 			case FINAL:
+				panel.setElevatorState(this.state);
 				return true;
 				
 			case OPENING_CLOSING_DOORS:
+				panel.setElevatorState(this.state);
 				System.out.println(this + " opening doors");
 				door.openClose();
 				System.out.println(this + " closed doors");

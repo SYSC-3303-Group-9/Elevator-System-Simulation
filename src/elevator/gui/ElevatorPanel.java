@@ -70,4 +70,8 @@ public class ElevatorPanel extends JPanel {
 	public DirectionLampPanel getDirectionLamp() {
 		return this.directionLamp;
 	}
+	
+	public void setElevatorState(ElevatorState state) {
+		elevatorState.setText(state.toString());
+	}
 }
