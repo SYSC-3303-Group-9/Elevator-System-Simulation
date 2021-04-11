@@ -56,6 +56,11 @@ public class Constants {
 	public static final int SCHEDULER_RECEIVER_PORT = 123;
 	
 	/**
+	 * Measurement's port.
+	 */
+	public static final int MEASUREMENT_RECEIVER_PORT = 139;
+	
+	/**
 	 * The input file path.
 	 * File is located in resources/input.txt by default.
 	 */

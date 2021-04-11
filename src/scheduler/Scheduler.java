@@ -1,7 +1,14 @@
 package scheduler;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import common.Constants;
 import common.IBufferInput;
 import common.IBufferOutput;
 import elevator.Direction;
@@ -40,6 +47,9 @@ public class Scheduler implements Runnable {
 	private IBufferOutput<SchedulerMessage> outputBuffer;
 	private IBufferInput<ElevatorCommand> inputBuffer;
 	
+	
+	private DatagramSocket sendSocket;
+	
 	/**
 	 * Creates a new instance of the Scheduler class.
 	 * @param numElevators The number of elevators to connect to.
@@ -61,6 +71,13 @@ public class Scheduler implements Runnable {
 		for (int i = 0; i < numElevators; i++) {
 			elevators.add(new SchedulerElevator(i, 1, Direction.WAITING));
 		}
+		
+		try {
+			this.sendSocket = new DatagramSocket();
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	/**
@@ -76,6 +93,7 @@ public class Scheduler implements Runnable {
 		while(true) {
 			// If tick returns true, stop state machine.
 			if (tick()) {
+				sendSocket.close();
 				break;
 			}
 		}
@@ -245,6 +263,19 @@ public class Scheduler implements Runnable {
 								+ " for job "
 								+ job.getJobId());
 						completedJobs.add(job);
+						
+						try {
+							//Notify Measurement that this job is done using DatagramPacket on Measurement's receiver port.
+							DatagramPacket sendPacket = new DatagramPacket(job.getInputData().toBytes(), job.getInputData().toBytes().length, InetAddress.getLocalHost(), Constants.MEASUREMENT_RECEIVER_PORT);
+							sendSocket.send(sendPacket);
+						} catch (UnknownHostException e) {
+							e.printStackTrace();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						
+						
+						
 					} else {
 						shouldRequestDoors = true;
 						this.elevatorToCommand = elevator;
