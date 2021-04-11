@@ -22,12 +22,12 @@ public class Constants {
 	/**
 	 * Time it takes for the system to overcome a transient fault in milliseconds.
 	 */
-	public static final int TRANSIENT_FAULT_TIME = 3000;
+	public static final int TRANSIENT_FAULT_TIME = 5000;
 	
 	/**
 	 * Time it takes for the system to realize a permanent fault has occurred in milliseconds.
 	 */
-	public static final int PERMANENT_FAULT_TIME = 7000;
+	public static final int PERMANENT_FAULT_TIME = 9000;
 	
 	/**
 	 * ElevatorSubsystem's base port. Every sequential elevator is assigned

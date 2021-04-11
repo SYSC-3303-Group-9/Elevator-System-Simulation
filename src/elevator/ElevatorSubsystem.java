@@ -6,26 +6,45 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 import common.Constants;
+import elevator.gui.DirectionLampPanel;
+import elevator.gui.ElevatorPanel;
+import floor.gui.FloorLampPanel;
 
 public class ElevatorSubsystem implements Runnable {
 
 	private ElevatorMotor motor;
 	private ElevatorState state;
-	private ElevatorDoor door;
 	private int id;
 	private int floor;
+	private int prevDestination;
+	private boolean transientFaultRegistered;
+	
+	// Command variables
 	private ElevatorCommand command = null;
 	private ElevatorMoveCommand moveCmd = null;
 	private ElevatorDoorCommand doorCmd = null;
+	
+	// Datagram variables
 	private DatagramSocket sendReceiveSocket;
 	private DatagramPacket receivePacket, sendPacket;
+	
+	// GUI variables
+	private ElevatorDoor door;
+	private ElevatorPanel panel;
+	private FloorLampPanel floorLamps;
+	private DirectionLampPanel directionLamps;
 
-	public ElevatorSubsystem(ElevatorMotor motor, int floor, int id) {
-		this.motor = motor;
+	public ElevatorSubsystem(int id, ElevatorPanel panel) {
+		this.prevDestination = -1;
+		this.panel = panel;
+		this.floorLamps = panel.getFloorLamps();
+		this.directionLamps = panel.getDirectionLamps();
 		this.state = ElevatorState.INITIAL;
-		this.door = new ElevatorDoor();
+		this.motor = new ElevatorMotor();
+		this.door = new ElevatorDoor(panel.getDoor());
 		this.id = id;
-		this.floor = floor;
+		this.floor = 1;
+		this.floorLamps.turnOnLamp(this.floor);
 		try {
 			// Unique port for each elevator.
 			this.sendReceiveSocket = new DatagramSocket(Constants.ELEVATOR_BASE_PORT + id);
@@ -119,7 +138,9 @@ public class ElevatorSubsystem implements Runnable {
 			floor++;
 		} else {
 			floor--;
-		}	
+		}
+		floorLamps.turnOffLamp();
+		floorLamps.turnOnLamp(floor);
 		System.out.println(this + " arrived at floor " + floor + ". Destination floor " + this.moveCmd.getDestinationFloor());
 	}
 
@@ -141,6 +162,7 @@ public class ElevatorSubsystem implements Runnable {
 			case WAITING:
 				// Receive new ElevatorCommand packet from ElevatorComunicator via Elevator Base
 				// Port + Elevator ID.
+				panel.setElevatorState(this.state);
 				byte data[] = new byte[100];
 				receivePacket = new DatagramPacket(data, data.length);
 	
@@ -149,7 +171,6 @@ public class ElevatorSubsystem implements Runnable {
 				} catch (IOException e) {
 					System.out.println("ElevatorSubsystem, run " + e);
 				}
-	
 				command = ElevatorCommand.fromBytes(receivePacket.getData());
 	
 				// If the buffer was disabled and returned null, stop execution.
@@ -162,10 +183,18 @@ public class ElevatorSubsystem implements Runnable {
 					if (command instanceof ElevatorMoveCommand) {
 						moveCmd = (ElevatorMoveCommand) command;
 						// Check if there is a permanent fault
+						if (moveCmd.getFault() == Fault.TRANSIENT) {
+							transientFaultRegistered = true;
+						}
 						if(moveCmd.getFault() == Fault.PERMANENT) {
 							this.state = ElevatorState.PERMANENT_FAULT;
 						}
 						else {
+							// Update destination in GUI
+							if(moveCmd.getDestinationFloor() != prevDestination) {
+								panel.setDestination(moveCmd.getDestinationFloor());
+								prevDestination = moveCmd.getDestinationFloor();
+							}
 							// Change the state of the Elevator to Moving up or Moving down or 
 							if (moveCmd.getDirection() == Direction.UP) {
 								this.state = ElevatorState.MOVING_UP;
@@ -177,8 +206,10 @@ public class ElevatorSubsystem implements Runnable {
 					} 
 					else if (command instanceof ElevatorDoorCommand) {
 						doorCmd = (ElevatorDoorCommand) command;
-						if(doorCmd.getFault() == Fault.TRANSIENT) {
+						// Won't ever happen in current implementation
+						if(transientFaultRegistered) {
 							this.state = ElevatorState.TRANSIENT_FAULT;
+							transientFaultRegistered = false;
 						}
 						else {							
 							this.state = ElevatorState.OPENING_CLOSING_DOORS;
@@ -188,32 +219,44 @@ public class ElevatorSubsystem implements Runnable {
 				break;
 			
 			case TRANSIENT_FAULT:
+				panel.setElevatorState(this.state);
 				System.out.println(this + " has encountered a fault. Attempting to overcome it.");
+				floorLamps.errorLamp(Fault.TRANSIENT);
 				waitTime = (long) (Constants.TRANSIENT_FAULT_TIME / Constants.TIME_MULTIPLIER);
 				try {
 					Thread.sleep(waitTime);
 				} catch (InterruptedException e) {}
+				floorLamps.errorLamp(Fault.NONE);
 				System.out.println(this + " has overcome a transient fault.");
 				this.state = ElevatorState.OPENING_CLOSING_DOORS;
 				break;
 				
 			case PERMANENT_FAULT:
+				directionLamps.turnOffBothLamps();
+				panel.setElevatorState(this.state);
 				System.out.println(this + " has encountered a fault. Attempting to overcome it.");
+				floorLamps.errorLamp(Fault.TRANSIENT);
 				waitTime = (long) (Constants.PERMANENT_FAULT_TIME / Constants.TIME_MULTIPLIER);
 				try {
 					Thread.sleep(waitTime);
 				} catch (InterruptedException e) {}
 				System.out.println(this + " has encountered a permanent fault. Shutting down.");
+				floorLamps.errorLamp(Fault.PERMANENT);
+				panel.setDestination(-1);
 				this.state = ElevatorState.DISABLED;
 				break;
 				
-			case MOVING_DOWN: 
+			case MOVING_DOWN:
+				directionLamps.turnOnLamp(Direction.DOWN);
+				panel.setElevatorState(this.state);
 				move(Direction.DOWN);
 				sendElevatorMoveEvent();
 				this.state = ElevatorState.WAITING;	
 				break;
 	
 			case MOVING_UP: 
+				directionLamps.turnOnLamp(Direction.UP);
+				panel.setElevatorState(this.state);
 				move(Direction.UP);
 				sendElevatorMoveEvent();
 				this.state = ElevatorState.WAITING;	
@@ -228,6 +271,9 @@ public class ElevatorSubsystem implements Runnable {
 				return true;
 				
 			case OPENING_CLOSING_DOORS:
+				panel.setDestination(-1);
+				directionLamps.turnOffBothLamps();
+				panel.setElevatorState(this.state);
 				System.out.println(this + " opening doors");
 				door.openClose();
 				System.out.println(this + " closed doors");

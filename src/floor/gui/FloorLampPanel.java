@@ -8,6 +8,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import elevator.Direction;
+import elevator.Fault;
 import elevator.gui.DirectionLampPanel;
 
 public class FloorLampPanel extends JPanel {
@@ -15,6 +16,7 @@ public class FloorLampPanel extends JPanel {
 	private FloorLamp[][] floorGrid;
 	private int columns;
 	private int rows;
+	private int onLamp;
 
 	/**
 	 * Creates a FloorLampPanel instance
@@ -31,11 +33,14 @@ public class FloorLampPanel extends JPanel {
 		for (int i = 0; i < this.rows; i++) {
 			for (int j = 0; j < this.columns; j++) {
 				this.floorGrid[j][i] = new FloorLamp(floor);
+				this.floorGrid[j][i].setBackground(Color.WHITE);
 				floor--;
 				if(this.floorGrid[j][i].getFloor() % 2 == 0) {
 					this.floorGrid[j][i] = new FloorLamp(this.floorGrid[j][i].getFloor() - 1);
+					this.floorGrid[j][i].setBackground(Color.WHITE);
 				} else {
 					this.floorGrid[j][i] = new FloorLamp(this.floorGrid[j][i].getFloor() + 1);
+					this.floorGrid[j][i].setBackground(Color.WHITE);
 				}
 				this.add(this.floorGrid[j][i]);
 			}
@@ -55,6 +60,7 @@ public class FloorLampPanel extends JPanel {
 				}
 			}
 		}
+		onLamp = floor;
 	}
 
 	/**
@@ -66,7 +72,32 @@ public class FloorLampPanel extends JPanel {
 		for (int i = 0; i < this.rows; i++) {
 			for (int j = 0; j < this.columns; j++) {
 				if (this.floorGrid[j][i].getFloor() == floor) {
-					this.floorGrid[j][i].setBackground(Color.GRAY);
+					this.floorGrid[j][i].setBackground(Color.WHITE);
+				}
+			}
+		}
+	}
+	
+	public void turnOffLamp() {
+		turnOffLamp(onLamp);
+		onLamp = -1;
+	}
+	
+	public void errorLamp(Fault fault) {
+		Color c;
+		if(fault == Fault.TRANSIENT) {
+			c = Color.ORANGE;
+		}
+		else if(fault == Fault.NONE) {
+			c = Color.YELLOW;
+		}
+		else {
+			c = Color.RED;
+		}
+		for (int i = 0; i < this.rows; i++) {
+			for (int j = 0; j < this.columns; j++) {
+				if (this.floorGrid[j][i].getFloor() == onLamp) {
+					this.floorGrid[j][i].setBackground(c);
 				}
 			}
 		}

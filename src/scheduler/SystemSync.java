@@ -40,6 +40,7 @@ public class SystemSync {
 			se.printStackTrace();
 			System.exit(1);
 		}
+		System.out.println("Config done");
 	}
 
 	public void run() {
@@ -82,6 +83,7 @@ public class SystemSync {
 	 */
 	public boolean syncing() {
 		// Construct a DatagramPacket for receiving packets
+		System.out.println("Syncing");
 		byte data[] = new byte[8];
 		receivePacket = new DatagramPacket(data, data.length);
 

@@ -3,17 +3,21 @@ package elevator;
 import java.util.ArrayList;
 import scheduler.RunTimeConfig;
 import common.Clock;
+import elevator.gui.ElevatorFrame;
 
 public class Main {
 	public static void main(String[] args) {
 		// Sync the application clock with the other applications.
 		RunTimeConfig config = Clock.sync("elevator");
-
+		
+		// Create an ElevatorFrame to display the elevators
+		ElevatorFrame elevatorFrame = new ElevatorFrame(config.getNumElevators());
+		
 		// Create the elevators.
 		ArrayList<ElevatorSubsystem> elevators = new ArrayList<ElevatorSubsystem>();
 		for (int i = 0; i < config.getNumElevators(); i++) {
 			// Elevator IDs are assigned sequentially. All elevators start at floor 1.
-			elevators.add(new ElevatorSubsystem(new ElevatorMotor(), 1, i));
+			elevators.add(new ElevatorSubsystem(i, elevatorFrame.getElevatorPanel(i)));
 		}
 
 		// Create the elevator threads.
