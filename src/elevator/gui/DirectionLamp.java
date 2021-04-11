@@ -27,7 +27,7 @@ public class DirectionLamp extends JLabel {
 		this.source = source;
 		this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		this.setOpaque(true); // Only way color change is seen on Mac OS
-		this.setBounds(0, 0, 30, 30);
+		this.setBounds(0, 0, 50, 50);
 		this.setIcon(resizeIcon(new ImageIcon(source), this.getWidth(), this.getHeight()));
 	}
 

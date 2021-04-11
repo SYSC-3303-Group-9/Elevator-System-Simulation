@@ -1,10 +1,8 @@
 package elevator.gui;
 
 import java.awt.Color;
-import java.awt.GridLayout;
 
 import javax.swing.BoxLayout;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import common.Constants;

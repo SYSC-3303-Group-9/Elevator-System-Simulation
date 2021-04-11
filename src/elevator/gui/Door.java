@@ -1,5 +1,6 @@
 package elevator.gui;
 
+import java.awt.Font;
 import java.awt.Image;
 
 import javax.swing.Icon;
@@ -11,7 +12,7 @@ import javax.swing.JLabel;
 public class Door extends JLabel {
 	private static final int WIDTH = 100;
 	private static final int HEIGHT = 100;
-	
+	private static final Font font = new Font("Dialog", Font.BOLD, 16);
 	/**
 	 * Creates a direction button lamp
 	 * 
@@ -21,6 +22,7 @@ public class Door extends JLabel {
 	public Door() {
 		this.setOpaque(true);
 		this.setBounds(0, 0, WIDTH, HEIGHT);
+		this.setFont(font);
 		this.setHorizontalAlignment(JLabel.CENTER);
 		this.setHorizontalTextPosition(JLabel.CENTER);
 		this.setVerticalTextPosition(JLabel.BOTTOM);
