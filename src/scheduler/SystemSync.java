@@ -28,7 +28,6 @@ public class SystemSync {
 
 		//do nothing while configuration frame is not done
 		while (!configFrame.isDone()) {
-			System.out.print("waiting in SystemSync()");
 		}
 		//create a RunTimeConfig object using data entered in configuration frame
 		configData = new RunTimeConfig(configFrame.getFloorNum(), configFrame.getElevatorNum(),
@@ -40,6 +39,7 @@ public class SystemSync {
 			se.printStackTrace();
 			System.exit(1);
 		}
+		System.out.println("Config done");
 	}
 
 	public void run() {
@@ -82,6 +82,7 @@ public class SystemSync {
 	 */
 	public boolean syncing() {
 		// Construct a DatagramPacket for receiving packets
+		System.out.println("Syncing");
 		byte data[] = new byte[8];
 		receivePacket = new DatagramPacket(data, data.length);
 

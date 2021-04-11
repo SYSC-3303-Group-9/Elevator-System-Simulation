@@ -6,12 +6,14 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 import common.Constants;
+import elevator.gui.ElevatorPanel;
 
 public class ElevatorSubsystem implements Runnable {
 
 	private ElevatorMotor motor;
 	private ElevatorState state;
 	private ElevatorDoor door;
+	private ElevatorPanel panel;
 	private int id;
 	private int floor;
 	private ElevatorCommand command = null;
@@ -20,12 +22,12 @@ public class ElevatorSubsystem implements Runnable {
 	private DatagramSocket sendReceiveSocket;
 	private DatagramPacket receivePacket, sendPacket;
 
-	public ElevatorSubsystem(ElevatorMotor motor, int floor, int id) {
-		this.motor = motor;
+	public ElevatorSubsystem(int id, ElevatorPanel panel) {
 		this.state = ElevatorState.INITIAL;
-		this.door = new ElevatorDoor();
+		this.motor = new ElevatorMotor();
+		this.door = new ElevatorDoor(panel.getDoor());
 		this.id = id;
-		this.floor = floor;
+		this.floor = 1;
 		try {
 			// Unique port for each elevator.
 			this.sendReceiveSocket = new DatagramSocket(Constants.ELEVATOR_BASE_PORT + id);

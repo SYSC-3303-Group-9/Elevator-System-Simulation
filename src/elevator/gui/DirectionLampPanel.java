@@ -49,5 +49,10 @@ public class DirectionLampPanel extends JPanel {
 			down.setBackground(Color.GRAY);
 		}
 	}
+	
+	public void turnOffBothLamps() {
+		turnOffLamp(Direction.UP);
+		turnOffLamp(Direction.DOWN);
+	}
 
 }
