@@ -63,12 +63,12 @@ public class ElevatorPanel extends JPanel {
 		return this.door;
 	}
 	
-	public FloorLampPanel getFloorLamp() {
-		return this.floorLamp;
+	public DirectionLampPanel getDirectionLamps() {
+		return this.directionLamp;
 	}
 	
-	public DirectionLampPanel getDirectionLamp() {
-		return this.directionLamp;
+	public FloorLampPanel getFloorLamps() {
+		return this.floorLamp;
 	}
 	
 	public void setElevatorState(ElevatorState state) {

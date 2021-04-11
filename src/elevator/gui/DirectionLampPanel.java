@@ -19,7 +19,9 @@ public class DirectionLampPanel extends JPanel {
 	public DirectionLampPanel() {
 		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		up = new DirectionLamp(Direction.UP, Constants.UP_ARROW);
+		up.setBackground(Color.WHITE);
 		down = new DirectionLamp(Direction.DOWN, Constants.DOWN_ARROW);
+		down.setBackground(Color.WHITE);
 		this.add(down);
 		this.add(up);
 	}
@@ -44,9 +46,9 @@ public class DirectionLampPanel extends JPanel {
 	 */
 	public void turnOffLamp(Direction direction) {
 		if (direction == Direction.UP) {
-			up.setBackground(Color.GRAY);
+			up.setBackground(Color.WHITE);
 		} else if (direction == Direction.DOWN) {
-			down.setBackground(Color.GRAY);
+			down.setBackground(Color.WHITE);
 		}
 	}
 	

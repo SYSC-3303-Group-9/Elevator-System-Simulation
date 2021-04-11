@@ -6,29 +6,42 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 import common.Constants;
+import elevator.gui.DirectionLampPanel;
 import elevator.gui.ElevatorPanel;
+import floor.gui.FloorLampPanel;
 
 public class ElevatorSubsystem implements Runnable {
 
 	private ElevatorMotor motor;
 	private ElevatorState state;
-	private ElevatorDoor door;
-	private ElevatorPanel panel;
 	private int id;
 	private int floor;
+	
+	// Command variables
 	private ElevatorCommand command = null;
 	private ElevatorMoveCommand moveCmd = null;
 	private ElevatorDoorCommand doorCmd = null;
+	
+	// Datagram variables
 	private DatagramSocket sendReceiveSocket;
 	private DatagramPacket receivePacket, sendPacket;
+	
+	// GUI variables
+	private ElevatorDoor door;
+	private ElevatorPanel panel;
+	private FloorLampPanel floorLamps;
+	private DirectionLampPanel directionLamps;
 
 	public ElevatorSubsystem(int id, ElevatorPanel panel) {
 		this.panel = panel;
+		this.floorLamps = panel.getFloorLamps();
+		this.directionLamps = panel.getDirectionLamps();
 		this.state = ElevatorState.INITIAL;
 		this.motor = new ElevatorMotor();
 		this.door = new ElevatorDoor(panel.getDoor());
 		this.id = id;
 		this.floor = 1;
+		this.floorLamps.turnOnLamp(this.floor);
 		try {
 			// Unique port for each elevator.
 			this.sendReceiveSocket = new DatagramSocket(Constants.ELEVATOR_BASE_PORT + id);
@@ -122,7 +135,9 @@ public class ElevatorSubsystem implements Runnable {
 			floor++;
 		} else {
 			floor--;
-		}	
+		}
+		floorLamps.turnOffLamp();
+		floorLamps.turnOnLamp(floor);
 		System.out.println(this + " arrived at floor " + floor + ". Destination floor " + this.moveCmd.getDestinationFloor());
 	}
 
@@ -180,6 +195,7 @@ public class ElevatorSubsystem implements Runnable {
 					} 
 					else if (command instanceof ElevatorDoorCommand) {
 						doorCmd = (ElevatorDoorCommand) command;
+						// Won't ever happen in current implementation
 						if(doorCmd.getFault() == Fault.TRANSIENT) {
 							this.state = ElevatorState.TRANSIENT_FAULT;
 						}
@@ -193,6 +209,7 @@ public class ElevatorSubsystem implements Runnable {
 			case TRANSIENT_FAULT:
 				panel.setElevatorState(this.state);
 				System.out.println(this + " has encountered a fault. Attempting to overcome it.");
+				floorLamps.errorLamp(Fault.TRANSIENT);
 				waitTime = (long) (Constants.TRANSIENT_FAULT_TIME / Constants.TIME_MULTIPLIER);
 				try {
 					Thread.sleep(waitTime);
@@ -202,17 +219,21 @@ public class ElevatorSubsystem implements Runnable {
 				break;
 				
 			case PERMANENT_FAULT:
+				directionLamps.turnOffBothLamps();
 				panel.setElevatorState(this.state);
 				System.out.println(this + " has encountered a fault. Attempting to overcome it.");
+				floorLamps.errorLamp(Fault.TRANSIENT);
 				waitTime = (long) (Constants.PERMANENT_FAULT_TIME / Constants.TIME_MULTIPLIER);
 				try {
 					Thread.sleep(waitTime);
 				} catch (InterruptedException e) {}
 				System.out.println(this + " has encountered a permanent fault. Shutting down.");
+				floorLamps.errorLamp(Fault.PERMANENT);
 				this.state = ElevatorState.DISABLED;
 				break;
 				
-			case MOVING_DOWN: 
+			case MOVING_DOWN:
+				directionLamps.turnOnLamp(Direction.DOWN);
 				panel.setElevatorState(this.state);
 				move(Direction.DOWN);
 				sendElevatorMoveEvent();
@@ -220,6 +241,7 @@ public class ElevatorSubsystem implements Runnable {
 				break;
 	
 			case MOVING_UP: 
+				directionLamps.turnOnLamp(Direction.UP);
 				panel.setElevatorState(this.state);
 				move(Direction.UP);
 				sendElevatorMoveEvent();
@@ -227,16 +249,15 @@ public class ElevatorSubsystem implements Runnable {
 				break;
 				
 			case DISABLED: 
-				panel.setElevatorState(this.state);
 				sendElevatorFaultEvent();
 				this.state = ElevatorState.FINAL;
 				break;
 	
 			case FINAL:
-				panel.setElevatorState(this.state);
 				return true;
 				
 			case OPENING_CLOSING_DOORS:
+				directionLamps.turnOffBothLamps();
 				panel.setElevatorState(this.state);
 				System.out.println(this + " opening doors");
 				door.openClose();
