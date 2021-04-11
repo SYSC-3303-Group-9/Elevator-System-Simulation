@@ -49,32 +49,4 @@ public class Door extends JLabel {
 		this.setIcon(resizeIcon(state.getIcon(), WIDTH, HEIGHT));
 		this.setText(state.toString());
 	}
-	
-	// Remove when done testing
-	public static void main(String args[]) {
-		Door d = new Door();
-		JFrame frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(400, 200);
-		frame.getContentPane().add(d);
-		frame.setVisible(true);
-		while(true) {
-			try {
-				Thread.sleep(2000);
-			} catch (Exception e) {}
-			d.setState(DoorState.DOOR_OPENING);
-			try {
-				Thread.sleep(2000);
-			} catch (Exception e) {}
-			d.setState(DoorState.DOOR_OPEN);
-			try {
-				Thread.sleep(2000);
-			} catch (Exception e) {}
-			d.setState(DoorState.DOOR_CLOSING);
-			try {
-				Thread.sleep(2000);
-			} catch (Exception e) {}
-			d.setState(DoorState.DOOR_CLOSED);
-		}
-	}
 }
