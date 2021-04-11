@@ -16,6 +16,7 @@ public class ElevatorSubsystem implements Runnable {
 	private ElevatorState state;
 	private int id;
 	private int floor;
+	private int prevDestination;
 	
 	// Command variables
 	private ElevatorCommand command = null;
@@ -33,6 +34,7 @@ public class ElevatorSubsystem implements Runnable {
 	private DirectionLampPanel directionLamps;
 
 	public ElevatorSubsystem(int id, ElevatorPanel panel) {
+		this.prevDestination = -1;
 		this.panel = panel;
 		this.floorLamps = panel.getFloorLamps();
 		this.directionLamps = panel.getDirectionLamps();
@@ -184,6 +186,11 @@ public class ElevatorSubsystem implements Runnable {
 							this.state = ElevatorState.PERMANENT_FAULT;
 						}
 						else {
+							// Update destination in GUI
+							if(moveCmd.getDestinationFloor() != prevDestination) {
+								panel.setDestination(moveCmd.getDestinationFloor());
+								prevDestination = moveCmd.getDestinationFloor();
+							}
 							// Change the state of the Elevator to Moving up or Moving down or 
 							if (moveCmd.getDirection() == Direction.UP) {
 								this.state = ElevatorState.MOVING_UP;
@@ -229,6 +236,7 @@ public class ElevatorSubsystem implements Runnable {
 				} catch (InterruptedException e) {}
 				System.out.println(this + " has encountered a permanent fault. Shutting down.");
 				floorLamps.errorLamp(Fault.PERMANENT);
+				panel.setDestination(-1);
 				this.state = ElevatorState.DISABLED;
 				break;
 				
@@ -257,6 +265,7 @@ public class ElevatorSubsystem implements Runnable {
 				return true;
 				
 			case OPENING_CLOSING_DOORS:
+				panel.setDestination(-1);
 				directionLamps.turnOffBothLamps();
 				panel.setElevatorState(this.state);
 				System.out.println(this + " opening doors");

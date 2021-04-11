@@ -63,6 +63,15 @@ public class ElevatorPanel extends JPanel {
 		return this.door;
 	}
 	
+	public void setDestination(int destination) {
+		if(destination == -1) {
+			elevatorDestination.setText("Destination: N/A");
+		}
+		else {
+			elevatorDestination.setText("Destination: " + destination);
+		}
+	}
+	
 	public DirectionLampPanel getDirectionLamps() {
 		return this.directionLamp;
 	}
