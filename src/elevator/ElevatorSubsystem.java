@@ -186,7 +186,7 @@ public class ElevatorSubsystem implements Runnable {
 						if (moveCmd.getFault() == Fault.TRANSIENT) {
 							transientFaultRegistered = true;
 						}
-						if(moveCmd.getFault() == Fault.PERMANENT) {
+						if (moveCmd.getFault() == Fault.PERMANENT) {
 							this.state = ElevatorState.PERMANENT_FAULT;
 						}
 						else {
@@ -206,8 +206,7 @@ public class ElevatorSubsystem implements Runnable {
 					} 
 					else if (command instanceof ElevatorDoorCommand) {
 						doorCmd = (ElevatorDoorCommand) command;
-						// Won't ever happen in current implementation
-						if(transientFaultRegistered) {
+						if (transientFaultRegistered || doorCmd.getFault() == Fault.TRANSIENT) {
 							this.state = ElevatorState.TRANSIENT_FAULT;
 							transientFaultRegistered = false;
 						}

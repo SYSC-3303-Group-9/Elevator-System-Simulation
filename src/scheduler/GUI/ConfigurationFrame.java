@@ -3,6 +3,7 @@ package scheduler.GUI;
 import javax.swing.*;
 
 import common.Constants;
+import common.ISystemSyncListener;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -10,24 +11,34 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 @SuppressWarnings("serial")
-public class ConfigurationFrame extends JFrame implements ActionListener {
+public class ConfigurationFrame extends JFrame implements ISystemSyncListener {
+	/**
+	 * Used to check if values are registered and frame has been closed.
+	 */
+	private boolean isDone = false;
 
 	/**
-	 * JTextArea for the elevator,floor and file inputs
+	 * JTextArea for the elevator, floor and file inputs.
 	 */
 	private JTextField elevators, floors, file;
+	
+	/**
+	 * JLabel for elevator and floor subsystem statuses.
+	 */
+	private JLabel lbElevatorStatus, lbFloorStatus;
 
 	/**
-	 * JButton for the open and start buttons
+	 * JButton for the open and start buttons.
 	 */
 	private JButton open, start;
 
 	/**
-	 * JFileChooser for choosing files
+	 * JFileChooser for choosing files.
 	 */
 	private JFileChooser fc;
+	
 	/**
-	 * Strings to contain file value from entered from text field
+	 * Strings to contain file value from entered from text field.
 	 */
 	private String inputFile = null;
 
@@ -40,11 +51,8 @@ public class ConfigurationFrame extends JFrame implements ActionListener {
 	 * JFrame for configuration data
 	 */
 	private JFrame frame;
-
-	/**
-	 * used to check if values are registered and frame has been closed
-	 */
-	private boolean done = false;
+	
+	private boolean elevatorReady = false, floorReady = false;
 
 	public ConfigurationFrame() {
 		// Create the frame
@@ -81,66 +89,77 @@ public class ConfigurationFrame extends JFrame implements ActionListener {
 		// creating a button for open file
 		fc = new JFileChooser();
 		open = new JButton("Open File");
-		open.addActionListener(this);
+		open.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// Open a file dialog window to select the input file path.
+				int returnVal = fc.showOpenDialog(frame);
+
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+					File selectedFile = fc.getSelectedFile();
+					System.out.print("Opening: " + selectedFile.getAbsolutePath() + ".");
+					file.setText(selectedFile.getAbsolutePath());
+				} else {
+					System.out.print("Open command cancelled by user.");
+				}
+				fc.setSelectedFile(null);
+			}
+		});
 
 		panel3.add(label3);
 		panel3.add(file);
 		panel3.add(open);
+		
+		// fourth panel with subsystem statuses
+		JPanel panel4 = new JPanel();
+		panel4.setLayout(new BoxLayout(panel4, BoxLayout.Y_AXIS));
+		panel4.setAlignmentX(Component.CENTER_ALIGNMENT);
+		lbElevatorStatus = new JLabel("Elevator Subsystem: Not Ready");
+		lbFloorStatus = new JLabel("Floor Subsystem: Not Ready");
+		
+		panel4.add(lbElevatorStatus);
+		panel4.add(lbFloorStatus);
 
 		// creating button and adding addActionListener
 		start = new JButton("Start");
-		start.addActionListener(this);
+		start.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// verify floor and elevator values are integers, if not display a warning
+				try {
+					elevatorNum = Integer.parseInt(elevators.getText());
+					floorNum = Integer.parseInt(floors.getText());
+				} catch (NumberFormatException ex) {
+					JOptionPane.showMessageDialog(frame, "Please ensure Elevator and Floor values are integers!",
+							"Invalid format", JOptionPane.ERROR_MESSAGE);
+				}
+				if (elevatorNum == 0 || floorNum == 0) {
+					JOptionPane.showMessageDialog(frame, "Please ensure Elevator and Floor values are not zero!",
+							"Invalid format", JOptionPane.ERROR_MESSAGE);
+				}
+
+				// get file value from text field
+				inputFile = file.getText();
+
+				// if value is entered for all fields, close frame
+				if (elevatorNum != 0 && floorNum != 0 && inputFile != null) {
+					setDone();
+					frame.dispose();
+				}
+			}
+		});
+		start.setAlignmentX(CENTER_ALIGNMENT);
+		start.setEnabled(false);
 
 		panel.add(panel1);
 		panel.add(panel2);
 		panel.add(panel3);
+		panel.add(panel4);
 		panel.add(start);
 
 		// Adding Components to the frame and making frame visible
 		frame.getContentPane().add(BorderLayout.CENTER, panel);
 		frame.setVisible(true);
-
-	}
-
-	public void actionPerformed(ActionEvent evt) {
-
-		// the the open button is clicked
-		if (evt.getSource() == open) {
-			int returnVal = fc.showOpenDialog(frame);
-
-			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				File selectedFile = fc.getSelectedFile();
-				System.out.print("Opening: " + selectedFile.getAbsolutePath() + ".");
-				file.setText(selectedFile.getAbsolutePath());
-			} else {
-				System.out.print("Open command cancelled by user.");
-			}
-			fc.setSelectedFile(null);
-
-		} else {// the start button is clicked
-
-			// verify floor and elevator values are integers, if not display a warning
-			try {
-				elevatorNum = Integer.parseInt(elevators.getText());
-				floorNum = Integer.parseInt(floors.getText());
-			} catch (NumberFormatException e) {
-				JOptionPane.showMessageDialog(frame, "Please ensure Elevator and Floor values are integers!",
-						"Invalid format", JOptionPane.ERROR_MESSAGE);
-			}
-			if (elevatorNum == 0 || floorNum == 0) {
-				JOptionPane.showMessageDialog(frame, "Please ensure Elevator and Floor values are not zero!",
-						"Invalid format", JOptionPane.ERROR_MESSAGE);
-			}
-
-			// get file value from text field
-			inputFile = file.getText();
-
-			// if value is entered for all fields, close frame
-			if (elevatorNum != 0 && floorNum != 0 && inputFile != null) {
-				this.done = true;
-				frame.dispose();
-			}
-		}
 	}
 
 	public int getElevatorNum() {
@@ -151,16 +170,49 @@ public class ConfigurationFrame extends JFrame implements ActionListener {
 		return floorNum;
 	}
 
-	public boolean isDone() {
-		return done;
-	}
-
 	public String getInputFile() {
 		return inputFile;
 	}
-
-	public static void main(String[] args) {
-		new ConfigurationFrame();
+	
+	/**
+	 * Sets this instance as done and notifies all waiting threads.
+	 */
+	private synchronized void setDone() {
+		this.isDone = true;
+		notifyAll();
+	}
+	
+	/**
+	 * Blocks a thread until the configuration is done.
+	 * @throws InterruptedException
+	 */
+	public synchronized void waitUntilDone() throws InterruptedException {
+		while (!this.isDone) {
+			wait();
+		}
 	}
 
+	@Override
+	public void onElevatorHandshake() {
+		// Update the elevator status label.
+		lbElevatorStatus.setText("Elevator Subsystem: Ready");
+		elevatorReady = true;
+		
+		// If both subsystems are ready, enable the start button.
+		if (floorReady) {
+			start.setEnabled(true);
+		}
+	}
+
+	@Override
+	public void onFloorHandshake() {
+		// Update the floor status label.
+		lbFloorStatus.setText("Floor Subsystem: Ready");
+		floorReady = true;
+		
+		// If both subsystems are ready, enable the start button.
+		if (elevatorReady) {
+			start.setEnabled(true);
+		}
+	}
 }

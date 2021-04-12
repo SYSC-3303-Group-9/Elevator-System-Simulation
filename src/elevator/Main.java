@@ -1,14 +1,16 @@
 package elevator;
 
 import java.util.ArrayList;
-import scheduler.RunTimeConfig;
-import common.Clock;
+
+import common.ClockSync;
+import common.RuntimeConfig;
+import common.SystemSync;
 import elevator.gui.ElevatorFrame;
 
 public class Main {
 	public static void main(String[] args) {
-		// Sync the application clock with the other applications.
-		RunTimeConfig config = Clock.sync("elevator");
+		// Get the runtime config from the master application.
+		RuntimeConfig config = SystemSync.sendConfigHandshake("elevator");
 		
 		// Create an ElevatorFrame to display the elevators
 		ElevatorFrame elevatorFrame = new ElevatorFrame(config.getNumElevators());
@@ -25,6 +27,9 @@ public class Main {
 		for (ElevatorSubsystem es : elevators) {
 			threads.add(new Thread(es));
 		}
+		
+		// Sync the application clock with the other applications.
+		ClockSync.sync("elevator");
 
 		// Start the threads.
 		for (Thread t : threads) {

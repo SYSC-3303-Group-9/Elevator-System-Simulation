@@ -1,15 +1,15 @@
-package scheduler;
+package common;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-public class RunTimeConfig {
+public class RuntimeConfig {
 
 	private int numFloors;
 	private int numElevators;
 	private String inputFile;
 
-	public RunTimeConfig(int floors, int elevators, String filePath) {
+	public RuntimeConfig(int floors, int elevators, String filePath) {
 		this.numFloors = floors;
 		this.numElevators = elevators;
 		this.inputFile = filePath;
@@ -44,7 +44,7 @@ public class RunTimeConfig {
 	 * @throws IOException
 	 * @throws ClassNotFoundException
 	 */
-	public static RunTimeConfig fromBytes(byte[] bytes) {
+	public static RuntimeConfig fromBytes(byte[] bytes) {
 
 		ByteBuffer buffer = ByteBuffer.wrap(bytes);
 		int floors = buffer.getInt();
@@ -54,7 +54,7 @@ public class RunTimeConfig {
 		System.arraycopy(bytes, 8, fileArray, 0, bytes.length - 8);
 		String file = new String(fileArray);
 
-		return new RunTimeConfig(floors, elevators, file.trim());
+		return new RuntimeConfig(floors, elevators, file.trim());
 
 	}
 
@@ -64,8 +64,8 @@ public class RunTimeConfig {
 			return true;
 		}
 
-		if (o instanceof RunTimeConfig) {
-			RunTimeConfig other = (RunTimeConfig) o;
+		if (o instanceof RuntimeConfig) {
+			RuntimeConfig other = (RuntimeConfig) o;
 			return getNumFloors() == (other.getNumFloors()) && getNumElevators() == other.getNumElevators()
 					&& getInputFile().equals(other.getInputFile());
 		}

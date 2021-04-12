@@ -2,6 +2,9 @@ package scheduler;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+
+import common.RuntimeConfig;
+
 import java.util.Arrays;
 
 public class RunTimeConfigTest {
@@ -9,8 +12,8 @@ public class RunTimeConfigTest {
 	@Test
 	public void equalsShouldBeTrue() {
 		// arrange
-		RunTimeConfig obj1 = new RunTimeConfig(11, 4, "test.txt");
-		RunTimeConfig obj2 = new RunTimeConfig(11, 4, "test.txt");
+		RuntimeConfig obj1 = new RuntimeConfig(11, 4, "test.txt");
+		RuntimeConfig obj2 = new RuntimeConfig(11, 4, "test.txt");
 
 		// act
 		assertEquals(obj1, obj2);
@@ -19,8 +22,8 @@ public class RunTimeConfigTest {
 	@Test
 	void equalsShouldBeFalseForNull() {
 		// arrange
-		RunTimeConfig obj1 = new RunTimeConfig(11, 4, "test.txt");
-		RunTimeConfig obj2 = null;
+		RuntimeConfig obj1 = new RuntimeConfig(11, 4, "test.txt");
+		RuntimeConfig obj2 = null;
 
 		// act
 		assertNotEquals(obj1, obj2);
@@ -29,8 +32,8 @@ public class RunTimeConfigTest {
 	@Test
 	void equalsShouldBeFalseForDifferentElevatorNum() {
 		// arrange
-		RunTimeConfig obj1 = new RunTimeConfig(11, 4, "test1.txt");
-		RunTimeConfig obj2 = new RunTimeConfig(11, 6, "test1.txt");
+		RuntimeConfig obj1 = new RuntimeConfig(11, 4, "test1.txt");
+		RuntimeConfig obj2 = new RuntimeConfig(11, 6, "test1.txt");
 
 		// act
 		assertNotEquals(obj1, obj2);
@@ -39,8 +42,8 @@ public class RunTimeConfigTest {
 	@Test
 	void equalsShouldBeFalseForDifferentFloor() {
 		// arrange
-		RunTimeConfig obj1 = new RunTimeConfig(10, 4, "test1.txt");
-		RunTimeConfig obj2 = new RunTimeConfig(13, 4, "test1.txt");
+		RuntimeConfig obj1 = new RuntimeConfig(10, 4, "test1.txt");
+		RuntimeConfig obj2 = new RuntimeConfig(13, 4, "test1.txt");
 
 		// act
 		assertNotEquals(obj1, obj2);
@@ -49,8 +52,8 @@ public class RunTimeConfigTest {
 	@Test
 	void equalsShouldBeFalseForDifferentFilePath() {
 		// arrange
-		RunTimeConfig obj1 = new RunTimeConfig(11, 4, "test1.txt");
-		RunTimeConfig obj2 = new RunTimeConfig(11, 4, "test2.txt");
+		RuntimeConfig obj1 = new RuntimeConfig(11, 4, "test1.txt");
+		RuntimeConfig obj2 = new RuntimeConfig(11, 4, "test2.txt");
 
 		// act
 		assertNotEquals(obj1, obj2);
@@ -59,17 +62,17 @@ public class RunTimeConfigTest {
 	@Test
 	void toAndFromBytes() {
 		// arrange
-		RunTimeConfig obj1 = new RunTimeConfig(11, 4, "test1.txt");
-		RunTimeConfig obj2 = new RunTimeConfig(12, 5, "test2.txt");
-		RunTimeConfig obj3 = new RunTimeConfig(13, 6, "test3.txt");
+		RuntimeConfig obj1 = new RuntimeConfig(11, 4, "test1.txt");
+		RuntimeConfig obj2 = new RuntimeConfig(12, 5, "test2.txt");
+		RuntimeConfig obj3 = new RuntimeConfig(13, 6, "test3.txt");
 
 		// act
 		byte toByte1[] = obj1.toBytes();
 		byte toByte2[] = obj2.toBytes();
 		byte toByte3[] = obj3.toBytes();
-		RunTimeConfig toInputData1 = RunTimeConfig.fromBytes(toByte1);
-		RunTimeConfig toInputData2 = RunTimeConfig.fromBytes(toByte2);
-		RunTimeConfig toInputData3 = RunTimeConfig.fromBytes(toByte3);
+		RuntimeConfig toInputData1 = RuntimeConfig.fromBytes(toByte1);
+		RuntimeConfig toInputData2 = RuntimeConfig.fromBytes(toByte2);
+		RuntimeConfig toInputData3 = RuntimeConfig.fromBytes(toByte3);
 
 		// assert
 		assertEquals(toInputData1, obj1);
@@ -80,12 +83,12 @@ public class RunTimeConfigTest {
 	@Test
 	void toAndFromBytes_longBuffer() {
 		// arrange
-		RunTimeConfig obj1 = new RunTimeConfig(11, 4, "test1.txt");
+		RuntimeConfig obj1 = new RuntimeConfig(11, 4, "test1.txt");
 
 		// act
 		byte toByte1[] = obj1.toBytes();
 		byte[] longBuffer = Arrays.copyOf(toByte1, toByte1.length + 50);
-		RunTimeConfig config = RunTimeConfig.fromBytes(longBuffer);
+		RuntimeConfig config = RuntimeConfig.fromBytes(longBuffer);
 
 		// arrange
 		assertEquals(obj1, config);
@@ -94,17 +97,17 @@ public class RunTimeConfigTest {
 	@Test
 	void differentToAndFromBytes() {
 		// arrange
-		RunTimeConfig obj1 = new RunTimeConfig(11, 4, "test1.txt");
-		RunTimeConfig obj2 = new RunTimeConfig(12, 5, "test2.txt");
-		RunTimeConfig obj3 = new RunTimeConfig(13, 6, "test3.txt");
+		RuntimeConfig obj1 = new RuntimeConfig(11, 4, "test1.txt");
+		RuntimeConfig obj2 = new RuntimeConfig(12, 5, "test2.txt");
+		RuntimeConfig obj3 = new RuntimeConfig(13, 6, "test3.txt");
 
 		// act
 		byte toByte1[] = obj1.toBytes();
 		byte toByte2[] = obj2.toBytes();
 		byte toByte3[] = obj3.toBytes();
-		RunTimeConfig toInputData1 = RunTimeConfig.fromBytes(toByte1);
-		RunTimeConfig toInputData2 = RunTimeConfig.fromBytes(toByte2);
-		RunTimeConfig toInputData3 = RunTimeConfig.fromBytes(toByte3);
+		RuntimeConfig toInputData1 = RuntimeConfig.fromBytes(toByte1);
+		RuntimeConfig toInputData2 = RuntimeConfig.fromBytes(toByte2);
+		RuntimeConfig toInputData3 = RuntimeConfig.fromBytes(toByte3);
 
 		// arrange
 		assertNotEquals(obj1, toInputData2);
