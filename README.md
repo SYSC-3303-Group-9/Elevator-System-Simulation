@@ -29,7 +29,8 @@ This project is a design and implementation of an elevator control system and si
 1.  Download zip file and unzip
 2.  Open unzipped file through the Eclipse file system
 3.  Locate the 3 `Main.java` files: `scheduler/Main.java`, `elevator/Main.java`, and `floor/Main.java`. Each `Main.java` represents one part of the Elevator-System, they are meant to be running simultaneously.
-4.  Launch each `Main.java` by right-clicking -> Run as Java application. **They must be launched in the order given in step 3**.
+4.  Launch each `Main.java` by right-clicking -> Run as Java application. Start with `scheduler/Main.java`, the order of the other two does not matter.
+5.  Configure the system using the configuration UI and press start when ready. Note: the start button will be disabled until the other two applications have sent their handshake packets.
 
 Tests are written and run with JUnit 5. The 'test' folder contains a test package for each subsystem
 
@@ -532,6 +533,8 @@ James
 - Modify ElevatorSubsystem to set a door event flag on outgoing ElevatorEvents
 - Create SchedulerReceiver to receive ElevatorEvents sent from the scheduler application to the floor application
 - Modify ElevatorEventReceiver to forward ElevatorEvents with (door flag == true) to SchedulerReceiver
+- ConfigurationFrame start button is disabled until handshakes received
+- Wait for UIs to build before starting the simulation
 
 Liya
 

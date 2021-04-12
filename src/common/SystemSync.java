@@ -27,18 +27,15 @@ public class SystemSync implements Runnable {
 	}
 
 	/**
-	 * Send a packet containing runtime config data.
+	 * Send a packet with the given data to the given port.
 	 * @param port The port to send to.
-	 * @param configData The config data to send.
+	 * @param configData The data to send.
 	 */
-	private void sendConfigPacket(int port, RuntimeConfig configData) {
+	private void sendPacket(int port, byte[] data) {
 		
 		// Construct a DatagramPacket for sending packet to floor
-		byte reply[] = configData.toBytes();
-
-		// send reply packet
 		try {
-			DatagramPacket sendPacket = new DatagramPacket(reply, reply.length, InetAddress.getLocalHost(), port);
+			DatagramPacket sendPacket = new DatagramPacket(data, data.length, InetAddress.getLocalHost(), port);
 			socket.send(sendPacket);
 
 		} catch (IOException e) {
@@ -92,15 +89,12 @@ public class SystemSync implements Runnable {
 	}
 
 	/**
-	 * Start the simulation by sending config data and starting the clock.
-	 * TODO: Config data and clock should be separate handshakes to allow the subsystem UIs to start in time.
+	 * Start up the simulation by sending config data so GUIs can be built.
 	 * @param configData The config data to send.
 	 */
-	public void startSimulation(RuntimeConfig configData) {		
-		sendConfigPacket(elevatorPort, configData);
-		sendConfigPacket(floorPort, configData);
-		
-		Clock.startClock();
+	public void sendRuntimeHandshakes(RuntimeConfig configData) {
+		sendPacket(elevatorPort, configData.toBytes());
+		sendPacket(floorPort, configData.toBytes());
 	}
 	
 	/**
@@ -118,5 +112,27 @@ public class SystemSync implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Used by children applications to sync runtime config with the master application.
+	 * @param name Name of child.
+	 * @return The master application's runtime config.
+	 */
+	public static RuntimeConfig sendConfigHandshake(String name) {
+		// Convert the name to bytes for the packet.
+		byte[] data = name.getBytes();
+		byte[] responseBytes = new byte[100];
+		try (DatagramSocket socket = new DatagramSocket()) {
+			// Send a handshake packet to SystemSync.
+			socket.send(new DatagramPacket(data, data.length, InetAddress.getLocalHost(), Constants.SYSTEM_SYNC_PORT));
+			
+			// Wait for a response packet from SystemSync.
+			socket.receive(new DatagramPacket(responseBytes, responseBytes.length));
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		return RuntimeConfig.fromBytes(responseBytes);
 	}
 }

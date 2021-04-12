@@ -3,22 +3,17 @@ package floor;
 import java.net.SocketException;
 
 import common.Buffer;
-import common.Clock;
+import common.ClockSync;
 import common.RuntimeConfig;
+import common.SystemSync;
 import elevator.ElevatorEvent;
 import scheduler.SchedulerReceiver;
 
 public class Main {
 	public static void main(String[] args) throws SocketException {
-		// Sync the application clock with the other applications.
-		RuntimeConfig config = Clock.sync("floor");
-		// This is a TEMPORARY FIX to avoid floor getting ahead of elevator subsystem
-		try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		// Get the runtime config from the master application.
+		RuntimeConfig config = SystemSync.sendConfigHandshake("floor");
+	
 		// Create the ElevatorEvent buffer.
 		// TODO: Connect the output side of this buffer to the FloorFrame UI.
 		Buffer<ElevatorEvent> elevatorEventBuffer = new Buffer<ElevatorEvent>();
@@ -32,6 +27,9 @@ public class Main {
 		// Create the thread.
 		Thread thSchedulerReceiver = new Thread(schedulerReceiver);
 		Thread thFloorSubsystem = new Thread(floorSubsystem);
+		
+		// Sync the application clock with the other applications.
+		ClockSync.sync("floor");
 		
 		// Start the threads.
 		thSchedulerReceiver.start();

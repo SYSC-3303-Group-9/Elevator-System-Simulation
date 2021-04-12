@@ -11,11 +11,14 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 @SuppressWarnings("serial")
-public class ConfigurationFrame extends JFrame implements ISystemSyncListener {	
+public class ConfigurationFrame extends JFrame implements ISystemSyncListener {
+	/**
+	 * Used to check if values are registered and frame has been closed.
+	 */
 	private boolean isDone = false;
 
 	/**
-	 * JTextArea for the elevator,floor and file inputs
+	 * JTextArea for the elevator, floor and file inputs.
 	 */
 	private JTextField elevators, floors, file;
 	
@@ -25,16 +28,17 @@ public class ConfigurationFrame extends JFrame implements ISystemSyncListener {
 	private JLabel lbElevatorStatus, lbFloorStatus;
 
 	/**
-	 * JButton for the open and start buttons
+	 * JButton for the open and start buttons.
 	 */
 	private JButton open, start;
 
 	/**
-	 * JFileChooser for choosing files
+	 * JFileChooser for choosing files.
 	 */
 	private JFileChooser fc;
+	
 	/**
-	 * Strings to contain file value from entered from text field
+	 * Strings to contain file value from entered from text field.
 	 */
 	private String inputFile = null;
 
@@ -88,6 +92,7 @@ public class ConfigurationFrame extends JFrame implements ISystemSyncListener {
 		open.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				// Open a file dialog window to select the input file path.
 				int returnVal = fc.showOpenDialog(frame);
 
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -169,11 +174,18 @@ public class ConfigurationFrame extends JFrame implements ISystemSyncListener {
 		return inputFile;
 	}
 	
+	/**
+	 * Sets this instance as done and notifies all waiting threads.
+	 */
 	private synchronized void setDone() {
 		this.isDone = true;
 		notifyAll();
 	}
 	
+	/**
+	 * Blocks a thread until the configuration is done.
+	 * @throws InterruptedException
+	 */
 	public synchronized void waitUntilDone() throws InterruptedException {
 		while (!this.isDone) {
 			wait();
@@ -182,8 +194,11 @@ public class ConfigurationFrame extends JFrame implements ISystemSyncListener {
 
 	@Override
 	public void onElevatorHandshake() {
+		// Update the elevator status label.
 		lbElevatorStatus.setText("Elevator Subsystem: Ready");
 		elevatorReady = true;
+		
+		// If both subsystems are ready, enable the start button.
 		if (floorReady) {
 			start.setEnabled(true);
 		}
@@ -191,8 +206,11 @@ public class ConfigurationFrame extends JFrame implements ISystemSyncListener {
 
 	@Override
 	public void onFloorHandshake() {
+		// Update the floor status label.
 		lbFloorStatus.setText("Floor Subsystem: Ready");
 		floorReady = true;
+		
+		// If both subsystems are ready, enable the start button.
 		if (elevatorReady) {
 			start.setEnabled(true);
 		}

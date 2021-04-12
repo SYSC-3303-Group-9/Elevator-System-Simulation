@@ -46,6 +46,11 @@ public class Constants {
 	public static final int SYSTEM_SYNC_PORT = 78;
 	
 	/**
+	 * ClockSync's port.
+	 */
+	public static final int CLOCK_SYNC_PORT = 79;
+	
+	/**
 	 * ElevatorEventReceiver's port.
 	 */
 	public static final int ELEVATOR_EVENT_RECEIVER_PORT = 110;
