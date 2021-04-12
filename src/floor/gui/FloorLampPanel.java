@@ -72,6 +72,36 @@ public class FloorLampPanel extends JPanel {
 				}
 			}
 			
+		} else if(numOfFloors > 10){
+			this.rows = (numOfFloors + 1) / 2;
+			this.columns = 2;
+
+			this.floorGrid = new FloorLamp[columns][rows];
+			this.setLayout(new GridLayout(this.rows, this.columns));
+			this.setSize(30, 30);
+
+			// set lamp number
+			int floor = numOfFloors + 1;
+			for (int i = 0; i < this.rows; i++) {
+				for (int j = 0; j < this.columns; j++) {
+					this.floorGrid[j][i] = new FloorLamp(floor);
+					this.floorGrid[j][i].setBackground(Color.WHITE);
+					floor--;
+					if (this.floorGrid[j][i].getFloor() % 2 == 0) {
+						this.floorGrid[j][i] = new FloorLamp(this.floorGrid[j][i].getFloor() - 1);
+						this.floorGrid[j][i].setBackground(Color.WHITE);
+					} else {
+						this.floorGrid[j][i] = new FloorLamp(this.floorGrid[j][i].getFloor() + 1);
+						this.floorGrid[j][i].setBackground(Color.WHITE);
+					}
+					
+					if(this.floorGrid[j][i].getFloor() == (numOfFloors + 1)){
+						this.floorGrid[j][i].setText("");
+					}
+					
+					this.add(this.floorGrid[j][i]);
+				}
+			}
 		} else {
 			// Unexpected scenario
 			// 1 column display
