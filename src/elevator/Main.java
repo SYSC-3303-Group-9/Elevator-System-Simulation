@@ -1,14 +1,15 @@
 package elevator;
 
 import java.util.ArrayList;
-import scheduler.RunTimeConfig;
+
 import common.Clock;
+import common.RuntimeConfig;
 import elevator.gui.ElevatorFrame;
 
 public class Main {
 	public static void main(String[] args) {
 		// Sync the application clock with the other applications.
-		RunTimeConfig config = Clock.sync("elevator");
+		RuntimeConfig config = Clock.sync("elevator");
 		
 		// Create an ElevatorFrame to display the elevators
 		ElevatorFrame elevatorFrame = new ElevatorFrame(config.getNumElevators());

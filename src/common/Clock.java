@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import scheduler.RunTimeConfig;
 
 public class Clock {
 	private static long startTime;
@@ -26,7 +25,7 @@ public class Clock {
 	 * Sync the clock with the scheduler's clock.
 	 * @param name The name of the current application.
 	 */
-	public static RunTimeConfig sync(String name) {
+	public static RuntimeConfig sync(String name) {
 		// Convert the name to bytes for the packet.
 		byte[] data = name.getBytes();
 		byte[] responseBytes = new byte[100];
@@ -43,6 +42,6 @@ public class Clock {
 		}
 		// Now immediately start the clock for this application.
 		Clock.startClock();
-		return RunTimeConfig.fromBytes(responseBytes);
+		return RuntimeConfig.fromBytes(responseBytes);
 	}
 }

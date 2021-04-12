@@ -14,14 +14,14 @@ import java.util.List;
 
 import common.Clock;
 import common.Constants;
-import scheduler.RunTimeConfig;
+import common.RuntimeConfig;
 
 public class FloorSubsystem implements Runnable {
 	private DatagramPacket sendPacket, receivePacket;
 	private DatagramSocket sendReceiveSocket;
-	private RunTimeConfig config;
+	private RuntimeConfig config;
 	
-	public FloorSubsystem(RunTimeConfig config) {		
+	public FloorSubsystem(RuntimeConfig config) {		
 		try {
 			this.config = config;
 			sendReceiveSocket = new DatagramSocket();

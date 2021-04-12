@@ -4,14 +4,14 @@ import java.net.SocketException;
 
 import common.Buffer;
 import common.Clock;
+import common.RuntimeConfig;
 import elevator.ElevatorEvent;
-import scheduler.RunTimeConfig;
 import scheduler.SchedulerReceiver;
 
 public class Main {
 	public static void main(String[] args) throws SocketException {
 		// Sync the application clock with the other applications.
-		RunTimeConfig config = Clock.sync("floor");
+		RuntimeConfig config = Clock.sync("floor");
 		// This is a TEMPORARY FIX to avoid floor getting ahead of elevator subsystem
 		try {
 			Thread.sleep(3000);

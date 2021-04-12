@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.Random;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -23,8 +22,6 @@ public class ElevatorSubsystemTest {
 	
 	ElevatorMotor elevator;
 	ElevatorSubsystem system;
-	Random ran = new Random();
-	int upperBound = 100;
 	
 	@BeforeAll
 	public static void setup() throws IOException {
@@ -39,7 +36,7 @@ public class ElevatorSubsystemTest {
 
 	@Test
 	void moveToWaiting() {
-		system = new ElevatorSubsystem(ran.nextInt(upperBound), new ElevatorPanel(1));
+		system = new ElevatorSubsystem(0, new ElevatorPanel(1));
 
 		// Transition to WAITING state
 		system.next();
@@ -48,7 +45,7 @@ public class ElevatorSubsystemTest {
 
 	@Test
 	void movedElevatorUp() throws IOException {
-		system = new ElevatorSubsystem(ran.nextInt(upperBound), new ElevatorPanel(1));
+		system = new ElevatorSubsystem(1, new ElevatorPanel(1));
 
 		// Transition to WAITING state
 		system.next();
@@ -86,7 +83,7 @@ public class ElevatorSubsystemTest {
 
 	@Test
 	void movedElevatorDown() throws IOException {
-		system = new ElevatorSubsystem(ran.nextInt(upperBound), new ElevatorPanel(1));
+		system = new ElevatorSubsystem(2, new ElevatorPanel(1));
 		
 		// Transition to WAITING state
 		system.next();
@@ -131,7 +128,7 @@ public class ElevatorSubsystemTest {
 
 	@Test
 	void permanentFaultElevator() throws IOException {
-		system = new ElevatorSubsystem(ran.nextInt(upperBound), new ElevatorPanel(1));
+		system = new ElevatorSubsystem(3, new ElevatorPanel(1));
 
 		// Transition to WAITING state
 		system.next();
@@ -162,7 +159,7 @@ public class ElevatorSubsystemTest {
 
 	@Test
 	void openCloseElevatorDoors() throws IOException {
-		system = new ElevatorSubsystem(ran.nextInt(upperBound), new ElevatorPanel(1));
+		system = new ElevatorSubsystem(4, new ElevatorPanel(1));
 
 		// Transition to WAITING state
 		system.next();
@@ -189,7 +186,7 @@ public class ElevatorSubsystemTest {
 	
 	@Test
 	void transientFaultElevator() throws IOException {
-		system = new ElevatorSubsystem(ran.nextInt(upperBound), new ElevatorPanel(1));
+		system = new ElevatorSubsystem(5, new ElevatorPanel(1));
 
 		// Transition to WAITING state
 		system.next();
