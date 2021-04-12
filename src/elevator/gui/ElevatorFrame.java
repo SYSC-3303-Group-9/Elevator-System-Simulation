@@ -9,7 +9,7 @@ public class ElevatorFrame extends JFrame {
 	private JFrame frame;
 	private ElevatorPanel[] elevatorPanels;
 	
-	public ElevatorFrame(int numElevators) {
+	public ElevatorFrame(int numElevators, int numOfFloors) {
 		elevatorPanels = new ElevatorPanel[numElevators];
 		frame = new JFrame("Elevators");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -18,7 +18,7 @@ public class ElevatorFrame extends JFrame {
 		Container frameContent = frame.getContentPane();
 		frameContent.setLayout(new GridLayout(1, numElevators));
 		for(int i = 0; i < numElevators; i++) {
-			elevatorPanels[i] = new ElevatorPanel(i);
+			elevatorPanels[i] = new ElevatorPanel(i, numOfFloors);
 			frameContent.add(elevatorPanels[i]);
 		}
 		frame.setVisible(true);
@@ -28,7 +28,7 @@ public class ElevatorFrame extends JFrame {
 		return elevatorPanels[elevatorNum];
 	}
 	public static void main(String[] args) {
-		ElevatorFrame frame = new ElevatorFrame(4);
+		ElevatorFrame frame = new ElevatorFrame(4, 22);
 	}
 
 }
