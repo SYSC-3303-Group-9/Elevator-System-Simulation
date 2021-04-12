@@ -19,7 +19,7 @@ public class ElevatorPanel extends JPanel {
 	
 	private static final Font font = new Font("Dialog", Font.BOLD, 24);
 	
-	public ElevatorPanel(int elevatorNum) {
+	public ElevatorPanel(int elevatorNum, int numOfFloors) {
 		// Setup Elevator header
 		elevatorName = new JLabel("Elevator " + elevatorNum);
 		elevatorName.setFont(font);
@@ -40,7 +40,7 @@ public class ElevatorPanel extends JPanel {
 		directionLamp.setAlignmentX(CENTER_ALIGNMENT);
 		
 		// Setup Elevator's Floor Lamp
-		floorLamp = new FloorLampPanel();
+		floorLamp = new FloorLampPanel(numOfFloors);
 		floorLamp.setAlignmentX(CENTER_ALIGNMENT);
 		floorLamp.setBorder(new EmptyBorder(0, 5, 0, 5));
 		
