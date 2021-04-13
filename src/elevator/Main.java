@@ -13,7 +13,7 @@ public class Main {
 		RuntimeConfig config = SystemSync.sendConfigHandshake("elevator");
 		
 		// Create an ElevatorFrame to display the elevators
-		ElevatorFrame elevatorFrame = new ElevatorFrame(config.getNumElevators());
+		ElevatorFrame elevatorFrame = new ElevatorFrame(config.getNumElevators(), config.getNumFloors());
 		
 		// Create the elevators.
 		ArrayList<ElevatorSubsystem> elevators = new ArrayList<ElevatorSubsystem>();
