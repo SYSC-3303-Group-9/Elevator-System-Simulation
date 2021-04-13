@@ -7,22 +7,27 @@ import common.ClockSync;
 import common.RuntimeConfig;
 import common.SystemSync;
 import elevator.ElevatorEvent;
+import elevator.gui.ElevatorFrame;
+import floor.gui.FloorFrame;
 import scheduler.SchedulerReceiver;
 
 public class Main {
 	public static void main(String[] args) throws SocketException {
 		// Get the runtime config from the master application.
 		RuntimeConfig config = SystemSync.sendConfigHandshake("floor");
-	
+		
+		// Create an ElevatorFrame to display the elevators
+		FloorFrame floorFrame = new FloorFrame(config.getNumFloors());
+		
 		// Create the ElevatorEvent buffer.
 		// TODO: Connect the output side of this buffer to the FloorFrame UI.
 		Buffer<ElevatorEvent> elevatorEventBuffer = new Buffer<ElevatorEvent>();
 		
 		// Create the SchedulerReceiver.
-		SchedulerReceiver schedulerReceiver = new SchedulerReceiver(elevatorEventBuffer);
+		SchedulerReceiver schedulerReceiver = new SchedulerReceiver(elevatorEventBuffer, floorFrame);
 		
 		// Create the floor subsystem.
-		FloorSubsystem floorSubsystem = new FloorSubsystem(config);
+		FloorSubsystem floorSubsystem = new FloorSubsystem(config, floorFrame);
 		
 		// Create the thread.
 		Thread thSchedulerReceiver = new Thread(schedulerReceiver);

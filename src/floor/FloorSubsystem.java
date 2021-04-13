@@ -15,13 +15,17 @@ import java.util.List;
 import common.Clock;
 import common.Constants;
 import common.RuntimeConfig;
+import elevator.gui.DirectionLampPanel;
+import floor.gui.FloorFrame;
 
 public class FloorSubsystem implements Runnable {
 	private DatagramPacket sendPacket, receivePacket;
 	private DatagramSocket sendReceiveSocket;
 	private RuntimeConfig config;
+	private FloorFrame floorFrame;
 	
-	public FloorSubsystem(RuntimeConfig config) {		
+	public FloorSubsystem(RuntimeConfig config, FloorFrame floorFrame) {	
+		this.floorFrame = floorFrame;
 		try {
 			this.config = config;
 			sendReceiveSocket = new DatagramSocket();
@@ -52,6 +56,9 @@ public class FloorSubsystem implements Runnable {
 			//Don't send InputData until it's actual time has come
 			while((Clock.getTime() * Constants.TIME_MULTIPLIER) < x.getTime().getLong(ChronoField.MILLI_OF_DAY)) {}
 			System.out.println("[" + x.getTime() + "] Floor " + x.getCurrentFloor() + " requested elevator");
+			//turn floor direction lamp on 
+			DirectionLampPanel floorButton = this.floorFrame.getDirectionButton(x.getCurrentFloor()-1);
+			floorButton.turnOnLamp(x.getDirection());
 			try {
 				sendPacket = new DatagramPacket(x.toBytes(), x.toBytes().length, InetAddress.getLocalHost(), Constants.FLOOR_RECEIVER_PORT);
 				sendReceiveSocket.send(sendPacket);
