@@ -18,6 +18,7 @@ public class ElevatorSubsystem implements Runnable {
 	private int floor;
 	private int prevDestination;
 	private boolean transientFaultRegistered;
+	private Direction serviceDirection;
 	
 	// Command variables
 	private ElevatorCommand command = null;
@@ -87,8 +88,7 @@ public class ElevatorSubsystem implements Runnable {
 	 * @param isDoorEvent Whether this was a door event.
 	 */
 	private void sendElevatorEvent(boolean isPermanentFault, boolean isDoorEvent) {
-		//TODO serviceDirection
-		ElevatorEvent elevatorInfo = new ElevatorEvent(this.floor, this.id, isPermanentFault, isDoorEvent, null);
+		ElevatorEvent elevatorInfo = new ElevatorEvent(this.floor, this.id, isPermanentFault, isDoorEvent, this.serviceDirection);
 
 		// Send ElevatorEvent packet to ElevatorCommunicator.
 		try {
@@ -164,15 +164,16 @@ public class ElevatorSubsystem implements Runnable {
 				// Receive new ElevatorCommand packet from ElevatorComunicator via Elevator Base
 				// Port + Elevator ID.
 				panel.setElevatorState(this.state);
-				byte data[] = new byte[100];
+				byte data[] = new byte[500];
 				receivePacket = new DatagramPacket(data, data.length);
 	
 				try {
 					sendReceiveSocket.receive(receivePacket);
-				} catch (IOException e) {
-					System.out.println("ElevatorSubsystem, run " + e);
+					command = ElevatorCommand.fromBytes(receivePacket.getData());
+				} catch (IOException | ClassNotFoundException e) {
+					e.printStackTrace();
+					return true;
 				}
-				command = ElevatorCommand.fromBytes(receivePacket.getData());
 	
 				// If the buffer was disabled and returned null, stop execution.
 				if (command == null) {
@@ -180,6 +181,8 @@ public class ElevatorSubsystem implements Runnable {
 					this.state = ElevatorState.FINAL;
 				} 
 				else {
+					this.serviceDirection = command.getServiceDirection();
+					
 					// Identify what kind of elevator command was passed
 					if (command instanceof ElevatorMoveCommand) {
 						moveCmd = (ElevatorMoveCommand) command;

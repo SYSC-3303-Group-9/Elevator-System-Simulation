@@ -7,7 +7,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 
 public class FloorLamp extends JLabel {
-
+	private static final long serialVersionUID = -599258791885739365L;
 	private int floor;
 	private static final Font font = new Font("Dialog", Font.BOLD, 20);
 	/**

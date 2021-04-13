@@ -1,4 +1,4 @@
-package scheduler.GUI;
+package scheduler.gui;
 
 import javax.swing.*;
 

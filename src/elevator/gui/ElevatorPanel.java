@@ -10,6 +10,7 @@ import elevator.ElevatorState;
 import floor.gui.FloorLampPanel;
 
 public class ElevatorPanel extends JPanel {
+	private static final long serialVersionUID = 4592418405521632011L;
 	private DirectionLampPanel directionLamp;
 	private FloorLampPanel floorLamp;
 	private Door door;

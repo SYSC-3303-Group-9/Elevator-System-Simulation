@@ -152,30 +152,7 @@ public class Scheduler implements Runnable {
 				break;
 			}
 			
-			// Create the job and assign it to the chosen elevator.
-			ScheduledJob job = new ScheduledJob(elevator, inputData);
-			elevator.getAssignedJobs().add(job);
-			System.out.println("Assigned job " + job.getJobId() + " to Elevator " + elevator.getElevatorId() + ": " + inputData);
-			
-			// If the elevator is waiting, start moving it towards the pickup.
-			if (elevator.getDirection() == Direction.WAITING) {
-				this.elevatorToCommand = elevator;
-				
-				// Set the elevator's fault code to the input's fault code.
-				this.elevatorToCommand.setPendingFault(this.inputData.getFault());
-				
-				// Move to appropriate scheduling state.
-				if (moveToPickup(elevator, job)) {
-					this.state = SchedulerState.SCHEDULE_DOOR;
-				} else {
-					this.state = SchedulerState.SCHEDULE_MOVE;
-				}
-			}
-			// Otherwise the elevator should already be moving towards the pickup
-			// because of another job it is already handling.
-			else {
-				this.state = SchedulerState.WAITING_FOR_MESSAGE;
-			}
+			createJobForElevator(this.inputData, elevator);
 			
 			break;
 		}
@@ -246,9 +223,11 @@ public class Scheduler implements Runnable {
 						System.out.println("Elevator " + elevator.getElevatorId() + " picked up passenger on floor " + this.elevatorEvent.getFloor());
 						moveToDropOff(elevator, job);
 					} else {
+						// Set the elevator's fault code to the input's fault code.
+						elevator.setPendingFault(job.getInputData().getFault());
+						
 						shouldRequestDoors = true;
 						this.elevatorToCommand = elevator;
-						this.state = SchedulerState.SCHEDULE_DOOR;
 					}
 				}
 				// If dropping off passenger.
@@ -273,13 +252,9 @@ public class Scheduler implements Runnable {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-						
-						
-						
 					} else {
 						shouldRequestDoors = true;
 						this.elevatorToCommand = elevator;
-						this.state = SchedulerState.SCHEDULE_DOOR;
 					}
 				}
 			}
@@ -292,22 +267,23 @@ public class Scheduler implements Runnable {
 			
 			// If the elevator needs to open its doors.
 			if (shouldRequestDoors) {
+				// If opening doors to drop off last job, look for next job.
+				if (elevator.getAssignedJobs().size() == 1
+						&& elevator.getAssignedJobs().get(0).getIsOnElevator()
+						&& this.blockedInput.size() > 0) {
+					InputData inputData = blockedInput.get(0);
+					this.blockedInput.remove(0);
+					elevator.setDirection(Direction.WAITING);
+					createJobForElevator(inputData, elevator);
+				}
+				
 				this.state = SchedulerState.SCHEDULE_DOOR;
 			}
 			// If elevator has no jobs left.
 			else if (elevator.getAssignedJobs().size() == 0) {
 				elevator.setDirection(Direction.WAITING);
-				
-				// Look for blocked jobs.
-				if (this.blockedInput.size() > 0) {
-					this.inputData = blockedInput.get(0);
-					this.blockedInput.remove(0);
-					this.state = SchedulerState.PROCESSING_NEW_JOB;
-				}
-				// Otherwise wait for next message.
-				else {
-					this.state = SchedulerState.WAITING_FOR_MESSAGE;
-				}
+				elevator.setServiceDirection(Direction.WAITING);
+				this.state = SchedulerState.WAITING_FOR_MESSAGE;
 			}
 			// If trying to move past top floor.
 			else if (elevator.getLastKnownFloor() == this.numFloors && elevator.getDirection() == Direction.UP) {
@@ -351,7 +327,8 @@ public class Scheduler implements Runnable {
 					this.elevatorToCommand.getElevatorId(),
 					this.elevatorToCommand.getPendingFault(),
 					this.elevatorToCommand.getDirection(),
-					destination));
+					destination,
+					this.elevatorToCommand.getServiceDirection()));
 			
 			// Reset elevator fault code now that the command is sent.
 			this.elevatorToCommand.setPendingFault(Fault.NONE);
@@ -368,7 +345,8 @@ public class Scheduler implements Runnable {
 			// Add the elevator door command to the buffer and move to waiting for message.
 			this.inputBuffer.put(new ElevatorDoorCommand(
 					this.elevatorToCommand.getElevatorId(),
-					this.elevatorToCommand.getPendingFault()));
+					this.elevatorToCommand.getPendingFault(),
+					this.elevatorToCommand.getServiceDirection()));
 			
 			// Reset elevator fault code now that the command is sent.
 			this.elevatorToCommand.setPendingFault(Fault.NONE);
@@ -379,6 +357,40 @@ public class Scheduler implements Runnable {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Creates a job for the given elevator based on the input data.
+	 * @param inputData The input data to create the job from.
+	 * @param elevator The elevator to assign the job to.
+	 */
+	private void createJobForElevator(InputData inputData, SchedulerElevator elevator) {
+		// Set the service direction for this elevator.
+		elevator.setServiceDirection(inputData.getDirection());
+		
+		// Create the job and assign it to the chosen elevator.
+		ScheduledJob job = new ScheduledJob(elevator, inputData);
+		elevator.getAssignedJobs().add(job);
+		System.out.println("Assigned job " + job.getJobId() + " to Elevator " + elevator.getElevatorId() + ": " + inputData);
+		
+		// If the elevator is waiting, start moving it towards the pickup.
+		if (elevator.getDirection() == Direction.WAITING) {
+			this.elevatorToCommand = elevator;
+			
+			// Move to appropriate scheduling state.
+			if (moveToPickup(elevator, job)) {
+				// Set the elevator's fault code to the input's fault code.
+				elevator.setPendingFault(job.getInputData().getFault());
+				this.state = SchedulerState.SCHEDULE_DOOR;
+			} else {
+				this.state = SchedulerState.SCHEDULE_MOVE;
+			}
+		}
+		// Otherwise the elevator should already be moving towards the pickup
+		// because of another job it is already handling.
+		else {
+			this.state = SchedulerState.WAITING_FOR_MESSAGE;
+		}
 	}
 	
 	/**
@@ -423,17 +435,7 @@ public class Scheduler implements Runnable {
 			return true;
 		}
 		// Otherwise, elevator must be moving in same direction as request.
-		if (e.getDirection() == direction) {
-			// If the elevator already has requests, make sure they are in the same direction.
-			// This prevents elevators from being assigned jobs in the wrong direction while they
-			// move towards the pickup floor. Example: Elevator moving UP to pickup a DOWN request
-			// should not be assigned an UP request.
-			if (e.getAssignedJobs().size() > 0) {
-				if (e.getAssignedJobs().get(0).getInputData().getDirection() != direction) {
-					return false;
-				}
-			}
-			
+		if (e.getServiceDirection() == direction) {			
 			// If the elevator will be moving up, it must be below the start floor to pick it up without turning around.
 			if (direction == Direction.UP && e.getLastKnownFloor() <= startFloor) {
 				return true;

@@ -5,11 +5,11 @@ import java.awt.Image;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 
 public class Door extends JLabel {
+	private static final long serialVersionUID = -6776502908344405247L;
 	private static final int WIDTH = 100;
 	private static final int HEIGHT = 100;
 	private static final Font font = new Font("Dialog", Font.BOLD, 16);

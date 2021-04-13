@@ -9,7 +9,7 @@ import common.Constants;
 import elevator.Direction;
 
 public class DirectionLampPanel extends JPanel {
-
+	private static final long serialVersionUID = -8660892551297832912L;
 	private DirectionLamp up;
 	private DirectionLamp down;
 

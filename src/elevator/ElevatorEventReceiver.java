@@ -48,7 +48,7 @@ public class ElevatorEventReceiver implements Runnable {
 					}
 				}
 
-			} catch (IOException e) {
+			} catch (IOException | ClassNotFoundException e) {
 				e.printStackTrace();
 				System.exit(1);
 			}

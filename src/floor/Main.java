@@ -2,12 +2,9 @@ package floor;
 
 import java.net.SocketException;
 
-import common.Buffer;
 import common.ClockSync;
 import common.RuntimeConfig;
 import common.SystemSync;
-import elevator.ElevatorEvent;
-import elevator.gui.ElevatorFrame;
 import floor.gui.FloorFrame;
 import scheduler.SchedulerReceiver;
 
@@ -19,12 +16,8 @@ public class Main {
 		// Create an ElevatorFrame to display the elevators
 		FloorFrame floorFrame = new FloorFrame(config.getNumFloors());
 		
-		// Create the ElevatorEvent buffer.
-		// TODO: Connect the output side of this buffer to the FloorFrame UI.
-		Buffer<ElevatorEvent> elevatorEventBuffer = new Buffer<ElevatorEvent>();
-		
 		// Create the SchedulerReceiver.
-		SchedulerReceiver schedulerReceiver = new SchedulerReceiver(elevatorEventBuffer, floorFrame);
+		SchedulerReceiver schedulerReceiver = new SchedulerReceiver(floorFrame);
 		
 		// Create the floor subsystem.
 		FloorSubsystem floorSubsystem = new FloorSubsystem(config, floorFrame);
