@@ -27,8 +27,5 @@ public class ElevatorFrame extends JFrame {
 	public ElevatorPanel getElevatorPanel(int elevatorNum) {
 		return elevatorPanels[elevatorNum];
 	}
-	public static void main(String[] args) {
-		ElevatorFrame frame = new ElevatorFrame(4, 22);
-	}
 
 }
