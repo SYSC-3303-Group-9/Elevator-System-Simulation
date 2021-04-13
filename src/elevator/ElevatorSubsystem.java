@@ -87,7 +87,8 @@ public class ElevatorSubsystem implements Runnable {
 	 * @param isDoorEvent Whether this was a door event.
 	 */
 	private void sendElevatorEvent(boolean isPermanentFault, boolean isDoorEvent) {
-		ElevatorEvent elevatorInfo = new ElevatorEvent(this.floor, this.id, isPermanentFault, isDoorEvent);
+		//TODO serviceDirection
+		ElevatorEvent elevatorInfo = new ElevatorEvent(this.floor, this.id, isPermanentFault, isDoorEvent, null);
 
 		// Send ElevatorEvent packet to ElevatorCommunicator.
 		try {
