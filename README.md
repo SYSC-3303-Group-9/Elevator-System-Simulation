@@ -535,6 +535,7 @@ James
 - Modify ElevatorEventReceiver to forward ElevatorEvents with (door flag == true) to SchedulerReceiver
 - ConfigurationFrame start button is disabled until handshakes received
 - Wait for UIs to build before starting the simulation
+- Update statemachine diagram
 
 Liya
 
