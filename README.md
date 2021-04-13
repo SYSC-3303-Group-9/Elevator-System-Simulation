@@ -536,6 +536,7 @@ James
 - ConfigurationFrame start button is disabled until handshakes received
 - Wait for UIs to build before starting the simulation
 - Update statemachine diagram
+- Modify Scheduler and ElevatorSubsystem to pass serviceDirection to FloorFrame
 
 Liya
 

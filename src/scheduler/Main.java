@@ -11,7 +11,7 @@ import elevator.ElevatorCommand;
 import elevator.ElevatorCommandSender;
 import elevator.ElevatorEventReceiver;
 import floor.FloorReceiver;
-import scheduler.GUI.ConfigurationFrame;
+import scheduler.gui.ConfigurationFrame;
 
 public class Main {
 

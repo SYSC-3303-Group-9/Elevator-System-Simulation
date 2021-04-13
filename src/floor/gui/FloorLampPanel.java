@@ -2,13 +2,12 @@ package floor.gui;
 
 import java.awt.Color;
 import java.awt.GridLayout;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import elevator.Fault;
 
 public class FloorLampPanel extends JPanel {
-
+	private static final long serialVersionUID = 3648445664509276914L;
 	private FloorLamp[][] floorGrid;
 	private int columns;
 	private int rows;

@@ -36,7 +36,7 @@ public class ElevatorSubsystemTest {
 
 	@Test
 	void moveToWaiting() {
-		system = new ElevatorSubsystem(0, new ElevatorPanel(1));
+		system = new ElevatorSubsystem(0, new ElevatorPanel(1, 1));
 
 		// Transition to WAITING state
 		system.next();
@@ -44,15 +44,15 @@ public class ElevatorSubsystemTest {
 	}
 
 	@Test
-	void movedElevatorUp() throws IOException {
-		system = new ElevatorSubsystem(1, new ElevatorPanel(1));
+	void movedElevatorUp() throws IOException, ClassNotFoundException {
+		system = new ElevatorSubsystem(1, new ElevatorPanel(1, 1));
 
 		// Transition to WAITING state
 		system.next();
 		assertEquals(ElevatorState.WAITING, system.getState());
 
 		// Move elevator one floor up
-		ElevatorMoveCommand request = new ElevatorMoveCommand(system.getId(), Fault.NONE, Direction.UP, 2);
+		ElevatorMoveCommand request = new ElevatorMoveCommand(system.getId(), Fault.NONE, Direction.UP, 2, Direction.WAITING);
 
 		// Construct a datagram packet that is to be sent
 		sendPacket = new DatagramPacket(request.toBytes(), request.toBytes().length, InetAddress.getLocalHost(),
@@ -68,7 +68,7 @@ public class ElevatorSubsystemTest {
 
 		// Construct a DatagramPacket for receiving packets up
 		// to 100 bytes
-		byte data[] = new byte[100];
+		byte data[] = new byte[500];
 		receivePacket = new DatagramPacket(data, data.length);
 
 		// Receiving Elevator command
@@ -82,15 +82,15 @@ public class ElevatorSubsystemTest {
 	}
 
 	@Test
-	void movedElevatorDown() throws IOException {
-		system = new ElevatorSubsystem(2, new ElevatorPanel(1));
+	void movedElevatorDown() throws IOException, ClassNotFoundException {
+		system = new ElevatorSubsystem(2, new ElevatorPanel(1, 1));
 		
 		// Transition to WAITING state
 		system.next();
 		assertEquals(ElevatorState.WAITING, system.getState());
 
 		// Move elevator one floor up
-		ElevatorMoveCommand requestDown = new ElevatorMoveCommand(system.getId(), Fault.NONE, Direction.DOWN, 0);
+		ElevatorMoveCommand requestDown = new ElevatorMoveCommand(system.getId(), Fault.NONE, Direction.DOWN, 0, Direction.WAITING);
 
 		// Construct a datagram packet that is to be sent
 		sendPacket = new DatagramPacket(requestDown.toBytes(), requestDown.toBytes().length, InetAddress.getLocalHost(),
@@ -114,7 +114,7 @@ public class ElevatorSubsystemTest {
 
 		// Construct a DatagramPacket for receiving packets up
 		// to 100 bytes
-		byte data[] = new byte[100];
+		byte data[] = new byte[500];
 		receivePacket = new DatagramPacket(data, data.length);
 
 		// Receiving Elevator command
@@ -128,14 +128,14 @@ public class ElevatorSubsystemTest {
 
 	@Test
 	void permanentFaultElevator() throws IOException {
-		system = new ElevatorSubsystem(3, new ElevatorPanel(1));
+		system = new ElevatorSubsystem(3, new ElevatorPanel(1, 1));
 
 		// Transition to WAITING state
 		system.next();
 		assertEquals(ElevatorState.WAITING, system.getState());
 
 		// Move elevator one floor down
-		ElevatorMoveCommand request = new ElevatorMoveCommand(system.getId(), Fault.PERMANENT, Direction.DOWN, 2);
+		ElevatorMoveCommand request = new ElevatorMoveCommand(system.getId(), Fault.PERMANENT, Direction.DOWN, 2, Direction.WAITING);
 
 		// Construct a datagram packet that is to be sent
 		sendPacket = new DatagramPacket(request.toBytes(), request.toBytes().length, InetAddress.getLocalHost(),
@@ -159,14 +159,14 @@ public class ElevatorSubsystemTest {
 
 	@Test
 	void openCloseElevatorDoors() throws IOException {
-		system = new ElevatorSubsystem(4, new ElevatorPanel(1));
+		system = new ElevatorSubsystem(4, new ElevatorPanel(1, 1));
 
 		// Transition to WAITING state
 		system.next();
 		assertEquals(ElevatorState.WAITING, system.getState());
 
 		// Move elevator one floor down
-		ElevatorDoorCommand request = new ElevatorDoorCommand(system.getId(), Fault.NONE);
+		ElevatorDoorCommand request = new ElevatorDoorCommand(system.getId(), Fault.NONE, Direction.WAITING);
 
 		// Construct a datagram packet that is to be sent
 		sendPacket = new DatagramPacket(request.toBytes(), request.toBytes().length, InetAddress.getLocalHost(),
@@ -186,14 +186,14 @@ public class ElevatorSubsystemTest {
 	
 	@Test
 	void transientFaultElevator() throws IOException {
-		system = new ElevatorSubsystem(5, new ElevatorPanel(1));
+		system = new ElevatorSubsystem(5, new ElevatorPanel(1, 1));
 
 		// Transition to WAITING state
 		system.next();
 		assertEquals(ElevatorState.WAITING, system.getState());
 
 		// Move elevator one floor down
-		ElevatorDoorCommand request = new ElevatorDoorCommand(system.getId(), Fault.TRANSIENT);
+		ElevatorDoorCommand request = new ElevatorDoorCommand(system.getId(), Fault.TRANSIENT, Direction.WAITING);
 
 		// Construct a datagram packet that is to be sent
 		sendPacket = new DatagramPacket(request.toBytes(), request.toBytes().length, InetAddress.getLocalHost(),

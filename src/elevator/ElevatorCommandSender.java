@@ -27,10 +27,9 @@ public class ElevatorCommandSender implements Runnable {
 
 			// If buffer is not empty send instruction to elevatorSubsystem
 			if (command != null) {
-				byte commandByte[] = command.toBytes();
-				int elevatorId = command.getID();
-
 				try {
+					byte commandByte[] = command.toBytes();
+					int elevatorId = command.getID();
 					DatagramPacket sendPacket = new DatagramPacket(
 							commandByte,
 							commandByte.length,

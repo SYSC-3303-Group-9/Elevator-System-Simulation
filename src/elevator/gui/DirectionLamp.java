@@ -11,7 +11,7 @@ import javax.swing.JLabel;
 import elevator.Direction;
 
 public class DirectionLamp extends JLabel {
-
+	private static final long serialVersionUID = -6812435032515110849L;
 	private Direction direction;
 	private String source;
 

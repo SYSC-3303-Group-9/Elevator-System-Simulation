@@ -2,6 +2,9 @@ package elevator;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.IOException;
+import java.io.StreamCorruptedException;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,8 +15,8 @@ class ElevatorCommandTest {
 	
 	@BeforeEach
 	void setUp() throws Exception {
-		doorCommand = new ElevatorDoorCommand(1, Fault.TRANSIENT);
-		moveCommand = new ElevatorMoveCommand(1, Fault.TRANSIENT, Direction.UP, 7);
+		doorCommand = new ElevatorDoorCommand(1, Fault.TRANSIENT, Direction.WAITING);
+		moveCommand = new ElevatorMoveCommand(1, Fault.TRANSIENT, Direction.UP, 7, Direction.WAITING);
 	}
 
 	@AfterEach
@@ -23,30 +26,30 @@ class ElevatorCommandTest {
 	}
 	
 	@Test
-	void testDifferentCommandDifferentBytes() {
+	void testDifferentCommandDifferentBytes() throws IOException {
 		byte[] actualBytes1 = doorCommand.toBytes();
 		byte[] actualBytes2 = moveCommand.toBytes();
 		assertNotEquals(actualBytes1, actualBytes2);
 	}
 	
 	@Test
-	void testIllegalCommandIdentifierThrowsException() {
+	void testIllegalCommandIdentifierThrowsException() throws IOException {
 		// Create illegal byte array using illegal command identifier
 		byte[] wrongBytes1 = doorCommand.toBytes();
 		wrongBytes1[0] = (byte) 0x03;
-		assertThrows(IllegalArgumentException.class, () -> {ElevatorCommand.fromBytes(wrongBytes1);});
+		assertThrows(StreamCorruptedException.class, () -> {ElevatorCommand.fromBytes(wrongBytes1);});
 	}
 	
 	@Test
-	void testCorruptedMoveDirectionThrowsException() {
+	void testCorruptedMoveDirectionThrowsException() throws IOException {
 		// Create illegal byte array using 'corrupted' move direction
 		byte[] wrongBytes1 = moveCommand.toBytes();
 		wrongBytes1[11] = (byte) 0x69;
-		assertThrows(IllegalArgumentException.class, () -> {ElevatorCommand.fromBytes(wrongBytes1);});
+		assertThrows(ClassNotFoundException.class, () -> {ElevatorCommand.fromBytes(wrongBytes1);});
 	}
 	
 	@Test
-	void testFromBytesReturnsProperObjects() {
+	void testFromBytesReturnsProperObjects() throws ClassNotFoundException, IOException {
 		byte[] actualBytes1 = doorCommand.toBytes();
 		byte[] actualBytes2 = moveCommand.toBytes();
 		ElevatorCommand actual1 = ElevatorCommand.fromBytes(actualBytes1);

@@ -12,8 +12,10 @@ public class SchedulerElevator {
 	private int elevatorId;
 	private int lastKnownFloor;
 	private Direction direction;
+	
 	private Fault pendingFault = Fault.NONE;
 	private boolean doorsOpening = false;
+	private Direction serviceDirection = Direction.WAITING;
 	private ArrayList<ScheduledJob> assignedJobs = new ArrayList<ScheduledJob>();
 	
 	public SchedulerElevator(int elevatorId, int lastKnownFloor, Direction direction) {
@@ -101,6 +103,26 @@ public class SchedulerElevator {
 	 */
 	public ArrayList<ScheduledJob> getAssignedJobs() {
 		return assignedJobs;
+	}
+	
+	/**
+	 * The direction the elevator will travel to service requests.
+	 * This is not necessarily the current direction of the elevator if
+	 * the elevator is empty.
+	 * @return
+	 */
+	public Direction getServiceDirection() {
+		return this.serviceDirection;
+	}
+	
+	/**
+	 * Sets the direction the elevator will travel to service requests.
+	 * This is not necessarily the current direction of the elevator if
+	 * the elevator is empty.
+	 * @param The service direction.
+	 */
+	public void setServiceDirection(Direction serviceDirection) {
+		this.serviceDirection = serviceDirection;
 	}
 	
 	/**

@@ -6,6 +6,7 @@ import java.awt.GridLayout;
 import javax.swing.*;
 
 public class ElevatorFrame extends JFrame {
+	private static final long serialVersionUID = -4779458824801336405L;
 	private JFrame frame;
 	private ElevatorPanel[] elevatorPanels;
 	

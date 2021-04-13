@@ -1,9 +1,7 @@
 package elevator;
 
-import java.nio.ByteBuffer;
-
 public class ElevatorMoveCommand extends ElevatorCommand {
-	public static final byte COMMAND_IDENTIFIER = (byte) 0x01;
+	private static final long serialVersionUID = 175254660284202558L;
 	private Direction moveDirection;
 	private int destinationFloor;
 	
@@ -12,46 +10,10 @@ public class ElevatorMoveCommand extends ElevatorCommand {
 	 * @param elevatorID an int indicating the ID of the elevator to be moved
 	 * @param direction the direction in which the elevator should be moved
 	 */
-	public ElevatorMoveCommand(int elevatorID, Fault fault, Direction direction, int destinationFloor) {
-		super(elevatorID, fault);
+	public ElevatorMoveCommand(int elevatorID, Fault fault, Direction direction, int destinationFloor, Direction serviceDirection) {
+		super(elevatorID, fault, serviceDirection);
 		this.moveDirection = direction;
 		this.destinationFloor = destinationFloor;
-	}
-	
-	/**
-	 * Converts an ElevatorMoveCommand object into an array of bytes to be sent with packets
-	 * @return byte array representing an ElevatorMoveCommand object
-	 */
-	@Override
-	public byte[] toBytes() {
-		// Convert state into bytes
-		byte[] elevatorCommandBytes = super.toBytes();
-		byte[] moveDirectionBytes = moveDirection.toBytes();
-		byte[] destinationFloorBytes = ByteBuffer.allocate(4).putInt(destinationFloor).array();
-		// Combine all byte arrays into one, prepending command identifier
-		byte[] elevatorMoveCommandBytes = new byte[elevatorCommandBytes.length + moveDirectionBytes.length + destinationFloorBytes.length + 1];
-		elevatorMoveCommandBytes[0] = ElevatorMoveCommand.COMMAND_IDENTIFIER;
-		System.arraycopy(elevatorCommandBytes, 0, elevatorMoveCommandBytes, 1, elevatorCommandBytes.length);
-		System.arraycopy(moveDirectionBytes, 0, elevatorMoveCommandBytes, elevatorCommandBytes.length + 1, moveDirectionBytes.length);
-		System.arraycopy(destinationFloorBytes, 0, elevatorMoveCommandBytes, elevatorCommandBytes.length + moveDirectionBytes.length + 1, destinationFloorBytes.length);
-		return elevatorMoveCommandBytes;
-	}
-	
-	/**
-	 * Constructs an ElevatorMoveCommand object from a passed array of bytes
-	 * @param bytes an array of bytes created from calling toBytes() on an ElevatorMoveCommand object
-	 * @return the ElevatorMoveCommand object represented by the data stored in the byte array
-	 */
-	public static ElevatorMoveCommand fromBytes(byte[] bytes) {
-		// Create a ByteBuffer for bytes
-		ByteBuffer buffer = ByteBuffer.wrap(bytes);
-		if(buffer.get() != ElevatorMoveCommand.COMMAND_IDENTIFIER) return null;
-		int elevatorID = buffer.getInt();
-		byte[] faultBytes = new byte[4];
-		byte[] directionBytes = new byte[4];
-		buffer.get(faultBytes);
-		buffer.get(directionBytes);
-		return new ElevatorMoveCommand(elevatorID, Fault.fromBytes(faultBytes), Direction.fromBytes(directionBytes), buffer.getInt());
 	}
 	
 	public Direction getDirection() {

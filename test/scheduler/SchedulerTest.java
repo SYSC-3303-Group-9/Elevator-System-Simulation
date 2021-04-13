@@ -52,30 +52,13 @@ public class SchedulerTest {
 		assertEquals(SchedulerState.WAITING_FOR_MESSAGE, subject.getState());
 	}
 	
-	private void processElevatorEventUnblockJob(Scheduler subject, ProcessType t) {
-		subject.tick();
-		assertEquals(SchedulerState.PROCESSING_ELEVATOR_EVENT, subject.getState());
-		subject.tick();
-		assertEquals(SchedulerState.PROCESSING_NEW_JOB, subject.getState());
-		if (t.equals(ProcessType.MOVE)) {
-			subject.tick();
-			assertEquals(SchedulerState.SCHEDULE_MOVE, subject.getState());
-		}
-		else if (t.equals(ProcessType.DOOR)) {
-			subject.tick();
-			assertEquals(SchedulerState.SCHEDULE_DOOR, subject.getState());
-		}
-		subject.tick();
-		assertEquals(SchedulerState.WAITING_FOR_MESSAGE, subject.getState());
-	}
-	
 	private void mimicElevatorEvent(int floor, int elevatorId, Buffer<SchedulerMessage> messageBuffer) {
-		ElevatorEvent event = new ElevatorEvent(floor, elevatorId, false, false);
+		ElevatorEvent event = new ElevatorEvent(floor, elevatorId, false, false, Direction.WAITING);
 		messageBuffer.put(SchedulerMessage.fromElevatorEvent(event));
 	}
 	
 	private void mimicElevatorFaultEvent(int floor, int elevatorId, Buffer<SchedulerMessage> messageBuffer) {
-		ElevatorEvent event = new ElevatorEvent(floor, elevatorId, true, false);
+		ElevatorEvent event = new ElevatorEvent(floor, elevatorId, true, false, Direction.WAITING);
 		messageBuffer.put(SchedulerMessage.fromElevatorEvent(event));
 	}
 	
@@ -85,6 +68,8 @@ public class SchedulerTest {
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
 		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
 		Scheduler subject = new Scheduler(1, 3, messageBuffer, commandBuffer);
+		ElevatorDoorCommand doorCmd;
+		ElevatorMoveCommand moveCmd;
 		
 		// act: move out of initial state
 		subject.tick();
@@ -96,22 +81,30 @@ public class SchedulerTest {
 		
 		// assert: move up to floor 2
 		processNewJob(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = (ElevatorMoveCommand)commandBuffer.get();
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		
 		// assert: open doors for pickup
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		
 		// assert: move up to floor 3
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = (ElevatorMoveCommand)commandBuffer.get();
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(3, 0, messageBuffer);
 		
 		// assert: open doors for drop off
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(3, 0, messageBuffer);
 		
 		// assert: command buffer has no remaining commands
@@ -126,6 +119,8 @@ public class SchedulerTest {
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
 		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
 		Scheduler subject = new Scheduler(1, 5, messageBuffer, commandBuffer);
+		ElevatorDoorCommand doorCmd;
+		ElevatorMoveCommand moveCmd;
 		
 		// act: move out of initial state
 		subject.tick();
@@ -137,32 +132,44 @@ public class SchedulerTest {
 		
 		// assert: move up to floor 2
 		processNewJob(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = (ElevatorMoveCommand)commandBuffer.get();
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		
 		// assert: move up to floor 3
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = (ElevatorMoveCommand)commandBuffer.get();
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(3, 0, messageBuffer);
 		
 		// assert: open doors for pickup
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(3, 0, messageBuffer);
 		
 		// assert: move up to floor 4
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = (ElevatorMoveCommand)commandBuffer.get();
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(4, 0, messageBuffer);
 		
 		// assert: move up to floor 5
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = (ElevatorMoveCommand)commandBuffer.get();
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(5, 0, messageBuffer);
 		
 		// assert: open doors for drop off
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(5, 0, messageBuffer);
 		
 		// assert: command buffer has no remaining commands
@@ -177,6 +184,8 @@ public class SchedulerTest {
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
 		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
 		Scheduler subject = new Scheduler(1, 5, messageBuffer, commandBuffer);
+		ElevatorDoorCommand doorCmd;
+		ElevatorMoveCommand moveCmd;
 		
 		// act: move out of initial state
 		subject.tick();
@@ -188,47 +197,65 @@ public class SchedulerTest {
 		
 		// assert: move up to floor 2
 		processNewJob(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = (ElevatorMoveCommand)commandBuffer.get();
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.DOWN, moveCmd.getServiceDirection());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		
 		// assert: move up to floor 3
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = (ElevatorMoveCommand)commandBuffer.get();
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.DOWN, moveCmd.getServiceDirection());
 		mimicElevatorEvent(3, 0, messageBuffer);
 		
 		// assert: move up to floor 4
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = (ElevatorMoveCommand)commandBuffer.get();
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.DOWN, moveCmd.getServiceDirection());
 		mimicElevatorEvent(4, 0, messageBuffer);
 		
 		// assert: move up to floor 5
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = (ElevatorMoveCommand)commandBuffer.get();
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.DOWN, moveCmd.getServiceDirection());
 		mimicElevatorEvent(5, 0, messageBuffer);
 		
 		// assert: open doors for pickup
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.DOWN, doorCmd.getServiceDirection());
 		mimicElevatorEvent(5, 0, messageBuffer);
 		
 		// assert: move down to floor 4
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.DOWN, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = (ElevatorMoveCommand)commandBuffer.get();
+		assertEquals(Direction.DOWN, moveCmd.getDirection());
+		assertEquals(Direction.DOWN, moveCmd.getServiceDirection());
 		mimicElevatorEvent(4, 0, messageBuffer);
 		
 		// assert: move down to floor 3
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.DOWN, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = (ElevatorMoveCommand)commandBuffer.get();
+		assertEquals(Direction.DOWN, moveCmd.getDirection());
+		assertEquals(Direction.DOWN, moveCmd.getServiceDirection());
 		mimicElevatorEvent(3, 0, messageBuffer);
 		
 		// assert: move down to floor 2
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.DOWN, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = (ElevatorMoveCommand)commandBuffer.get();
+		assertEquals(Direction.DOWN, moveCmd.getDirection());
+		assertEquals(Direction.DOWN, moveCmd.getServiceDirection());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		
 		// assert: open doors for drop off
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.DOWN, doorCmd.getServiceDirection());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		
 		// assert: command buffer has no remaining commands
@@ -243,7 +270,7 @@ public class SchedulerTest {
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
 		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
 		Scheduler subject = new Scheduler(2 /* 2 elevators */, 5, messageBuffer, commandBuffer);
-		
+		ElevatorDoorCommand doorCmd;
 		ElevatorMoveCommand moveCmd;
 		
 		// act: move out of initial state
@@ -256,19 +283,24 @@ public class SchedulerTest {
 		
 		// assert: E0 open doors for pickup
 		processNewJob(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(1, 0, messageBuffer);
 		
 		// assert: E0 move up to floor 2
 		processElevatorEvent(subject, ProcessType.MOVE);
 		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
 		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		assertEquals(0, moveCmd.getID());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		
 		// assert: E0 open doors for drop off
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		processElevatorEvent(subject, ProcessType.NONE);
 		
@@ -278,19 +310,24 @@ public class SchedulerTest {
 		
 		// assert: E1 open doors for pickup
 		processNewJob(subject, ProcessType.DOOR);
-		assertEquals(1, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(1, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(1, 1, messageBuffer);
 		
 		// assert: E1 move up to floor 2
 		processElevatorEvent(subject, ProcessType.MOVE);
 		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
 		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		assertEquals(1, moveCmd.getID());
 		mimicElevatorEvent(2, 1, messageBuffer);
 		
 		// assert: E1 open doors for drop off
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(1, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(1, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(2, 1, messageBuffer);
 		
 		// assert: command buffer has no remaining commands
@@ -305,6 +342,8 @@ public class SchedulerTest {
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
 		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
 		Scheduler subject = new Scheduler(1, 5, messageBuffer, commandBuffer);
+		ElevatorDoorCommand doorCmd;
+		ElevatorMoveCommand moveCmd;
 		
 		// act: move out of initial state
 		subject.tick();
@@ -316,12 +355,16 @@ public class SchedulerTest {
 		
 		// assert: open doors for pickup
 		processNewJob(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(1, 0, messageBuffer);
 		
 		// assert: move up to floor 2
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		
 		/* request 2 -> 4 before mimicking elevator event, i.e., before elevator has reached floor 2 but after it was scheduled to move there. */
 		InputData request2 = new InputData(LocalTime.of(1, 1, 1, 1), 2, Direction.UP, 4, Fault.NONE);
@@ -333,27 +376,37 @@ public class SchedulerTest {
 		
 		// assert: open doors for pickup
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		
 		// assert: move up to floor 3
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(3, 0, messageBuffer);
 		
 		// assert: open doors for drop off
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(3, 0, messageBuffer);
 		
 		// assert: move up to floor 4
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(4, 0, messageBuffer);
 		
 		// assert: open doors for drop off
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(4, 0, messageBuffer);
 		
 		// assert: command buffer has no remaining commands
@@ -368,6 +421,8 @@ public class SchedulerTest {
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
 		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
 		Scheduler subject = new Scheduler(1, 5, messageBuffer, commandBuffer);
+		ElevatorDoorCommand doorCmd;
+		ElevatorMoveCommand moveCmd;
 		
 		// act: move out of initial state
 		subject.tick();
@@ -383,42 +438,58 @@ public class SchedulerTest {
 		// assert: open doors for pickup
 		processNewJob(subject, ProcessType.DOOR);
 		processNewJob(subject, ProcessType.NONE);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(1, 0, messageBuffer);
 		
 		// assert: move up to floor 2
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		
 		// assert: move up to floor 3
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(3, 0, messageBuffer);
 		
 		// assert: open doors for drop off
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.DOWN, doorCmd.getServiceDirection());
 		mimicElevatorEvent(3, 0, messageBuffer);
 		
 		// assert: move down to floor 2, unblock queued job
-		processElevatorEventUnblockJob(subject, ProcessType.MOVE);
-		assertEquals(Direction.DOWN, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		processElevatorEvent(subject, ProcessType.MOVE);
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.DOWN, moveCmd.getDirection());
+		assertEquals(Direction.DOWN, moveCmd.getServiceDirection());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		
 		// assert: open doors for pick up
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.DOWN, doorCmd.getServiceDirection());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		
 		// assert: move down to floor 1
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.DOWN, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.DOWN, moveCmd.getDirection());
+		assertEquals(Direction.DOWN, moveCmd.getServiceDirection());
 		mimicElevatorEvent(1, 0, messageBuffer);
 		
 		// assert: open doors for drop off
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.DOWN, doorCmd.getServiceDirection());
 		mimicElevatorEvent(1, 0, messageBuffer);
 		
 		// assert: command buffer has no remaining commands
@@ -433,6 +504,8 @@ public class SchedulerTest {
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
 		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
 		Scheduler subject = new Scheduler(1, 5, messageBuffer, commandBuffer);
+		ElevatorDoorCommand doorCmd;
+		ElevatorMoveCommand moveCmd;
 		
 		// act: move out of initial state
 		subject.tick();
@@ -448,42 +521,58 @@ public class SchedulerTest {
 		// assert: open doors for pick up
 		processNewJob(subject, ProcessType.DOOR);
 		processNewJob(subject, ProcessType.NONE);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(1, 0, messageBuffer);
 		
 		// assert: move up to floor 2
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		
 		// assert: move up to floor 3
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(3, 0, messageBuffer);
 		
 		// assert: open doors for drop off
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.DOWN, doorCmd.getServiceDirection());
 		mimicElevatorEvent(3, 0, messageBuffer);
 		
 		// assert: move up to floor 4
-		processElevatorEventUnblockJob(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		processElevatorEvent(subject, ProcessType.MOVE);
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.DOWN, moveCmd.getServiceDirection());
 		mimicElevatorEvent(4, 0, messageBuffer);
 		
 		// assert: open doors for pick up
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.DOWN, doorCmd.getServiceDirection());
 		mimicElevatorEvent(4, 0, messageBuffer);
 		
 		// assert: move down to floor 3
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.DOWN, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.DOWN, moveCmd.getDirection());
+		assertEquals(Direction.DOWN, moveCmd.getServiceDirection());
 		mimicElevatorEvent(3, 0, messageBuffer);
 		
 		// assert: open doors for drop off
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.DOWN, doorCmd.getServiceDirection());
 		mimicElevatorEvent(3, 0, messageBuffer);
 		
 		// assert: command buffer has no remaining commands
@@ -498,6 +587,8 @@ public class SchedulerTest {
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
 		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
 		Scheduler subject = new Scheduler(1, 5, messageBuffer, commandBuffer);
+		ElevatorDoorCommand doorCmd;
+		ElevatorMoveCommand moveCmd;
 		
 		// act: move out of initial state
 		subject.tick();
@@ -509,12 +600,16 @@ public class SchedulerTest {
 		
 		// assert: open doors for pick up
 		processNewJob(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(1, 0, messageBuffer);
 		
 		// assert: move up to floor 2
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		
 		// arrange: requesting 1 -> 2; This request also moves up but we are already on floor 2,
@@ -525,37 +620,51 @@ public class SchedulerTest {
 		// assert: move up to floor 3
 		processElevatorEvent(subject, ProcessType.MOVE);
 		processNewJob(subject, ProcessType.NONE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(3, 0, messageBuffer);
 		
 		// assert: open doors for drop off
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(3, 0, messageBuffer);
 		
 		// assert: move down to floor 2
-		processElevatorEventUnblockJob(subject, ProcessType.MOVE);
-		assertEquals(Direction.DOWN, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		processElevatorEvent(subject, ProcessType.MOVE);
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.DOWN, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		
 		// assert: move down to floor 1
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.DOWN, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.DOWN, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(1, 0, messageBuffer);
 		
 		// assert: open doors for pick up
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(1, 0, messageBuffer);
 		
 		// assert: move up to floor 2
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		
 		// assert: open doors for drop off
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		
 		// assert: command buffer has no remaining commands
@@ -570,6 +679,8 @@ public class SchedulerTest {
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
 		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
 		Scheduler subject = new Scheduler(2 /* 2 elevators */, 5, messageBuffer, commandBuffer);
+		ElevatorDoorCommand doorCmd;
+		ElevatorMoveCommand moveCmd;
 		
 		// act: move out of initial state
 		subject.tick();
@@ -586,18 +697,26 @@ public class SchedulerTest {
 		processNewJob(subject, ProcessType.MOVE);
 		processNewJob(subject, ProcessType.MOVE);
 		
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.DOWN, moveCmd.getServiceDirection());
 		mimicElevatorEvent(2, 1, messageBuffer);
 		
 		// assert: E0 opens doors for pickup; E1 moves up to floor 3
 		processElevatorEvent(subject, ProcessType.DOOR);
 		processElevatorEvent(subject, ProcessType.MOVE);
 		
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.DOWN, moveCmd.getServiceDirection());
 		
 		mimicElevatorEvent(2, 0, messageBuffer);
 		mimicElevatorEvent(3, 1, messageBuffer);
@@ -606,19 +725,26 @@ public class SchedulerTest {
 		processElevatorEvent(subject, ProcessType.MOVE);
 		processElevatorEvent(subject, ProcessType.DOOR);
 		
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
-		assertEquals(1, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(1, doorCmd.getID());
+		assertEquals(Direction.DOWN, doorCmd.getServiceDirection());
 		
 		mimicElevatorEvent(3, 0, messageBuffer);
 		mimicElevatorEvent(3, 1, messageBuffer);
-		
 		
 		// assert: E0 moves up to floor 4; E1 moves down to floor 2
 		processElevatorEvent(subject, ProcessType.MOVE);
 		processElevatorEvent(subject, ProcessType.MOVE);
 
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
-		assertEquals(Direction.DOWN, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.DOWN, moveCmd.getDirection());
+		assertEquals(Direction.DOWN, moveCmd.getServiceDirection());
 		
 		mimicElevatorEvent(4, 0, messageBuffer);
 		mimicElevatorEvent(2, 1, messageBuffer);
@@ -627,8 +753,12 @@ public class SchedulerTest {
 		processElevatorEvent(subject, ProcessType.DOOR);
 		processElevatorEvent(subject, ProcessType.MOVE);
 
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
-		assertEquals(Direction.DOWN, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.DOWN, moveCmd.getDirection());
+		assertEquals(Direction.DOWN, moveCmd.getServiceDirection());
 		
 		mimicElevatorEvent(4, 0, messageBuffer);
 		mimicElevatorEvent(1, 1, messageBuffer);
@@ -637,7 +767,9 @@ public class SchedulerTest {
 		processElevatorEvent(subject, ProcessType.NONE);
 		processElevatorEvent(subject, ProcessType.DOOR);
 
-		assertEquals(1, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(1, doorCmd.getID());
+		assertEquals(Direction.DOWN, doorCmd.getServiceDirection());
 		
 		mimicElevatorEvent(1, 1, messageBuffer);
 		
@@ -680,11 +812,65 @@ public class SchedulerTest {
 	}
 	
 	@Test
+	public void tick_shouldNotApplyFaultUntilJobIsStarted() {
+		// arrange subject
+		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
+		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
+		Scheduler subject = new Scheduler(1 /* 1 elevators */, 5, messageBuffer, commandBuffer);
+		ElevatorDoorCommand doorCmd;
+		ElevatorMoveCommand moveCmd;
+		
+		// act: move out of initial state.
+		subject.tick();
+		assertEquals(SchedulerState.WAITING_FOR_MESSAGE, subject.getState());
+		
+		// arrange: requesting 1 -> 2 and 2 -> 3 with a permanent fault
+		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2, Fault.NONE);
+		InputData request2 = new InputData(LocalTime.of(1, 1, 1, 1), 2, Direction.UP, 3, Fault.PERMANENT);
+		messageBuffer.put(SchedulerMessage.fromInputData(request1));
+		messageBuffer.put(SchedulerMessage.fromInputData(request2));
+		
+		// assert: open doors for pickup
+		processNewJob(subject, ProcessType.DOOR);
+		processNewJob(subject, ProcessType.NONE);
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Fault.NONE, doorCmd.getFault());
+		mimicElevatorEvent(1, 0, messageBuffer);
+		
+		// assert: move up to floor 2
+		processElevatorEvent(subject, ProcessType.MOVE);
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
+		assertEquals(Fault.NONE, moveCmd.getFault());
+		mimicElevatorEvent(2, 0, messageBuffer);
+		
+		// assert: open doors for pickup and drop off, should have permanent fault.
+		processElevatorEvent(subject, ProcessType.DOOR);
+		assertEquals(Fault.PERMANENT, commandBuffer.get().getFault());
+		mimicElevatorFaultEvent(2, 0, messageBuffer);
+		
+		// assert: scheduler shuts down when only elevator faults
+		subject.tick();
+		assertEquals(SchedulerState.PROCESSING_ELEVATOR_EVENT, subject.getState());
+		subject.tick();
+		assertEquals(SchedulerState.FINAL, subject.getState());
+		assertTrue(subject.tick());
+		
+		// assert: command buffer has no remaining commands
+		commandBuffer.setIsDisabled(true);
+		assertEquals(commandBuffer.get(), null);
+	}
+	
+	@Test
 	public void tick_shouldReassignElevatorWhenPermanentFault() {
 		// arrange subject
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
 		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
 		Scheduler subject = new Scheduler(2 /* 2 elevators */, 5, messageBuffer, commandBuffer);
+		ElevatorDoorCommand doorCmd;
+		ElevatorMoveCommand moveCmd;
 		
 		// act: move out of initial state
 		subject.tick();
@@ -703,17 +889,23 @@ public class SchedulerTest {
 		processElevatorEvent(subject, ProcessType.NONE);
 		// job to reassign should be "new"
 		processNewJob(subject, ProcessType.DOOR);
-		assertEquals(1, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(1, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(1, 1, messageBuffer);
 		
 		// assert: E1 moves up to floor 2
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(2, 1, messageBuffer);
 		
 		// assert: E1 open doors for drop off
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(1, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(1, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(2, 1, messageBuffer);
 		
 		// assert: command buffer has no remaining commands
@@ -728,6 +920,8 @@ public class SchedulerTest {
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
 		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
 		Scheduler subject = new Scheduler(1 /* 1 elevators */, 5, messageBuffer, commandBuffer);
+		ElevatorDoorCommand doorCmd;
+		ElevatorMoveCommand moveCmd;
 		
 		// act: move out of initial state
 		subject.tick();
@@ -742,27 +936,37 @@ public class SchedulerTest {
 		// assert: open doors for pickup
 		processNewJob(subject, ProcessType.DOOR);
 		processNewJob(subject, ProcessType.NONE);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(1, 0, messageBuffer);
 		
 		// assert: move up to floor 2
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		
 		// assert: open doors for pickup *and* drop off
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		
 		// assert: move up to floor 3
 		processElevatorEvent(subject, ProcessType.MOVE);
-		assertEquals(Direction.UP, ((ElevatorMoveCommand)commandBuffer.get()).getDirection());
+		moveCmd = ((ElevatorMoveCommand)commandBuffer.get());
+		assertEquals(Direction.UP, moveCmd.getDirection());
+		assertEquals(Direction.UP, moveCmd.getServiceDirection());
 		mimicElevatorEvent(3, 0, messageBuffer);
 		
 		// assert: open doors for drop off
 		processElevatorEvent(subject, ProcessType.DOOR);
-		assertEquals(0, ((ElevatorDoorCommand)commandBuffer.get()).getID());
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
 		mimicElevatorEvent(3, 0, messageBuffer);
 		
 		// assert: command buffer has no remaining commands

@@ -6,7 +6,6 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 
 import common.Constants;
-import common.IBufferInput;
 import elevator.ElevatorEvent;
 import elevator.gui.DirectionLampPanel;
 import floor.gui.FloorFrame;
@@ -16,12 +15,10 @@ import floor.gui.FloorFrame;
  * Should only receive ElevatorEvents that have a door event.
  */
 public class SchedulerReceiver implements Runnable {
-	private IBufferInput<ElevatorEvent> buffer;
 	private DatagramSocket socket;
 	private FloorFrame floorFrame;
 
-	public SchedulerReceiver(IBufferInput<ElevatorEvent> buffer, FloorFrame floorFrame) throws SocketException {
-		this.buffer = buffer;
+	public SchedulerReceiver(FloorFrame floorFrame) throws SocketException {
 		this.socket = new DatagramSocket(Constants.SCHEDULER_RECEIVER_PORT);
 		this.floorFrame = floorFrame;
 	}
@@ -31,7 +28,7 @@ public class SchedulerReceiver implements Runnable {
 		// Loop forever.
 		while (true) {
 			// Receive ElevatorEvent packets.
-			DatagramPacket rcvPacket = new DatagramPacket(new byte[100], 100);
+			DatagramPacket rcvPacket = new DatagramPacket(new byte[500], 500);
 			try {
 				this.socket.receive(rcvPacket);
 			} catch (IOException e) {
@@ -40,14 +37,17 @@ public class SchedulerReceiver implements Runnable {
 			}
 			
 			// Convert packet data to an ElevatorEvent instance.
-			ElevatorEvent event = ElevatorEvent.fromBytes(rcvPacket.getData());
-			System.out.println("[SchedulerReceiver] Received " + event);
-			DirectionLampPanel floorButton = this.floorFrame.getDirectionButton(event.getFloor()-1);
-			//TODO turn off floors appropriate light
-			//floorButton.turnOffLamp(event.getServiceDirection());
-			
-			// Put the ElevatorEvent in the buffer.
-			buffer.put(event);
+			ElevatorEvent event;
+			try {
+				event = ElevatorEvent.fromBytes(rcvPacket.getData());
+				System.out.println("[SchedulerReceiver] Received " + event);
+				DirectionLampPanel floorButton = this.floorFrame.getDirectionButton(event.getFloor()-1);
+				
+				// Turn off the lamp for the direction of the elevator that arrived.
+				floorButton.turnOffLamp(event.getServiceDirection());
+			} catch (ClassNotFoundException | IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

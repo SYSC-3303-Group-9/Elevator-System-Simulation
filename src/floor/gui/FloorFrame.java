@@ -7,11 +7,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import elevator.gui.DirectionLampPanel;
-import elevator.gui.ElevatorPanel;
 
 
-@SuppressWarnings("serial")
 public class FloorFrame extends JFrame {
+	private static final long serialVersionUID = 8377902406913625950L;
 	private JFrame frame;
 	private int numFloors;
 	private DirectionLampPanel[] floorButtons;
