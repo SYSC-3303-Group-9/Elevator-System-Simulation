@@ -61,7 +61,7 @@ public class Constants {
 	public static final int SCHEDULER_RECEIVER_PORT = 123;
 	
 	/**
-	 * Measurement's port.
+	 * MeasurementReceiver's port.
 	 */
 	public static final int MEASUREMENT_RECEIVER_PORT = 139;
 	

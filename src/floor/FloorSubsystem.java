@@ -79,6 +79,7 @@ public class FloorSubsystem implements Runnable {
 				System.exit(1);
 			}
 		}
+		
 		sendReceiveSocket.close();
 	}
 }
