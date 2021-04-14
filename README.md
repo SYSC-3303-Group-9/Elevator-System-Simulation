@@ -547,11 +547,14 @@ Noah
 - Add boolean flag isDoorEvent to ElevatorEvent
 - Modify sync() in Clock to return RunTimeConfig
 - Split up ElevatorDoor wait timers
+- Construct ElevatorFrame GUI
 
 ## Detailed Set Up
 
-The Elevator System now simulates real time and the floor, scheduler and elevator subsystems now detects and handles faults. The scheduler instantiates  a `SystemSync` which is utilized to synchronize all three subsystems. Before the `Clock` can starts, the `SystemSync` must wait until the elevator and floor subsystem send a message using UDP to notify it that they're ready to start.
-Once both ready messages have been received, the `SystemSync` will start the Clock and the `FloorSubsystem` can begin reading requests from the input.txt file. The last parameter in a request will determine the fault type. Parameter value of 1 will have no fault, 2 will has a transient fault and 3 will be a permanent fault. The `FloorSubsystem` sends the requests in the form of `InputData` 
+The Elevator System now simulates real time and the floor, scheduler and elevator subsystems now detects and handles faults. To emulate a real elevator system, the values currently set in `Constants` represent the calculated values from Iteration 0 (`DOOR_TIME`, `MOVING_TIME`, `LOADING_TIME`). 
+
+When run, the scheduler instantiates  a `SystemSync` which is utilized to synchronize all three subsystems. Before the `Clock` can start, the `SystemSync` must wait until the elevator and floor subsystem send a message using UDP to notify it that they're ready to start.
+Once both ready messages have been received, the `SystemSync` will start the Clock and the `FloorSubsystem` can begin reading requests from the input.txt file. The last parameter in a request will determine the fault type. Parameter value of 0 will have no fault, 1 will has a transient fault and 2 will be a permanent fault. The `FloorSubsystem` sends the requests in the form of `InputData` 
 to the `FloorReceiver` on port 70.
 
 The `InputData` is then turned into a `ScheduleMessage` and placed into an IBufferInput where the `Scheduler` can access it. The `Scheduler` creates a `ScheduledJob` and assigns it to an appropriate elevator by creating an `ElevatorMoveCommand` and putting it into a buffer where the `ElevatorCommunicator` can access it. The `ElevatorCommunicator` will then 
