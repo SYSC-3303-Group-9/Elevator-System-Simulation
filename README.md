@@ -3,22 +3,27 @@
 - Elevator-System-Simulation
 - Set Up and Test Instructions
 - Authors
-- Iteration 1
-  - Folders/Files included
-  - Team Responsibilities
-  - Detailed Set Up
-- Iteration 2
-  - Folders/Files included
-  - Team Responsibilities
-  - Detailed Set Up
+- Iterations
+  - Iteration 1
+    - Folders/Files included
+    - Team Responsibilities
+    - Detailed Set Up
+  - Iteration 2
+    - Folders/Files included
+    - Team Responsibilities
+    - Detailed Set Up
   - Iteration 3
-  - Folders/Files included
-  - Team Responsibilities
-  - Detailed Set Up
+    - Folders/Files included
+    - Team Responsibilities
+    - Detailed Set Up
   - Iteration 4
-  - Folders/Files included
-  - Team Responsibilities
-  - Detailed Set Up
+    - Folders/Files included
+    - Team Responsibilities
+    - Detailed Set Up
+  - Iteration 5
+    - Folders/Files included
+    - Team Responsibilities
+    - Detailed Set Up
 
 # Elevator-System-Simulation
 
@@ -453,16 +458,28 @@ to an out of service elevator.
         - common
             + Buffer.java
             + Clock.java
+            + ClockSync.java
             + Constants.java
             + IBufferInput.java
             + IBufferOutput.java
+            + ISystemSyncListener.java
+            + RuntimeConfig.java
+            + SystemSync.java
         - elevator
+            - gui
+                + DirectionLamp.java
+                + DirectionLampPanel.java
+                + Door.java
+                + DoorState.java
+                + ElevatorFrame.java
+                + ElevatorPanel.java
             + Direction.java
             + ElevatorCommand.java
-            + ElevatorCommunicator.java
+            + ElevatorCommandSender.java
             + ElevatorDoor.java
             + ElevatorDoorCommand.java
             + ElevatorEvent.java
+            + ElevatorEventReceiver.java
             + ElevatorMotor.java
             + ElevatorMoveCommand.java
             + ElevatorState.java
@@ -470,34 +487,44 @@ to an out of service elevator.
             + Fault.java
             + Main.java
         - floor
+            - gui
+                + FloorFrame.java
+                + FloorLamp.java
+                + FloorLampPanel.java
             + FloorReceiver.java
             + FloorSubsystem.java
             + InputData.java
             + InputParser.java
             + Main.java
-        - main
-            + Main.java
-            + SystemBuilder
+            + MeasurementReceiver.java
         - scheduler
+            - gui
+                + ConfigurationFrame.java
             + Main.java
             + ScheduledJob.java
             + Scheduler.java
             + SchedulerElevator.java
             + SchedulerMessage.java
+            + SchedulerReceiver.java
             + SchedulerState.java
-            + SystemSync.java
 
     * UML Diagrams
             + StateDiagram.mdj
-            + StateDiagram.png
-            + UML-Class-Diagram-IT1 .png
-            + UML-Class-Diagram-IT1 .violet
-            + UML-Class-Diagram-IT3 .png
-            + UML-Class-Diagram-IT3 .violet
-            + UML-Sequence-Diagram-IT1 .png
-            + UML-Sequence-Diagram-IT1 .violet
+            + StateDiagram-Scheduler.png
+            + StateDiagram-ElevatorSubsystem.png
+            + UML-Class-Diagram-IT3.png
+            + UML-Class-Diagram-IT4.png
+            + UML-Class-Diagram-IT4.violet
+            + UML-Class-Diagram-IT5.png
+            + UML-Class-Diagram-IT5.violet
+            + UML-Sequence-Diagram-IT5.png
+            + UML-Sequence-Diagram-IT5.violet
+            + Permanent Timing Diagram.PNG
+            + Transient Timing Diagram.png
 
     * test
+        - common
+            + SystemSyncTest.java
         - elevator
             + ElevatorCommandTest.java
             + ElevatorDoorCommandTest.java
@@ -506,27 +533,34 @@ to an out of service elevator.
             + ElevatorMotorTest.java
             + ElevatorMoveCommandTest.java
             + ElevatorSubsystemTest.java
-            + Elevator.java
         - floor
-            + FloorSubsystemTest.java
+            + FloorReceiverTest.java
             + InputDataTest.java
             + InputParserTest.java
         - scheduler
             + BufferTest.java
             + SchedulerTest.java
-            + SystemSyncTest.java
+            + SchedulerTest.java
 
 ## Team Responsibilities
 
 Aubin
 
-- 
+- Implemented DirectionLamp &DirectionLampPanel
+- Implemented FloorLamp & FloorLampPanel
+- Implemented MeasurementReceiver
+- UML Class Diagram
+- UML Sequence Diagram
+- Readme & final Report
 
 
 Chris
 
-- 
-
+- Updated Scheduler to send InputData for measurement.
+- Configured Scheduler main to function with RunTimeConfig
+- Configured Elevator main to function with RunTimeConfig
+- Timing Diagrams
+- Readme & final Report
 
 James
 
@@ -537,10 +571,16 @@ James
 - Wait for UIs to build before starting the simulation
 - Update statemachine diagram
 - Modify Scheduler and ElevatorSubsystem to pass serviceDirection to FloorFrame
+- Readme & final Report
 
 Liya
 
-- 
+- Implemented RunTimeConfig
+- Created Configuration frame
+- Integrated Configuration frame with the floor subsystem
+- Created Floor frame
+- UML Class Diagram
+- Readme & final Report
 
 Noah
 
@@ -548,22 +588,14 @@ Noah
 - Modify sync() in Clock to return RunTimeConfig
 - Split up ElevatorDoor wait timers
 - Construct ElevatorFrame GUI
+- Readme & final Report
 
 ## Detailed Set Up
 
-The Elevator System now simulates real time and the floor, scheduler and elevator subsystems now detects and handles faults. To emulate a real elevator system, the values currently set in `Constants` represent the calculated values from Iteration 0 (`DOOR_TIME`, `MOVING_TIME`, `LOADING_TIME`). 
+In this iteration, graphical user interfaces were desgined and implemennted for the subsystems. A configuration frame was implemented to take in values for the number of elevators, number of floors and the location of the input file to read from. To ensure the synchronization of the FloorSubsystem and ElevatorSubsystem, a start button was implemented to only be enabled when both subsystems are ready. 
 
-When run, the scheduler instantiates  a `SystemSync` which is utilized to synchronize all three subsystems. Before the `Clock` can start, the `SystemSync` must wait until the elevator and floor subsystem send a message using UDP to notify it that they're ready to start.
-Once both ready messages have been received, the `SystemSync` will start the Clock and the `FloorSubsystem` can begin reading requests from the input.txt file. The last parameter in a request will determine the fault type. Parameter value of 0 will have no fault, 1 will has a transient fault and 2 will be a permanent fault. The `FloorSubsystem` sends the requests in the form of `InputData` 
-to the `FloorReceiver` on port 70.
+A floor frame was implemeted to display direction lamps on each floor. Upon receiving a request, the corresponding direction lamp changes color to indicate that a request for an elevator has been made on that floor. An Elevator frame was implemented to display the perspective of each elevator, as it moves from floor to floor. It indicates the state of the elevator as well as the destination of the elevator. It also display doors opening and any occuring faults.
 
-The `InputData` is then turned into a `ScheduleMessage` and placed into an IBufferInput where the `Scheduler` can access it. The `Scheduler` creates a `ScheduledJob` and assigns it to an appropriate elevator by creating an `ElevatorMoveCommand` and putting it into a buffer where the `ElevatorCommunicator` can access it. The `ElevatorCommunicator` will then 
-send this command to the appropriate `ElevatorSubsystem` on its distinct port.
-
-The `ElevatorSubsystem` determines if the command is an `ElevatorMoveCommand` or an `ElevatorDoorCommand`. If the command contains a parameter indicating it has a permanent fault, the `ElevatorSubsystem` will set its state to `DISABLED`. In the case of a `ElevatorMoveCommand`, the `ElevatorMotor` will move the elevator 
-1 floor in real time in the appropriate direction if it does not contain a fault. Whereas a transient fault will delay the elevator in the time required to overcome a transient fault and move one floor. In the case of a `ElevatorDoorCommand`, the `ElevatorDoor` will wait the appropriate time to open/close doors if there is no fault. If there is a transient fault, the elevator will wait until the 
-transient fault has been overcome and the time required to open/close the doors. Once the command has been processed, a `ElevatorEvent` is created and sent to the `ElevatorCommunicator` to notify the `Scheduler` that the elevator has processed the task. If a permanent fault occurs to an elevator with `ScheduledJob`s, the jobs are then reassigned and the elevator is removed to prevent scheduling jobs 
-to an out of service elevator.
-
+To compute the average time taken for a request to be processed and completed, a running total of the time and number of request is incremented as each request is completed. Once all the requests have been completed, the average is calculated.
 
 </details>
