@@ -7,12 +7,12 @@ public class Constants {
 	/**
 	 * Time it takes to move one floor in milliseconds.
 	 */
-	public static final int MOVE_TIME = 4000;
+	public static final int MOVE_TIME = 1742;
 	
 	/**
 	 * Time it takes to open or close the doors in milliseconds.
 	 */
-	public static final int DOOR_TIME = 2500;
+	public static final int DOOR_TIME = 2100;
 	
 	/**
 	 * Time it takes for passengers to load or unload from the elevator in milliseconds.
@@ -22,12 +22,12 @@ public class Constants {
 	/**
 	 * Time it takes for the system to overcome a transient fault in milliseconds.
 	 */
-	public static final int TRANSIENT_FAULT_TIME = 5000;
+	public static final int TRANSIENT_FAULT_TIME = 10000;
 	
 	/**
 	 * Time it takes for the system to realize a permanent fault has occurred in milliseconds.
 	 */
-	public static final int PERMANENT_FAULT_TIME = 9000;
+	public static final int PERMANENT_FAULT_TIME = 15000;
 	
 	/**
 	 * ElevatorSubsystem's base port. Every sequential elevator is assigned
