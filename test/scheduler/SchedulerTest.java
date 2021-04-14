@@ -785,6 +785,7 @@ public class SchedulerTest {
 		Buffer<SchedulerMessage> messageBuffer = new Buffer<SchedulerMessage>();
 		Buffer<ElevatorCommand> commandBuffer = new Buffer<ElevatorCommand>();
 		Scheduler subject = new Scheduler(1 /* 1 elevators */, 5, messageBuffer, commandBuffer);
+		ElevatorDoorCommand doorCmd;
 		
 		// act: move out of initial state.
 		subject.tick();
@@ -794,8 +795,15 @@ public class SchedulerTest {
 		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2, Fault.PERMANENT);
 		messageBuffer.put(SchedulerMessage.fromInputData(request1));
 		
-		// assert: elevator returns permanent fault
+		// assert: open doors for pickup
 		processNewJob(subject, ProcessType.DOOR);
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
+		mimicElevatorEvent(1, 0, messageBuffer);
+		
+		// assert: permanent fault when moving
+		processElevatorEvent(subject, ProcessType.MOVE);
 		assertEquals(Fault.PERMANENT, commandBuffer.get().getFault());
 		mimicElevatorFaultEvent(1, 0, messageBuffer);
 		
@@ -846,8 +854,15 @@ public class SchedulerTest {
 		assertEquals(Fault.NONE, moveCmd.getFault());
 		mimicElevatorEvent(2, 0, messageBuffer);
 		
-		// assert: open doors for pickup and drop off, should have permanent fault.
+		// assert: open doors for pickup and drop off
 		processElevatorEvent(subject, ProcessType.DOOR);
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Direction.UP, doorCmd.getServiceDirection());
+		mimicElevatorEvent(2, 0, messageBuffer);
+		
+		// assert: permanent fault when moving
+		processElevatorEvent(subject, ProcessType.MOVE);
 		assertEquals(Fault.PERMANENT, commandBuffer.get().getFault());
 		mimicElevatorFaultEvent(2, 0, messageBuffer);
 		
@@ -880,10 +895,17 @@ public class SchedulerTest {
 		InputData request1 = new InputData(LocalTime.of(1, 1, 1, 1), 1, Direction.UP, 2, Fault.PERMANENT);
 		messageBuffer.put(SchedulerMessage.fromInputData(request1));
 		
-		// assert: E0 return permanent fault
+		// assert: E0 open doors for pickup
 		processNewJob(subject, ProcessType.DOOR);
+		doorCmd = (ElevatorDoorCommand)commandBuffer.get();
+		assertEquals(0, doorCmd.getID());
+		assertEquals(Fault.NONE, doorCmd.getFault());
+		mimicElevatorEvent(1, 0, messageBuffer);
+		
+		// assert: E0 permanent fault when moving
+		processElevatorEvent(subject, ProcessType.MOVE);
 		assertEquals(Fault.PERMANENT, commandBuffer.get().getFault());
-		mimicElevatorFaultEvent(1, 0, messageBuffer);
+		mimicElevatorFaultEvent(2, 0, messageBuffer);
 		
 		// assert: E1 handles request instead; E1 opens doors for pick up
 		processElevatorEvent(subject, ProcessType.NONE);

@@ -218,14 +218,14 @@ public class Scheduler implements Runnable {
 			for (ScheduledJob job : elevator.getAssignedJobs()) {
 				// If picking up passenger.
 				if (this.elevatorEvent.getFloor() == job.getInputData().getCurrentFloor()) {
+					// Set the elevator's fault code to the input's fault code.
+					elevator.setPendingFault(job.getInputData().getFault());
+					
 					// If the doors have been opened already.
 					if (elevator.getDoorsOpening()) {
 						System.out.println("Elevator " + elevator.getElevatorId() + " picked up passenger on floor " + this.elevatorEvent.getFloor());
 						moveToDropOff(elevator, job);
 					} else {
-						// Set the elevator's fault code to the input's fault code.
-						elevator.setPendingFault(job.getInputData().getFault());
-						
 						shouldRequestDoors = true;
 						this.elevatorToCommand = elevator;
 					}
@@ -322,16 +322,24 @@ public class Scheduler implements Runnable {
 				+ ". Destination: "
 				+ destination);
 			
+			// Permanent faults should be sent on move commands only.			
+			Fault fault = Fault.NONE;
+			if (this.elevatorToCommand.getPendingFault() == Fault.PERMANENT) {
+				fault = Fault.PERMANENT;
+				
+				// Reset elevator fault code now that the command is sent.
+				this.elevatorToCommand.setPendingFault(Fault.NONE);
+			}
+			
 			// Add the elevator command to the buffer and move to waiting for message.
 			this.inputBuffer.put(new ElevatorMoveCommand(
 					this.elevatorToCommand.getElevatorId(),
-					this.elevatorToCommand.getPendingFault(),
+					fault,
 					this.elevatorToCommand.getDirection(),
 					destination,
 					this.elevatorToCommand.getServiceDirection()));
 			
-			// Reset elevator fault code now that the command is sent.
-			this.elevatorToCommand.setPendingFault(Fault.NONE);
+			
 			
 			this.state = SchedulerState.WAITING_FOR_MESSAGE;
 			break;
@@ -342,10 +350,19 @@ public class Scheduler implements Runnable {
 			// Set the elevator's doors as opening.
 			this.elevatorToCommand.setDoorsOpening(true);
 			
+			// Transient faults should be sent on move commands only.
+			Fault fault = Fault.NONE;
+			if (this.elevatorToCommand.getPendingFault() == Fault.TRANSIENT) {
+				fault = Fault.TRANSIENT;
+				
+				// Reset elevator fault code now that the command is sent.
+				this.elevatorToCommand.setPendingFault(Fault.NONE);
+			}
+			
 			// Add the elevator door command to the buffer and move to waiting for message.
 			this.inputBuffer.put(new ElevatorDoorCommand(
 					this.elevatorToCommand.getElevatorId(),
-					this.elevatorToCommand.getPendingFault(),
+					fault,
 					this.elevatorToCommand.getServiceDirection()));
 			
 			// Reset elevator fault code now that the command is sent.
