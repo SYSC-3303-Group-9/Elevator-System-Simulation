@@ -1,16 +1,11 @@
 package floor;
 
 import java.net.SocketException;
-import java.time.LocalTime;
-import java.util.Map;
 
-import common.Buffer;
 import common.ClockSync;
 import common.RuntimeConfig;
 import common.SystemSync;
-import elevator.ElevatorCommand;
 import floor.gui.FloorFrame;
-import scheduler.SchedulerMessage;
 import scheduler.SchedulerReceiver;
 
 public class Main {
@@ -24,15 +19,12 @@ public class Main {
 		// Create the SchedulerReceiver.
 		SchedulerReceiver schedulerReceiver = new SchedulerReceiver(floorFrame);
 
-		// Create the buffers.
-		Buffer<Map<LocalTime, Long>> toMeasurement = new Buffer<Map<LocalTime, Long>>();
-		Buffer<Map<LocalTime, Long>> fromMeasurement = new Buffer<Map<LocalTime, Long>>();
 
 		// Create the floor subsystem.
-		FloorSubsystem floorSubsystem = new FloorSubsystem(config, floorFrame, toMeasurement);
+		FloorSubsystem floorSubsystem = new FloorSubsystem(config, floorFrame);
 		
 		// Create the Measurement Receiver
-		MeasurementReceiver measurementReceiver = new MeasurementReceiver(fromMeasurement);
+		MeasurementReceiver measurementReceiver = new MeasurementReceiver();
 
 		// Create the thread.
 		Thread thSchedulerReceiver = new Thread(schedulerReceiver);

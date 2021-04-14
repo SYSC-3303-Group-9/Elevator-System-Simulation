@@ -10,16 +10,11 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.time.temporal.ChronoField;
-import java.time.LocalTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import common.Clock;
 import common.Constants;
-import common.IBufferInput;
 import common.RuntimeConfig;
-import elevator.ElevatorCommand;
 import elevator.gui.DirectionLampPanel;
 import floor.gui.FloorFrame;
 
@@ -29,14 +24,8 @@ public class FloorSubsystem implements Runnable {
 	private RuntimeConfig config;
 	private FloorFrame floorFrame;
 	
-	/* List of times InputData are sent*/
-	private Map<LocalTime, Long> dataTimes = new HashMap<LocalTime, Long>();
-	
-	private IBufferInput<Map<LocalTime, Long>> inputBuffer;
-	
-	public FloorSubsystem(RuntimeConfig config, FloorFrame floorFrame, IBufferInput<Map<LocalTime, Long>> inputBuffer) {	
+	public FloorSubsystem(RuntimeConfig config, FloorFrame floorFrame) {	
 		this.floorFrame = floorFrame;
-		this.inputBuffer = inputBuffer;
 		try {
 			this.config = config;
 			sendReceiveSocket = new DatagramSocket();
@@ -78,9 +67,6 @@ public class FloorSubsystem implements Runnable {
 				System.exit(1);
 			}
 			
-			// Insert the time InputData was sent to FloorReceiver for processing
-			this.dataTimes.put(x.getTime(), Clock.getTime());
-			
 			// Following section is if we want to send responses back from FloorReceiver
 			// expect a response from FloorReceiver acknowledging packet receipt
 			byte response[] = new byte[0];
@@ -94,8 +80,6 @@ public class FloorSubsystem implements Runnable {
 			}
 		}
 		
-		// Insert list of times into the inputBuffer
-		inputBuffer.put(this.dataTimes);
 		sendReceiveSocket.close();
 	}
 }
