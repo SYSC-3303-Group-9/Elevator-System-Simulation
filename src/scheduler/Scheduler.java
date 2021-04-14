@@ -435,7 +435,17 @@ public class Scheduler implements Runnable {
 			return true;
 		}
 		// Otherwise, elevator must be moving in same direction as request.
-		if (e.getServiceDirection() == direction) {			
+		if (e.getDirection() == direction) {	
+			// If the elevator already has requests, make sure they are in the same direction.
+			// This prevents elevators from being assigned jobs in the wrong direction while they
+			// move towards the pickup floor. Example: Elevator moving UP to pickup a DOWN request
+			// should not be assigned an UP request.
+			if (e.getAssignedJobs().size() > 0) {
+				if (e.getAssignedJobs().get(0).getInputData().getDirection() != direction) {
+					return false;
+				}
+			}
+			
 			// If the elevator will be moving up, it must be below the start floor to pick it up without turning around.
 			if (direction == Direction.UP && e.getLastKnownFloor() <= startFloor) {
 				return true;
