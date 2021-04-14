@@ -244,7 +244,7 @@ public class Scheduler implements Runnable {
 						completedJobs.add(job);
 						
 						try {
-							//Notify Measurement that this job is done using DatagramPacket on Measurement's receiver port.
+							//Notify MeasurementReceiver that this job is done using DatagramPacket on MeasurementReceiver's receiver port.
 							DatagramPacket sendPacket = new DatagramPacket(job.getInputData().toBytes(), job.getInputData().toBytes().length, InetAddress.getLocalHost(), Constants.MEASUREMENT_RECEIVER_PORT);
 							sendSocket.send(sendPacket);
 						} catch (UnknownHostException e) {
